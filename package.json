@@ -1,20 +1,28 @@
 {
-  "name": "omnichannel-e-commerce",
-  "private": true,
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
-  },
-  "devDependencies": {
-    "prettier": "^3.7.4",
-    "turbo": "^2.8.20",
-    "typescript": "5.9.2"
-  },
-  "packageManager": "pnpm@9.0.0",
-  "engines": {
-    "node": ">=18"
-  }
+    "name": "omnichannel-e-commerce",
+    "private": true,
+    "scripts": {
+        "build": "turbo run build",
+        "build:affected": "turbo run build --affected",
+        "dev": "turbo run dev",
+        "dev:api": "turbo run dev --filter=api",
+        "dev:web": "turbo run dev --filter=web",
+        "dev:admin": "turbo run dev --filter=admin",
+        "dev:seller": "turbo run dev --filter=seller",
+        "lint": "turbo run lint",
+        "lint:affected": "turbo run lint --affected",
+        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+        "check-types": "turbo run check-types",
+        "check-types:affected": "turbo run check-types --affected",
+        "test": "turbo run test"
+    },
+    "devDependencies": {
+        "prettier": "^3.7.4",
+        "turbo": "^2.8.20",
+        "typescript": "5.9.2"
+    },
+    "packageManager": "pnpm@9.0.0",
+    "engines": {
+        "node": ">=18"
+    }
 }

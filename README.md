@@ -1,159 +1,97 @@
-# Turborepo starter
+# Omnichannel E-commerce Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+Monorepo for a multi-vendor omnichannel e-commerce platform using Turborepo and pnpm workspaces.
 
-## Using this example
+## Tech Stack
 
-Run the following command:
+- TypeScript (strict mode)
+- Turborepo + pnpm workspaces
+- NestJS API
+- Next.js apps (`web`, `admin`, `seller`)
+- PostgreSQL + Prisma
+- MinIO object storage
 
-```sh
-npx create-turbo@latest
+## Workspace Structure
+
+- `apps/api`: Backend API (NestJS)
+- `apps/web`: Customer storefront
+- `apps/admin`: Admin portal
+- `apps/seller`: Seller center
+- `packages/database`: Prisma schema/client
+- `packages/shared-types`: Shared contracts/types
+- `packages/ui`: Shared UI components
+
+## Prerequisites
+
+- Node.js >= 18
+- pnpm 9
+- Docker (optional, for local infra)
+
+## Quick Start
+
+1. Install dependencies
+
+```bash
+pnpm install
 ```
 
-## What's inside?
+2. Create environment file
 
-This Turborepo includes the following packages/apps:
+```bash
+# Git Bash
+cp .env.example .env
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+# PowerShell
+Copy-Item .env.example .env
 ```
 
-Without global `turbo`, use your package manager:
+3. Start local infrastructure (Postgres + MinIO)
 
-```sh
-cd my-turborepo
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+docker compose up -d
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+4. Run all services in dev mode
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
+```bash
+pnpm dev
 ```
 
-Without global `turbo`:
+## Root Scripts
 
-```sh
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+### Build / Validate
 
-### Develop
+- `pnpm build`: Run build for all packages/apps
+- `pnpm build:affected`: Build only changed graph
+- `pnpm lint`: Run lint in all workspaces
+- `pnpm lint:affected`: Lint only changed graph
+- `pnpm check-types`: Run typecheck in all workspaces
+- `pnpm check-types:affected`: Typecheck only changed graph
+- `pnpm test`: Run tests across workspaces
 
-To develop all apps and packages, run the following command:
+### Dev
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+- `pnpm dev`: Start all dev tasks
+- `pnpm dev:api`: Start API only
+- `pnpm dev:web`: Start web app only
+- `pnpm dev:admin`: Start admin app only
+- `pnpm dev:seller`: Start seller app only
 
-```sh
-cd my-turborepo
-turbo dev
-```
+### Formatting
 
-Without global `turbo`, use your package manager:
+- `pnpm format`: Format `ts`, `tsx`, `md` files with Prettier
 
-```sh
-cd my-turborepo
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+## Default Dev Ports
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+- API: `8000` (`apps/api`)
+- Web: `3000` (`apps/web`)
+- Admin: `3001` (`apps/admin`)
+- Seller: `3002` (`apps/seller`)
+- Postgres: `5432`
+- MinIO API: `9000`
+- MinIO Console: `9001`
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+## Notes
 
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- Keep root scripts as Turbo delegations (`turbo run ...`).
+- Define task implementations in each workspace package.
