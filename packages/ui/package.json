@@ -3,12 +3,15 @@
     "version": "0.0.0",
     "private": true,
     "exports": {
-        "./*": "./src/*.tsx"
+        ".": "./src/index.ts",
+        "./styles.css": "./src/styles/tokens.css"
     },
     "scripts": {
         "lint": "eslint . --max-warnings 0",
         "generate:component": "turbo gen react-component",
-        "check-types": "tsc --noEmit"
+        "check-types": "tsc --noEmit",
+        "sync:exports": "node ./scripts/sync-exports.mjs",
+        "add:ui": "node ./scripts/add-ui.mjs"
     },
     "devDependencies": {
         "@repo/eslint-config": "workspace:*",
@@ -16,11 +19,26 @@
         "@types/node": "^22.15.3",
         "@types/react": "19.2.2",
         "@types/react-dom": "19.2.2",
+        "autoprefixer": "^10.4.27",
         "eslint": "^9.39.1",
+        "postcss": "^8.5.8",
+        "tailwindcss": "^4",
         "typescript": "5.9.2"
     },
     "peerDependencies": {
         "react": "^19.2.0",
         "react-dom": "^19.2.0"
+    },
+    "dependencies": {
+        "@radix-ui/react-dialog": "^1.1.15",
+        "@radix-ui/react-dropdown-menu": "^2.1.16",
+        "@radix-ui/react-label": "^2.1.7",
+        "@radix-ui/react-select": "^2.2.6",
+        "@radix-ui/react-slot": "^1.2.3",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "lucide-react": "^1.7.0",
+        "radix-ui": "^1.4.3",
+        "tailwind-merge": "^3.5.0"
     }
 }
