@@ -15,8 +15,15 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return ApiResponse envelope', () => {
+      expect(appController.getHello()).toEqual({
+        success: true,
+        statusCode: 200,
+        message: 'Successfully!',
+        data: {
+          greeting: 'Hello World!',
+        },
+      });
     });
   });
 });
