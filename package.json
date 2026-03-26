@@ -9,6 +9,9 @@
         "dev:web": "turbo run dev --filter=web",
         "dev:admin": "turbo run dev --filter=admin",
         "dev:seller": "turbo run dev --filter=seller",
+        "db:generate": "pnpm --filter @repo/database db:generate",
+        "db:migrate:dev": "pnpm --filter @repo/database db:migrate:dev",
+        "db:studio": "pnpm --filter @repo/database db:studio",
         "lint": "turbo run lint",
         "lint:affected": "turbo run lint --affected",
         "format": "prettier --write \"**/*.{ts,tsx,md}\"",
@@ -23,6 +26,6 @@
     },
     "packageManager": "pnpm@9.0.0",
     "engines": {
-        "node": ">=18"
+        "node": ">=20.19.0"
     }
 }
