@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call */
 import {
   Injectable,
   Logger,
@@ -81,18 +80,18 @@ export class PrismaService
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         await this.$connect();
-        this.logger.log('Connected to PostgreSQL database via Prisma');
+        this.logger.log('👌 Connected to PostgreSQL database via Prisma');
         return;
       } catch (error: unknown) {
         const errorMessage =
           error instanceof Error ? error.message : String(error);
         this.logger.warn(
-          `Prisma connect attempt ${attempt}/${maxAttempts} failed: ${errorMessage}`,
+          `🤌 Prisma connect attempt ${attempt}/${maxAttempts} failed: ${errorMessage}`,
         );
 
         if (attempt >= maxAttempts) {
           this.logger.error(
-            `Unable to connect to database after ${maxAttempts} attempts`,
+            `👎 Unable to connect to database after ${maxAttempts} attempts`,
           );
           throw error;
         }

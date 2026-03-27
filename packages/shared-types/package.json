@@ -4,10 +4,22 @@
     "private": true,
     "type": "module",
     "exports": {
-        ".": "./src/index.ts",
-        "./auth": "./src/auth.ts",
-        "./common": "./src/common.ts",
-        "./api-response": "./src/api-response.ts"
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        },
+        "./auth": {
+            "types": "./dist/auth.d.ts",
+            "default": "./dist/auth.js"
+        },
+        "./common": {
+            "types": "./dist/common.d.ts",
+            "default": "./dist/common.js"
+        },
+        "./api-response": {
+            "types": "./dist/api-response.d.ts",
+            "default": "./dist/api-response.js"
+        }
     },
     "scripts": {
         "build": "tsc -p tsconfig.json",

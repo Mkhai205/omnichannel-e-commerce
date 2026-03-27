@@ -1,3 +1,8 @@
+2 cách đăng cập:
+
+- bằng email + password
+- bằng Google OAuth 2.0
+
 ### 1. Frontend (Next.js) gọi backend endpoint đăng nhập
 
 - `GET /api/v1/auth/google/login`

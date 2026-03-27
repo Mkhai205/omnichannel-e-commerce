@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { ApiResponse, ApiResponseMetadata } from '@repo/shared-types';
 
 interface CreateSuccessResponseOptions {
