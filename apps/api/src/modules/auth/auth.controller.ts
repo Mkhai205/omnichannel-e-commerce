@@ -10,6 +10,13 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
+import {
+  ApiBody,
+  ApiFoundResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import type {
   ApiResponse,
   LoginResponse,
@@ -19,6 +26,12 @@ import type {
 import type { Request, Response } from 'express';
 import { Public } from '../../core/decorators';
 import { createSuccessResponse } from '../../core/http/api-response.util';
+import {
+  ApiAuthSchemes,
+  ApiCommonErrorResponses,
+  ApiCreatedEnvelopeResponse,
+  ApiOkEnvelopeResponse,
+} from '../../core/http/swagger-response.decorator';
 import { AuthGoogleService } from './auth-google.service';
 import { AuthService } from './auth.service';
 import { AuthTokenService } from './auth-token.service';
@@ -28,6 +41,10 @@ import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import {
+  AuthSessionDataSwaggerDto,
+  LogoutDataSwaggerDto,
+} from './dto/auth-swagger.dto';
+import {
   applyAuthCookies,
   clearAuthCookies,
   clearOAuthStateCookie,
@@ -35,6 +52,7 @@ import {
   setOAuthStateCookie,
 } from './utils/auth-cookie.util';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -45,6 +63,17 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @ApiOperation({ summary: 'Register a new account' })
+  @ApiBody({ type: RegisterDto })
+  @ApiCreatedEnvelopeResponse(
+    AuthSessionDataSwaggerDto,
+    'User registered successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid payload or validation failure',
+    unauthorized: false,
+    notFound: false,
+  })
   async register(
     @Body() payload: RegisterDto,
     @Req() request: Request,
@@ -71,6 +100,14 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login with email and password' })
+  @ApiBody({ type: LoginDto })
+  @ApiOkEnvelopeResponse(AuthSessionDataSwaggerDto, 'Logged in successfully')
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid payload or validation failure',
+    unauthorized: 'Invalid credentials',
+    notFound: false,
+  })
   async login(
     @Body() payload: LoginDto,
     @Req() request: Request,
@@ -96,6 +133,8 @@ export class AuthController {
 
   @Public()
   @Get('google/login')
+  @ApiOperation({ summary: 'Redirect user to Google OAuth consent screen' })
+  @ApiFoundResponse({ description: 'Redirect to Google OAuth' })
   googleLogin(@Res() response: Response): void {
     const state = this.authGoogleService.generateOAuthState();
     const stateCookieName = this.authGoogleService.getOAuthStateCookieName();
@@ -113,6 +152,21 @@ export class AuthController {
 
   @Public()
   @Get('google/callback')
+  @ApiOperation({
+    summary: 'Handle Google OAuth callback and redirect to frontend',
+  })
+  @ApiQuery({ name: 'code', required: false, type: String })
+  @ApiQuery({ name: 'state', required: false, type: String })
+  @ApiQuery({ name: 'error', required: false, type: String })
+  @ApiFoundResponse({
+    description: 'Redirect to frontend success or failure URL',
+  })
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid OAuth callback query',
+    unauthorized: false,
+    notFound: false,
+    internalServerError: false,
+  })
   async googleCallback(
     @Query() query: GoogleCallbackDto,
     @Req() request: Request,
@@ -164,6 +218,17 @@ export class AuthController {
 
   @Public()
   @Post('refresh')
+  @ApiOperation({ summary: 'Refresh access and refresh tokens' })
+  @ApiBody({ type: RefreshTokenDto })
+  @ApiOkEnvelopeResponse(
+    AuthSessionDataSwaggerDto,
+    'Token refreshed successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Refresh token not found in body/cookie',
+    unauthorized: 'Refresh token invalid or expired',
+    notFound: false,
+  })
   async refresh(
     @Body() payload: RefreshTokenDto,
     @Req() request: Request,
@@ -199,6 +264,15 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout current session or all sessions' })
+  @ApiAuthSchemes()
+  @ApiBody({ type: LogoutDto })
+  @ApiOkEnvelopeResponse(LogoutDataSwaggerDto, 'Logged out successfully')
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid logout payload',
+    unauthorized: 'Authentication required',
+    notFound: false,
+  })
   async logout(
     @Body() payload: LogoutDto,
     @Req() request: Request,
