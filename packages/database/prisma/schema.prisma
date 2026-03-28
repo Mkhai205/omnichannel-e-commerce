@@ -15,12 +15,34 @@ model User {
   phone         String?        @unique @db.VarChar(20)
   role          UserRole       @default(CUSTOMER)
   status        UserStatus     @default(ACTIVE)
+  addresses     Address[]
   oauthAccounts OauthAccount[]
   refreshTokens RefreshToken[]
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
 
   @@map("users")
+}
+
+model Address {
+  id             String      @id @default(uuid()) @db.Uuid
+  userId         String      @map("user_id") @db.Uuid
+  type           AddressType @default(HOME)
+  recipientName  String      @map("recipient_name") @db.VarChar(255)
+  recipientPhone String      @map("recipient_phone") @db.VarChar(20)
+  streetAddress  String      @map("street_address") @db.VarChar(255)
+  wardDistrict   String?     @map("ward_district") @db.VarChar(255)
+  city           String      @db.VarChar(100)
+  state          String      @db.VarChar(100)
+  postalCode     String      @map("postal_code") @db.VarChar(20)
+  country        String      @db.VarChar(100)
+  isDefault      Boolean     @default(false) @map("is_default")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("addresses")
 }
 
 model OauthAccount {
@@ -69,4 +91,10 @@ enum UserStatus {
 
 enum AuthProvider {
   GOOGLE
+}
+
+enum AddressType {
+  HOME
+  WORK
+  OTHER
 }
