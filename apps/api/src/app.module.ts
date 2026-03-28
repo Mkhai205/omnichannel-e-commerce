@@ -8,6 +8,7 @@ import { JwtAuthGuard, RolesGuard } from './core/guards';
 import { PrismaModule } from './infrastructure/database/prisma.module';
 import { StorageModule } from './infrastructure/storage/storage.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { CartModule } from './modules/cart/cart.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { ShopModule } from './modules/shop/shop.module';
 import { UsersModule } from './modules/users/users.module';
@@ -23,6 +24,7 @@ import { UsersModule } from './modules/users/users.module';
     PrismaModule,
     StorageModule,
     AuthModule,
+    CartModule,
     CatalogModule,
     ShopModule,
     UsersModule,
