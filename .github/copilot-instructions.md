@@ -36,6 +36,23 @@ The system handles complex transactions, inventory management, multi-tenant vend
 - Use TailwindCSS for styling.
 - Ensure all forms have proper validation (e.g., using Zod or React Hook Form) before submitting to the API.
 
+# Shared UI Usage (`@repo/ui`)
+
+- Frontend apps (`apps/web`, `apps/admin`, `apps/seller`) must use shared UI primitives from `@repo/ui` whenever available.
+- For buttons, inputs, cards, avatar, table, dialog, and common UI blocks, prefer importing from `@repo/ui` instead of rebuilding local versions.
+- Use workspace alias imports only (e.g., `import { Card, CardContent } from '@repo/ui';`). Never import across workspaces with relative paths.
+- Do not import internal source paths from the UI package (for example `@repo/ui/src/...`) in app code. Consume only public exports.
+- If a component does not exist in `@repo/ui`, add it via the shadcn CLI in `packages/ui` (for example using the project script) instead of hand-writing a custom local component.
+
+# Frontend Implementation Notes (UI-First Workflow)
+
+- Break large screens into small reusable components first (Header, Sidebar, StatCard, Table section), then compose the page.
+- Prefer static UI (dumb components) and mock data for frontend operator tasks unless API wiring is explicitly requested.
+- Do not add API fetching logic (`axios`, `fetch`, `useEffect` for remote calls) in UI-only tasks.
+- Keep design tokens consistent: prioritize existing utility classes/tokens such as `text-primary`, `bg-primary`, and approved seller palette classes.
+- If generated UI differs from design, iterate with concrete visual feedback (spacing, typography, color, alignment) before introducing structural changes.
+- If AI suggests a non-existent component in `@repo/ui`, replace with a valid existing primitive or add the missing component to `packages/ui` via shadcn CLI instead of writing a custom local version.
+
 # Database (PostgreSQL) Rules
 
 - Primary keys should default to `UUID`.
