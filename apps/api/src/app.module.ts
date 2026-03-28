@@ -7,6 +7,7 @@ import { validateEnv } from './core/config/env.validation';
 import { JwtAuthGuard, RolesGuard } from './core/guards';
 import { PrismaModule } from './infrastructure/database/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ShopModule } from './modules/shop/shop.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { UsersModule } from './modules/users/users.module';
     }),
     PrismaModule,
     AuthModule,
+    ShopModule,
     UsersModule,
   ],
   controllers: [AppController],

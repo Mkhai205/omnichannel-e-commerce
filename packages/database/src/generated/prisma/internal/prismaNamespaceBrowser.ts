@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  Shop: 'Shop',
   Address: 'Address',
   OauthAccount: 'OauthAccount',
   RefreshToken: 'RefreshToken'
@@ -86,6 +87,22 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const ShopScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  shopName: 'shopName',
+  slug: 'slug',
+  description: 'description',
+  businessLicense: 'businessLicense',
+  status: 'status',
+  rejectionReason: 'rejectionReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ShopScalarFieldEnum = (typeof ShopScalarFieldEnum)[keyof typeof ShopScalarFieldEnum]
 
 
 export const AddressScalarFieldEnum = {

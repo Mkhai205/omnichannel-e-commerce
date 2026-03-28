@@ -41,3 +41,12 @@ export const AddressType = {
 } as const
 
 export type AddressType = (typeof AddressType)[keyof typeof AddressType]
+
+
+export const ShopStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type ShopStatus = (typeof ShopStatus)[keyof typeof ShopStatus]
