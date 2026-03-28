@@ -30,3 +30,12 @@ export const DATABASE_CONFIG_KEY = {
   DATABASE_POOL_MAX: 10,
   DATABASE_CONNECTION_TIMEOUT: 30000,
 } as const;
+
+export const MINIO_CONFIG_KEY = {
+  MINIO_PORT: 9000,
+  MINIO_SECURE: false,
+  MINIO_REGION: 'us-east-1',
+  MINIO_BUCKETS: 'products,evidence,avatars',
+  MINIO_PUBLIC_BUCKETS: 'products',
+  MINIO_PRESIGNED_URL_EXPIRES_IN_SECONDS: 900,
+} as const;
