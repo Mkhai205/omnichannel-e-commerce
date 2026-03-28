@@ -28,6 +28,26 @@ export type User = Prisma.UserModel
  */
 export type Shop = Prisma.ShopModel
 /**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel
+/**
+ * Model Product
+ * 
+ */
+export type Product = Prisma.ProductModel
+/**
+ * Model ProductVariant
+ * 
+ */
+export type ProductVariant = Prisma.ProductVariantModel
+/**
+ * Model InventoryLog
+ * 
+ */
+export type InventoryLog = Prisma.InventoryLogModel
+/**
  * Model Address
  * 
  */

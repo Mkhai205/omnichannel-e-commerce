@@ -10,6 +10,10 @@
  */
 export type * from './models/User.js'
 export type * from './models/Shop.js'
+export type * from './models/Category.js'
+export type * from './models/Product.js'
+export type * from './models/ProductVariant.js'
+export type * from './models/InventoryLog.js'
 export type * from './models/Address.js'
 export type * from './models/OauthAccount.js'
 export type * from './models/RefreshToken.js'

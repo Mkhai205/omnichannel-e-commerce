@@ -50,3 +50,22 @@ export const ShopStatus = {
 } as const
 
 export type ShopStatus = (typeof ShopStatus)[keyof typeof ShopStatus]
+
+
+export const ProductStatus = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  HIDDEN: 'HIDDEN'
+} as const
+
+export type ProductStatus = (typeof ProductStatus)[keyof typeof ProductStatus]
+
+
+export const InventoryLogType = {
+  IMPORT: 'IMPORT',
+  EXPORT: 'EXPORT',
+  RETURN: 'RETURN',
+  ORDER_DEDUCT: 'ORDER_DEDUCT'
+} as const
+
+export type InventoryLogType = (typeof InventoryLogType)[keyof typeof InventoryLogType]
