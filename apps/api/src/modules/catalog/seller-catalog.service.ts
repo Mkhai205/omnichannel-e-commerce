@@ -4,11 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type {
-  CreateInventoryLogRequest,
   CreateProductRequest,
   CreateProductVariantRequest,
-  InventoryLogItem,
-  InventoryLogsListResponse,
   ProductItem,
   ProductVariantItem,
   SellerProductsFilterRequest,
@@ -16,11 +13,7 @@ import type {
   UpdateProductRequest,
   UpdateProductVariantRequest,
 } from '@repo/shared-types';
-import type {
-  InventoryLogRecord,
-  ProductRecord,
-  ProductVariantRecord,
-} from './catalog.repository';
+import type { ProductRecord, ProductVariantRecord } from './catalog.repository';
 import { CatalogRepository } from './catalog.repository';
 
 @Injectable()
@@ -183,89 +176,6 @@ export class SellerCatalogService {
     return this.toVariantItem(updated);
   }
 
-  async createMyInventoryLog(
-    userId: string,
-    variantId: string,
-    payload: CreateInventoryLogRequest,
-  ): Promise<InventoryLogItem> {
-    const variant = await this.catalogRepository.findVariantByIdForSeller(
-      userId,
-      variantId,
-    );
-
-    if (!variant) {
-      throw new NotFoundException('Variant not found');
-    }
-
-    if (payload.quantityChanged === 0) {
-      throw new BadRequestException('quantityChanged must be different from 0');
-    }
-
-    const log = await this.catalogRepository.runInTransaction(async (tx) => {
-      const updatedVariant = await this.catalogRepository.updateVariantById(
-        variantId,
-        {
-          stockQuantity: {
-            increment: payload.quantityChanged,
-          },
-        },
-        tx,
-      );
-
-      if (updatedVariant.stockQuantity < 0) {
-        throw new BadRequestException('Stock quantity cannot be negative');
-      }
-
-      return this.catalogRepository.createInventoryLog(
-        {
-          variantId,
-          type: payload.type,
-          quantityChanged: payload.quantityChanged,
-          note: payload.note?.trim() || null,
-        },
-        tx,
-      );
-    });
-
-    return this.toInventoryLogItem(log);
-  }
-
-  async getMyVariantInventoryLogs(
-    userId: string,
-    variantId: string,
-    filters: { page?: number; limit?: number },
-  ): Promise<InventoryLogsListResponse> {
-    const variant = await this.catalogRepository.findVariantByIdForSeller(
-      userId,
-      variantId,
-    );
-
-    if (!variant) {
-      throw new NotFoundException('Variant not found');
-    }
-
-    const page = this.resolvePage(filters.page);
-    const limit = this.resolveLimit(filters.limit);
-
-    const [logs, totalItems] = await Promise.all([
-      this.catalogRepository.findInventoryLogsByVariant(variantId, {
-        page,
-        limit,
-      }),
-      this.catalogRepository.countInventoryLogsByVariant(variantId),
-    ]);
-
-    return {
-      data: logs.map((log) => this.toInventoryLogItem(log)),
-      meta: {
-        page,
-        limit,
-        totalItems,
-        totalPages: totalItems === 0 ? 0 : Math.ceil(totalItems / limit),
-      },
-    };
-  }
-
   private async ensureSellerShopExists(userId: string) {
     const shop = await this.catalogRepository.findShopByUserId(userId);
 
@@ -329,17 +239,6 @@ export class SellerCatalogService {
       stockQuantity: variant.stockQuantity,
       createdAt: variant.createdAt.toISOString(),
       updatedAt: variant.updatedAt.toISOString(),
-    };
-  }
-
-  private toInventoryLogItem(log: InventoryLogRecord): InventoryLogItem {
-    return {
-      id: log.id,
-      variantId: log.variantId,
-      type: log.type,
-      quantityChanged: log.quantityChanged,
-      note: log.note,
-      createdAt: log.createdAt.toISOString(),
     };
   }
 

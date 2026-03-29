@@ -17,8 +17,6 @@ import {
 } from '@nestjs/swagger';
 import type {
   ApiResponse,
-  InventoryLogItem,
-  InventoryLogsListResponse,
   ProductItem,
   ProductVariantItem,
   SellerProductsListResponse,
@@ -33,17 +31,13 @@ import {
 } from '../../core/http/swagger-response.decorator';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
 import { SellerCatalogService } from './seller-catalog.service';
-import { CreateInventoryLogDto } from './dto/create-inventory-log.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { CreateProductVariantDto } from './dto/create-product-variant.dto';
 import {
-  InventoryLogSwaggerDto,
-  InventoryLogsListDataSwaggerDto,
   ProductSwaggerDto,
   ProductsListDataSwaggerDto,
   ProductVariantSwaggerDto,
 } from './dto/catalog-swagger.dto';
-import { InventoryLogsFilterDto } from './dto/inventory-logs-filter.dto';
 import { SellerProductsFilterDto } from './dto/seller-products-filter.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { UpdateProductVariantDto } from './dto/update-product-variant.dto';
@@ -199,70 +193,6 @@ export class SellerCatalogController {
 
     return createSuccessResponse(variant, {
       message: 'Product variant updated successfully',
-    });
-  }
-
-  @Post('variants/:variantId/inventory-logs')
-  @ApiOperation({
-    summary: 'Create inventory log and adjust stock for a variant',
-  })
-  @ApiAuthSchemes()
-  @ApiParam({ name: 'variantId', format: 'uuid' })
-  @ApiBody({ type: CreateInventoryLogDto })
-  @ApiCreatedEnvelopeResponse(
-    InventoryLogSwaggerDto,
-    'Inventory log created successfully',
-  )
-  @ApiCommonErrorResponses({
-    badRequest: 'Invalid payload or stock adjustment',
-    unauthorized: 'Authentication required',
-    notFound: 'Variant not found',
-  })
-  async createInventoryLog(
-    @CurrentUser() currentUser: JwtPayload,
-    @Param('variantId', new ParseUUIDPipe()) variantId: string,
-    @Body() payload: CreateInventoryLogDto,
-  ): Promise<ApiResponse<InventoryLogItem>> {
-    const log = await this.sellerCatalogService.createMyInventoryLog(
-      currentUser.sub,
-      variantId,
-      payload,
-    );
-
-    return createSuccessResponse(log, {
-      statusCode: 201,
-      message: 'Inventory log created successfully',
-    });
-  }
-
-  @Get('variants/:variantId/inventory-logs')
-  @ApiOperation({ summary: 'Get inventory logs for one seller variant' })
-  @ApiAuthSchemes()
-  @ApiParam({ name: 'variantId', format: 'uuid' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiOkEnvelopeResponse(
-    InventoryLogsListDataSwaggerDto,
-    'Inventory logs retrieved successfully',
-  )
-  @ApiCommonErrorResponses({
-    badRequest: 'Invalid query parameters or variant id',
-    unauthorized: 'Authentication required',
-    notFound: 'Variant not found',
-  })
-  async getInventoryLogs(
-    @CurrentUser() currentUser: JwtPayload,
-    @Param('variantId', new ParseUUIDPipe()) variantId: string,
-    @Query() filters: InventoryLogsFilterDto,
-  ): Promise<ApiResponse<InventoryLogsListResponse>> {
-    const response = await this.sellerCatalogService.getMyVariantInventoryLogs(
-      currentUser.sub,
-      variantId,
-      filters,
-    );
-
-    return createSuccessResponse(response, {
-      message: 'Inventory logs retrieved successfully',
     });
   }
 }

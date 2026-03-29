@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@repo/database';
-import type { InventoryLogType, ProductStatus } from '@repo/shared-types';
+import type { ProductStatus } from '@repo/shared-types';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
 
 const CATEGORY_SELECT = {
@@ -39,15 +39,6 @@ const PRODUCT_SELECT = {
   },
 } satisfies Prisma.ProductSelect;
 
-const INVENTORY_LOG_SELECT = {
-  id: true,
-  variantId: true,
-  type: true,
-  quantityChanged: true,
-  note: true,
-  createdAt: true,
-} satisfies Prisma.InventoryLogSelect;
-
 const SELLER_SHOP_SELECT = {
   id: true,
   userId: true,
@@ -65,10 +56,6 @@ export type ProductVariantRecord = Prisma.ProductVariantGetPayload<{
   select: typeof PRODUCT_VARIANT_SELECT;
 }>;
 
-export type InventoryLogRecord = Prisma.InventoryLogGetPayload<{
-  select: typeof INVENTORY_LOG_SELECT;
-}>;
-
 export interface CategoriesQueryInput {
   page: number;
   limit: number;
@@ -83,11 +70,6 @@ export interface ProductsQueryInput {
   categoryId?: string;
   shopId?: string;
   status?: ProductStatus;
-}
-
-export interface InventoryLogsQueryInput {
-  page: number;
-  limit: number;
 }
 
 @Injectable()
@@ -265,42 +247,6 @@ export class CatalogRepository {
     });
   }
 
-  createInventoryLog(
-    data: {
-      variantId: string;
-      type: InventoryLogType;
-      quantityChanged: number;
-      note?: string | null;
-    },
-    tx?: Prisma.TransactionClient,
-  ) {
-    const client = tx ?? this.prisma;
-
-    return client.inventoryLog.create({
-      data,
-      select: INVENTORY_LOG_SELECT,
-    });
-  }
-
-  findInventoryLogsByVariant(
-    variantId: string,
-    input: InventoryLogsQueryInput,
-  ) {
-    return this.prisma.inventoryLog.findMany({
-      where: { variantId },
-      skip: (input.page - 1) * input.limit,
-      take: input.limit,
-      orderBy: { createdAt: 'desc' },
-      select: INVENTORY_LOG_SELECT,
-    });
-  }
-
-  countInventoryLogsByVariant(variantId: string) {
-    return this.prisma.inventoryLog.count({
-      where: { variantId },
-    });
-  }
-
   findAdminProducts(input: ProductsQueryInput) {
     return this.prisma.product.findMany({
       where: this.buildProductsWhere(input),
@@ -315,12 +261,6 @@ export class CatalogRepository {
     return this.prisma.product.count({
       where: this.buildProductsWhere(input),
     });
-  }
-
-  runInTransaction<T>(
-    operation: (tx: Prisma.TransactionClient) => Promise<T>,
-  ): Promise<T> {
-    return this.prisma.$transaction((tx) => operation(tx));
   }
 
   private buildCategoriesWhere(
