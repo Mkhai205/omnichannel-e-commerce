@@ -1,8 +1,10 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type {
   AuthUser,
   LoginResponse,
@@ -13,10 +15,13 @@ import type {
   RegisterRequest,
 } from '@repo/shared-types';
 import bcrypt from 'bcrypt';
+import { MailService } from '../../infrastructure/mail/mail.service';
+import { MailTemplateService } from '../../infrastructure/mail/mail-template.service';
 import { AuthGoogleService } from './auth-google.service';
 import { AuthRepository } from './auth.repository';
 import { AuthTokenService } from './auth-token.service';
 import { REGISTRATION_ROLES } from './dto/register.dto';
+import { FRONTEND_REDIRECT_URI_CONFIG_KEY } from 'src/core/config/env.constant';
 
 interface RequestMeta {
   ipAddress?: string;
@@ -25,10 +30,15 @@ interface RequestMeta {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly authTokenService: AuthTokenService,
     private readonly authGoogleService: AuthGoogleService,
+    private readonly mailService: MailService,
+    private readonly mailTemplateService: MailTemplateService,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(
@@ -53,10 +63,12 @@ export class AuthService {
       fullName: input.fullName,
       phone: input.phone,
       role,
-      status: 'ACTIVE',
+      status: 'UNVERIFIED',
     });
 
     const tokens = await this.authTokenService.issueTokenPair(user, meta);
+
+    await this.sendVerifyEmail(user.id, user.email, user.fullName, user.role);
 
     return {
       ...tokens,
@@ -195,6 +207,84 @@ export class AuthService {
     };
   }
 
+  async forgotPassword(email: string): Promise<void> {
+    const normalizedEmail = email.toLowerCase();
+    const user = await this.authRepository.findUserByEmail(normalizedEmail);
+
+    if (!user || !user.passwordHash) {
+      return;
+    }
+
+    try {
+      const resetToken = await this.authTokenService.issuePasswordResetToken({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      });
+
+      const resetUrl = this.buildResetPasswordUrl(resetToken);
+      const template =
+        await this.mailTemplateService.buildResetPasswordEmailTemplate(
+          user.fullName,
+          resetUrl,
+        );
+
+      await this.mailService.sendMail({
+        to: user.email,
+        subject: template.subject,
+        text: template.text,
+        html: template.html,
+      });
+    } catch (error: unknown) {
+      this.logger.warn(
+        `Forgot password email failed for ${normalizedEmail}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const payload = await this.authTokenService.verifyPasswordResetToken(token);
+
+    const user = await this.authRepository.findUserByIdWithActiveRefreshTokens(
+      payload.sub,
+    );
+
+    if (!user || !user.passwordHash) {
+      throw new UnauthorizedException('Invalid reset password token');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    await this.authRepository.updateUserPasswordById(user.id, passwordHash);
+    await this.authRepository.revokeAllActiveRefreshTokensByUserId(user.id);
+  }
+
+  async verifyEmail(token: string): Promise<void> {
+    const tokenService = this.authTokenService as {
+      verifyEmailVerificationToken(
+        value: string,
+      ): Promise<{ sub: string; email: string }>;
+    };
+    const payload = await tokenService.verifyEmailVerificationToken(token);
+
+    const user = await this.authRepository.findUserByEmail(payload.email);
+
+    if (!user || user.id !== payload.sub) {
+      throw new UnauthorizedException('Invalid email verification token');
+    }
+
+    if (user.status === 'ACTIVE') {
+      return;
+    }
+
+    const authRepository = this.authRepository as {
+      activateUserById(userId: string): Promise<unknown>;
+    };
+    await authRepository.activateUserById(user.id);
+    await this.sendWelcomeEmail(user.email, user.fullName);
+  }
+
   private async ensureGoogleAccountLinked(
     userId: string,
     googleUser: {
@@ -220,6 +310,10 @@ export class AuthService {
   }
 
   private assertUserCanLogin(status: UserStatus): void {
+    if (status === 'UNVERIFIED') {
+      throw new UnauthorizedException('Please verify your email before login');
+    }
+
     if (status === 'BANNED') {
       throw new UnauthorizedException('Your account is banned');
     }
@@ -259,5 +353,84 @@ export class AuthService {
     }
 
     return null;
+  }
+
+  private async sendWelcomeEmail(
+    email: string,
+    fullName: string,
+  ): Promise<void> {
+    try {
+      const template =
+        await this.mailTemplateService.buildWelcomeEmailTemplate(fullName);
+
+      await this.mailService.sendMail({
+        to: email,
+        subject: template.subject,
+        text: template.text,
+        html: template.html,
+      });
+    } catch (error: unknown) {
+      this.logger.warn(
+        `Register succeeded but welcome email failed for ${email}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+    }
+  }
+
+  private async sendVerifyEmail(
+    userId: string,
+    email: string,
+    fullName: string,
+    role: UserRole,
+  ): Promise<void> {
+    try {
+      const tokenService = this.authTokenService as {
+        issueEmailVerificationToken(input: {
+          id: string;
+          email: string;
+          role: UserRole;
+        }): Promise<string>;
+      };
+      const verifyToken = await tokenService.issueEmailVerificationToken({
+        id: userId,
+        email,
+        role,
+      });
+      const verifyUrl = this.buildVerifyEmailUrl(verifyToken);
+      const template = await this.mailTemplateService.buildVerifyEmailTemplate(
+        fullName,
+        verifyUrl,
+      );
+
+      await this.mailService.sendMail({
+        to: email,
+        subject: template.subject,
+        text: template.text,
+        html: template.html,
+      });
+    } catch (error: unknown) {
+      this.logger.warn(
+        `Register succeeded but verify email failed for ${email}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+    }
+  }
+
+  private buildResetPasswordUrl(token: string): string {
+    const baseUrl = this.configService.get<string>(
+      'FRONTEND_RESET_PASSWORD_REDIRECT',
+      FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_RESET_PASSWORD_REDIRECT,
+    );
+
+    return `${baseUrl}?token=${encodeURIComponent(token)}`;
+  }
+
+  private buildVerifyEmailUrl(token: string): string {
+    const baseUrl = this.configService.get<string>(
+      'FRONTEND_VERIFY_EMAIL_REDIRECT',
+      FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_VERIFY_EMAIL_REDIRECT,
+    );
+
+    return `${baseUrl}?token=${encodeURIComponent(token)}`;
   }
 }

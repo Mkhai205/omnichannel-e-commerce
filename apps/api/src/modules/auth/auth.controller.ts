@@ -36,10 +36,13 @@ import { AuthGoogleService } from './auth-google.service';
 import { AuthService } from './auth.service';
 import { AuthTokenService } from './auth-token.service';
 import { GoogleCallbackDto } from './dto/google-callback.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 import {
   AuthSessionDataSwaggerDto,
   LogoutDataSwaggerDto,
@@ -129,6 +132,84 @@ export class AuthController {
       statusCode: HttpStatus.OK,
       message: 'Logged in successfully',
     });
+  }
+
+  @Public()
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send forgot password email' })
+  @ApiBody({ type: ForgotPasswordDto })
+  @ApiOkEnvelopeResponse(
+    LogoutDataSwaggerDto,
+    'If the email exists, a reset link has been sent',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid payload or validation failure',
+    unauthorized: false,
+    notFound: false,
+  })
+  async forgotPassword(
+    @Body() payload: ForgotPasswordDto,
+  ): Promise<ApiResponse<{ success: boolean }>> {
+    await this.authService.forgotPassword(payload.email);
+
+    return createSuccessResponse(
+      { success: true },
+      {
+        statusCode: HttpStatus.OK,
+        message: 'If the email exists, a reset link has been sent',
+      },
+    );
+  }
+
+  @Public()
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password with token' })
+  @ApiBody({ type: ResetPasswordDto })
+  @ApiOkEnvelopeResponse(LogoutDataSwaggerDto, 'Password reset successfully')
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid payload or validation failure',
+    unauthorized: 'Reset token invalid or expired',
+    notFound: false,
+  })
+  async resetPassword(
+    @Body() payload: ResetPasswordDto,
+  ): Promise<ApiResponse<{ success: boolean }>> {
+    await this.authService.resetPassword(payload.token, payload.newPassword);
+
+    return createSuccessResponse(
+      { success: true },
+      {
+        statusCode: HttpStatus.OK,
+        message: 'Password reset successfully',
+      },
+    );
+  }
+
+  @Public()
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify email with token' })
+  @ApiBody({ type: VerifyEmailDto })
+  @ApiOkEnvelopeResponse(LogoutDataSwaggerDto, 'Email verified successfully')
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid payload or validation failure',
+    unauthorized: 'Email verification token invalid or expired',
+    notFound: false,
+  })
+  async verifyEmail(
+    @Body() payload: VerifyEmailDto,
+  ): Promise<ApiResponse<{ success: boolean }>> {
+    await this.authService.verifyEmail(payload.token);
+
+    return createSuccessResponse(
+      { success: true },
+      {
+        statusCode: HttpStatus.OK,
+        message: 'Email verified successfully',
+      },
+    );
   }
 
   @Public()

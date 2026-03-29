@@ -160,4 +160,18 @@ export class AuthRepository {
       data: { revokedAt: new Date() },
     });
   }
+
+  updateUserPasswordById(userId: string, passwordHash: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+  }
+
+  activateUserById(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { status: 'ACTIVE' },
+    });
+  }
 }

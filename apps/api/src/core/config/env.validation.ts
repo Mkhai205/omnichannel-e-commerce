@@ -3,8 +3,9 @@ import {
   APP_CONFIG_KEY,
   AUTH_COOKIE_CONFIG_KEY,
   DATABASE_CONFIG_KEY,
-  GOOGLE_OAUTH_CONFIG_KEY,
+  FRONTEND_REDIRECT_URI_CONFIG_KEY,
   JWT_CONFIG_KEY,
+  MAIL_CONFIG_KEY,
   MINIO_CONFIG_KEY,
 } from './env.constant';
 
@@ -79,6 +80,10 @@ export function validateEnv(config: RawEnv): RawEnv {
   const minioEndpoint = normalizeRequiredString(config.MINIO_ENDPOINT);
   const minioRootUser = normalizeRequiredString(config.MINIO_ROOT_USER);
   const minioRootPassword = normalizeRequiredString(config.MINIO_ROOT_PASSWORD);
+  const gmailSmtpUser = normalizeRequiredString(config.GMAIL_SMTP_USER);
+  const gmailSmtpAppPassword = normalizeRequiredString(
+    config.GMAIL_SMTP_APP_PASSWORD,
+  );
 
   if (!jwtAccessSecret || !jwtRefreshSecret) {
     throw new Error(
@@ -99,6 +104,18 @@ export function validateEnv(config: RawEnv): RawEnv {
   if (!minioEndpoint || !minioRootUser || !minioRootPassword) {
     throw new Error(
       'Environment variables MINIO_ENDPOINT, MINIO_ROOT_USER, and MINIO_ROOT_PASSWORD are required for MinIO storage',
+    );
+  }
+
+  const mailEnabled = parseBoolean(
+    config.MAIL_ENABLED,
+    MAIL_CONFIG_KEY.MAIL_ENABLED,
+    'MAIL_ENABLED',
+  );
+
+  if (mailEnabled && (!gmailSmtpUser || !gmailSmtpAppPassword)) {
+    throw new Error(
+      'Environment variables GMAIL_SMTP_USER and GMAIL_SMTP_APP_PASSWORD are required when MAIL_ENABLED is true',
     );
   }
 
@@ -134,6 +151,16 @@ export function validateEnv(config: RawEnv): RawEnv {
       JWT_CONFIG_KEY.JWT_REFRESH_EXPIRES_IN_SECONDS,
       'JWT_REFRESH_EXPIRES_IN_SECONDS',
     ),
+    RESET_PASSWORD_TOKEN_EXPIRES_IN_SECONDS: parseNumber(
+      config.RESET_PASSWORD_TOKEN_EXPIRES_IN_SECONDS,
+      JWT_CONFIG_KEY.RESET_PASSWORD_TOKEN_EXPIRES_IN_SECONDS,
+      'RESET_PASSWORD_TOKEN_EXPIRES_IN_SECONDS',
+    ),
+    VERIFY_EMAIL_TOKEN_EXPIRES_IN_SECONDS: parseNumber(
+      config.VERIFY_EMAIL_TOKEN_EXPIRES_IN_SECONDS,
+      JWT_CONFIG_KEY.VERIFY_EMAIL_TOKEN_EXPIRES_IN_SECONDS,
+      'VERIFY_EMAIL_TOKEN_EXPIRES_IN_SECONDS',
+    ),
     // Cookie configuration
     AUTH_COOKIE_ACCESS_NAME: String(
       config.AUTH_COOKIE_ACCESS_NAME ??
@@ -158,12 +185,20 @@ export function validateEnv(config: RawEnv): RawEnv {
     GOOGLE_CALLBACK_URL: googleCallbackUrl,
     FRONTEND_LOGIN_SUCCESS_REDIRECT: String(
       config.FRONTEND_LOGIN_SUCCESS_REDIRECT ??
-        GOOGLE_OAUTH_CONFIG_KEY.FRONTEND_LOGIN_SUCCESS_REDIRECT,
+        FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_LOGIN_SUCCESS_REDIRECT,
     ),
     FRONTEND_LOGIN_FAILURE_REDIRECT: String(
       config.FRONTEND_LOGIN_FAILURE_REDIRECT ??
-        GOOGLE_OAUTH_CONFIG_KEY.FRONTEND_LOGIN_FAILURE_REDIRECT,
+        FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_LOGIN_FAILURE_REDIRECT,
     ),
+    FRONTEND_RESET_PASSWORD_REDIRECT: String(
+      config.FRONTEND_RESET_PASSWORD_REDIRECT ??
+        FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_RESET_PASSWORD_REDIRECT,
+    ).trim(),
+    FRONTEND_VERIFY_EMAIL_REDIRECT: String(
+      config.FRONTEND_VERIFY_EMAIL_REDIRECT ??
+        FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_VERIFY_EMAIL_REDIRECT,
+    ).trim(),
     // Database configuration
     DATABASE_URL: databaseUrl,
     DATABASE_POOL_MIN: parseNumber(
@@ -204,5 +239,31 @@ export function validateEnv(config: RawEnv): RawEnv {
       MINIO_CONFIG_KEY.MINIO_PRESIGNED_URL_EXPIRES_IN_SECONDS,
       'MINIO_PRESIGNED_URL_EXPIRES_IN_SECONDS',
     ),
+    // Mail configuration
+    MAIL_ENABLED: mailEnabled,
+    MAIL_SMTP_HOST: String(
+      config.MAIL_SMTP_HOST ?? MAIL_CONFIG_KEY.MAIL_SMTP_HOST,
+    ).trim(),
+    MAIL_SMTP_PORT: parseNumber(
+      config.MAIL_SMTP_PORT,
+      MAIL_CONFIG_KEY.MAIL_SMTP_PORT,
+      'MAIL_SMTP_PORT',
+    ),
+    MAIL_SMTP_SECURE: parseBoolean(
+      config.MAIL_SMTP_SECURE,
+      MAIL_CONFIG_KEY.MAIL_SMTP_SECURE,
+      'MAIL_SMTP_SECURE',
+    ),
+    MAIL_SMTP_CONNECTION_TIMEOUT: parseNumber(
+      config.MAIL_SMTP_CONNECTION_TIMEOUT,
+      MAIL_CONFIG_KEY.MAIL_SMTP_CONNECTION_TIMEOUT,
+      'MAIL_SMTP_CONNECTION_TIMEOUT',
+    ),
+    MAIL_FROM_EMAIL: String(config.MAIL_FROM_EMAIL ?? gmailSmtpUser).trim(),
+    MAIL_FROM_NAME: String(
+      config.MAIL_FROM_NAME ?? MAIL_CONFIG_KEY.MAIL_FROM_NAME,
+    ).trim(),
+    GMAIL_SMTP_USER: gmailSmtpUser,
+    GMAIL_SMTP_APP_PASSWORD: gmailSmtpAppPassword,
   };
 }

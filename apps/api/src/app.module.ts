@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { validateEnv } from './core/config/env.validation';
 import { JwtAuthGuard, RolesGuard } from './core/guards';
 import { PrismaModule } from './infrastructure/database/prisma.module';
+import { MailModule } from './infrastructure/mail/mail.module';
 import { StorageModule } from './infrastructure/storage/storage.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CartModule } from './modules/cart/cart.module';
@@ -23,6 +24,7 @@ import { UsersModule } from './modules/users/users.module';
       validate: validateEnv,
     }),
     PrismaModule,
+    MailModule,
     StorageModule,
     AuthModule,
     CartModule,
