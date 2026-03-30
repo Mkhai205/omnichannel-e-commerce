@@ -106,6 +106,7 @@ export class PaymentsService {
     userId: string,
     payload: CreateVnpayPaymentUrlRequest,
     clientIp: string,
+    tx?: Prisma.TransactionClient,
   ): Promise<CreateVnpayPaymentUrlResponse> {
     const orderIds = [...new Set(payload.orderIds)];
 
@@ -116,12 +117,14 @@ export class PaymentsService {
     const ipAddress = this.normalizeIpAddress(clientIp);
     const locale = this.parseLocale(payload.locale);
 
-    return this.paymentsRepository.runInTransaction(async (tx) => {
+    const operation = async (
+      transactionClient: Prisma.TransactionClient,
+    ): Promise<CreateVnpayPaymentUrlResponse> => {
       const orders =
         await this.paymentsRepository.findPendingOrdersByIdsForUser(
           userId,
           orderIds,
-          tx,
+          transactionClient,
         );
 
       if (orders.length !== orderIds.length) {
@@ -171,7 +174,7 @@ export class PaymentsService {
           expiresAt,
         },
         orderIds,
-        tx,
+        transactionClient,
       );
 
       this.logger.log(
@@ -188,7 +191,13 @@ export class PaymentsService {
         expiresAt: payment.expiresAt?.toISOString() ?? null,
         createdAt: payment.createdAt.toISOString(),
       };
-    });
+    };
+
+    if (tx) {
+      return operation(tx);
+    }
+
+    return this.paymentsRepository.runInTransaction(operation);
   }
 
   async getPaymentStatusByOrder(

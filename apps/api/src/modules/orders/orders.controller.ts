@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Req } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { ApiResponse, CheckoutOrdersResponse } from '@repo/shared-types';
+import type { Request } from 'express';
 import { CurrentUser, Roles } from '../../core/decorators';
 import { createSuccessResponse } from '../../core/http/api-response.util';
 import {
@@ -37,14 +38,34 @@ export class OrdersController {
   async checkout(
     @CurrentUser() currentUser: JwtPayload,
     @Body() payload: CheckoutOrdersDto,
+    @Req() request: Request,
   ): Promise<ApiResponse<CheckoutOrdersResponse>> {
     const response = await this.ordersService.checkout(
       currentUser.sub,
       payload,
+      this.extractRequestIp(request),
     );
 
     return createSuccessResponse(response, {
       message: 'Checkout completed successfully',
     });
+  }
+
+  private extractRequestIp(request: Request): string {
+    const fallbackIp = request.ip ?? '127.0.0.1';
+    const forwardedFor = request.headers['x-forwarded-for'];
+
+    if (typeof forwardedFor === 'string') {
+      return forwardedFor.split(',')[0]?.trim() || fallbackIp;
+    }
+
+    if (Array.isArray(forwardedFor)) {
+      const firstIp = forwardedFor[0]?.split(',')[0]?.trim();
+      if (firstIp) {
+        return firstIp;
+      }
+    }
+
+    return fallbackIp;
   }
 }

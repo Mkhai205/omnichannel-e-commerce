@@ -1,4 +1,5 @@
 import type { UUID } from "./common.js";
+import type { CreateVnpayPaymentUrlResponse } from "./payments.js";
 
 export type OrderStatus =
     | "PENDING_PAYMENT"
@@ -46,4 +47,5 @@ export interface CheckoutOrder {
 export interface CheckoutOrdersResponse {
     orders: CheckoutOrder[];
     totalCheckoutAmount: string;
+    payment: CreateVnpayPaymentUrlResponse;
 }

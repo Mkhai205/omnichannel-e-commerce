@@ -13,6 +13,7 @@ import {
   SellerInventoryService,
   type CheckoutInventoryDeductionItem,
 } from '../inventory/seller-inventory.service';
+import { PaymentsService } from '../payments/payments.service';
 import {
   type CheckoutCartItemRecord,
   type OrderItemRecord,
@@ -30,11 +31,13 @@ export class OrdersService {
   constructor(
     private readonly ordersRepository: OrdersRepository,
     private readonly sellerInventoryService: SellerInventoryService,
+    private readonly paymentsService: PaymentsService,
   ) {}
 
   async checkout(
     userId: string,
     payload: CheckoutOrdersRequest,
+    clientIp: string,
   ): Promise<CheckoutOrdersResponse> {
     const cartItemIds = [...new Set(payload.cartItemIds)];
 
@@ -127,9 +130,19 @@ export class OrdersService {
         tx,
       );
 
+      const payment = await this.paymentsService.createVnpayPaymentUrl(
+        userId,
+        {
+          orderIds: checkoutOrders.map((order) => order.id),
+        },
+        clientIp,
+        tx,
+      );
+
       return {
         orders: checkoutOrders,
         totalCheckoutAmount: this.formatCents(totalCheckoutCents),
+        payment,
       };
     });
   }

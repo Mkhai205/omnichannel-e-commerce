@@ -73,10 +73,42 @@ export class CheckoutOrderSwaggerDto {
   updatedAt!: string;
 }
 
+export class CheckoutPaymentSwaggerDto {
+  @ApiProperty({ format: 'uuid' })
+  paymentId!: string;
+
+  @ApiProperty({ example: 'PAY-1743367143518-AD14F3A1' })
+  txnRef!: string;
+
+  @ApiProperty({ type: [String], format: 'uuid' })
+  orderIds!: string[];
+
+  @ApiProperty({ example: '3897000.00' })
+  totalAmount!: string;
+
+  @ApiProperty({
+    example:
+      'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_Amount=3897000&vnp_TxnRef=PAY-1743367143518-AD14F3A1',
+  })
+  paymentUrl!: string;
+
+  @ApiProperty({ example: 'PENDING' })
+  status!: string;
+
+  @ApiProperty({ nullable: true, example: '2026-03-30T10:15:00.000Z' })
+  expiresAt!: string | null;
+
+  @ApiProperty({ example: '2026-03-30T10:00:00.000Z' })
+  createdAt!: string;
+}
+
 export class CheckoutOrdersResponseSwaggerDto {
   @ApiProperty({ type: [CheckoutOrderSwaggerDto] })
   orders!: CheckoutOrderSwaggerDto[];
 
   @ApiProperty({ example: '3897000.00' })
   totalCheckoutAmount!: string;
+
+  @ApiProperty({ type: CheckoutPaymentSwaggerDto })
+  payment!: CheckoutPaymentSwaggerDto;
 }
