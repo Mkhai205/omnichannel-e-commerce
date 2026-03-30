@@ -32,7 +32,7 @@ export function SellerShell({ children }: SellerShellProps) {
 
       <div className="flex min-h-[calc(100dvh-4rem)]">
         <SellerSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-        <main className="flex-1 p-4 md:p-8">{children}</main>
+        <main className="flex-1 p-4 md:py-8 md:pl-4 md:pr-6">{children}</main>
       </div>
     </div>
   );
