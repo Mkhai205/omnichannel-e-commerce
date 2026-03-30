@@ -106,3 +106,18 @@ export type Order = Prisma.OrderModel
  * 
  */
 export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel
+/**
+ * Model PaymentOrder
+ * 
+ */
+export type PaymentOrder = Prisma.PaymentOrderModel
+/**
+ * Model PaymentWebhookLog
+ * 
+ */
+export type PaymentWebhookLog = Prisma.PaymentWebhookLogModel

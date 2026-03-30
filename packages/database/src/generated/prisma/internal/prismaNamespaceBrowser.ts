@@ -63,7 +63,10 @@ export const ModelName = {
   OauthAccount: 'OauthAccount',
   RefreshToken: 'RefreshToken',
   Order: 'Order',
-  OrderItem: 'OrderItem'
+  OrderItem: 'OrderItem',
+  Payment: 'Payment',
+  PaymentOrder: 'PaymentOrder',
+  PaymentWebhookLog: 'PaymentWebhookLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -266,6 +269,56 @@ export const OrderItemScalarFieldEnum = {
 } as const
 
 export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
+
+
+export const PaymentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  status: 'status',
+  txnRef: 'txnRef',
+  gatewayTransactionNo: 'gatewayTransactionNo',
+  amount: 'amount',
+  currency: 'currency',
+  bankCode: 'bankCode',
+  orderInfo: 'orderInfo',
+  paidAt: 'paidAt',
+  failedReason: 'failedReason',
+  requestPayload: 'requestPayload',
+  responsePayload: 'responsePayload',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const PaymentOrderScalarFieldEnum = {
+  id: 'id',
+  paymentId: 'paymentId',
+  orderId: 'orderId',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentOrderScalarFieldEnum = (typeof PaymentOrderScalarFieldEnum)[keyof typeof PaymentOrderScalarFieldEnum]
+
+
+export const PaymentWebhookLogScalarFieldEnum = {
+  id: 'id',
+  paymentId: 'paymentId',
+  provider: 'provider',
+  eventKey: 'eventKey',
+  txnRef: 'txnRef',
+  isVerified: 'isVerified',
+  isSuccess: 'isSuccess',
+  responseCode: 'responseCode',
+  message: 'message',
+  payload: 'payload',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentWebhookLogScalarFieldEnum = (typeof PaymentWebhookLogScalarFieldEnum)[keyof typeof PaymentWebhookLogScalarFieldEnum]
 
 
 export const SortOrder = {

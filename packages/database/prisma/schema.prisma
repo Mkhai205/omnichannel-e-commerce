@@ -21,6 +21,7 @@ model User {
   oauthAccounts OauthAccount[]
   refreshTokens RefreshToken[]
   orders        Order[]
+  payments      Payment[]
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
 
@@ -196,21 +197,22 @@ model RefreshToken {
 }
 
 model Order {
-  id                String      @id @default(uuid()) @db.Uuid
-  orderNumber       String      @unique @map("order_number") @db.VarChar(50)
-  userId            String      @map("user_id") @db.Uuid
-  shopId            String      @map("shop_id") @db.Uuid
-  shippingAddressId String      @map("shipping_address_id") @db.Uuid
-  status            OrderStatus @default(PENDING_PAYMENT)
-  subtotal          Decimal     @db.Decimal(12, 2)
-  totalAmount       Decimal     @map("total_amount") @db.Decimal(12, 2)
-  note              String?     @db.Text
-  createdAt         DateTime    @default(now()) @map("created_at")
-  updatedAt         DateTime    @updatedAt @map("updated_at")
-  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  shop              Shop        @relation(fields: [shopId], references: [id])
-  shippingAddress   Address     @relation(fields: [shippingAddressId], references: [id])
+  id                String         @id @default(uuid()) @db.Uuid
+  orderNumber       String         @unique @map("order_number") @db.VarChar(50)
+  userId            String         @map("user_id") @db.Uuid
+  shopId            String         @map("shop_id") @db.Uuid
+  shippingAddressId String         @map("shipping_address_id") @db.Uuid
+  status            OrderStatus    @default(PENDING_PAYMENT)
+  subtotal          Decimal        @db.Decimal(12, 2)
+  totalAmount       Decimal        @map("total_amount") @db.Decimal(12, 2)
+  note              String?        @db.Text
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shop              Shop           @relation(fields: [shopId], references: [id])
+  shippingAddress   Address        @relation(fields: [shippingAddressId], references: [id])
   items             OrderItem[]
+  paymentOrders     PaymentOrder[]
 
   @@index([userId])
   @@index([shopId])
@@ -235,6 +237,69 @@ model OrderItem {
   @@index([orderId])
   @@index([variantId])
   @@map("order_items")
+}
+
+model Payment {
+  id                   String              @id @default(uuid()) @db.Uuid
+  userId               String              @map("user_id") @db.Uuid
+  provider             PaymentProvider
+  status               PaymentStatus       @default(PENDING)
+  txnRef               String              @unique @map("txn_ref") @db.VarChar(100)
+  gatewayTransactionNo String?             @map("gateway_transaction_no") @db.VarChar(100)
+  amount               Decimal             @db.Decimal(12, 2)
+  currency             String              @default("VND") @db.VarChar(10)
+  bankCode             String?             @map("bank_code") @db.VarChar(50)
+  orderInfo            String              @map("order_info") @db.VarChar(500)
+  paidAt               DateTime?           @map("paid_at")
+  failedReason         String?             @map("failed_reason") @db.VarChar(500)
+  requestPayload       Json                @default("{}") @map("request_payload")
+  responsePayload      Json                @default("{}") @map("response_payload")
+  expiresAt            DateTime?           @map("expires_at")
+  createdAt            DateTime            @default(now()) @map("created_at")
+  updatedAt            DateTime            @updatedAt @map("updated_at")
+  user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders               PaymentOrder[]
+  webhookLogs          PaymentWebhookLog[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([provider, status])
+  @@index([createdAt])
+  @@map("payments")
+}
+
+model PaymentOrder {
+  id        String   @id @default(uuid()) @db.Uuid
+  paymentId String   @map("payment_id") @db.Uuid
+  orderId   String   @map("order_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  payment   Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([paymentId, orderId])
+  @@index([paymentId])
+  @@index([orderId])
+  @@map("payment_orders")
+}
+
+model PaymentWebhookLog {
+  id           String          @id @default(uuid()) @db.Uuid
+  paymentId    String?         @map("payment_id") @db.Uuid
+  provider     PaymentProvider
+  eventKey     String          @unique @map("event_key") @db.VarChar(255)
+  txnRef       String          @map("txn_ref") @db.VarChar(100)
+  isVerified   Boolean         @default(false) @map("is_verified")
+  isSuccess    Boolean         @default(false) @map("is_success")
+  responseCode String?         @map("response_code") @db.VarChar(20)
+  message      String?         @db.VarChar(500)
+  payload      Json
+  createdAt    DateTime        @default(now()) @map("created_at")
+  payment      Payment?        @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@index([paymentId])
+  @@index([provider, txnRef])
+  @@index([createdAt])
+  @@map("payment_webhook_logs")
 }
 
 enum UserRole {
@@ -284,5 +349,16 @@ enum OrderStatus {
   PROCESSING
   SHIPPED
   DELIVERED
+  CANCELLED
+}
+
+enum PaymentProvider {
+  VNPAY
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
   CANCELLED
 }

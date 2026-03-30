@@ -13,6 +13,7 @@ import { CartModule } from './modules/cart/cart.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 import { ShopModule } from './modules/shop/shop.module';
 import { UsersModule } from './modules/users/users.module';
 
@@ -32,6 +33,7 @@ import { UsersModule } from './modules/users/users.module';
     CatalogModule,
     InventoryModule,
     OrdersModule,
+    PaymentsModule,
     ShopModule,
     UsersModule,
   ],

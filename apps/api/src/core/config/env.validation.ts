@@ -7,6 +7,7 @@ import {
   JWT_CONFIG_KEY,
   MAIL_CONFIG_KEY,
   MINIO_CONFIG_KEY,
+  VNPAY_CONFIG_KEY,
 } from './env.constant';
 
 type RawEnv = Record<string, unknown>;
@@ -84,6 +85,10 @@ export function validateEnv(config: RawEnv): RawEnv {
   const gmailSmtpAppPassword = normalizeRequiredString(
     config.GMAIL_SMTP_APP_PASSWORD,
   );
+  const vnpayTmnCode = normalizeRequiredString(config.VNPAY_TMN_CODE);
+  const vnpaySecureSecret = normalizeRequiredString(config.VNPAY_SECURE_SECRET);
+  const vnpayReturnUrl = normalizeRequiredString(config.VNPAY_RETURN_URL);
+  const vnpayIpnUrl = normalizeRequiredString(config.VNPAY_IPN_URL);
 
   if (!jwtAccessSecret || !jwtRefreshSecret) {
     throw new Error(
@@ -116,6 +121,12 @@ export function validateEnv(config: RawEnv): RawEnv {
   if (mailEnabled && (!gmailSmtpUser || !gmailSmtpAppPassword)) {
     throw new Error(
       'Environment variables GMAIL_SMTP_USER and GMAIL_SMTP_APP_PASSWORD are required when MAIL_ENABLED is true',
+    );
+  }
+
+  if (!vnpayTmnCode || !vnpaySecureSecret || !vnpayReturnUrl || !vnpayIpnUrl) {
+    throw new Error(
+      'Environment variables VNPAY_TMN_CODE, VNPAY_SECURE_SECRET, VNPAY_RETURN_URL, and VNPAY_IPN_URL are required for VNPay integration',
     );
   }
 
@@ -265,5 +276,22 @@ export function validateEnv(config: RawEnv): RawEnv {
     ).trim(),
     GMAIL_SMTP_USER: gmailSmtpUser,
     GMAIL_SMTP_APP_PASSWORD: gmailSmtpAppPassword,
+    // VNPay configuration
+    VNPAY_TMN_CODE: vnpayTmnCode,
+    VNPAY_SECURE_SECRET: vnpaySecureSecret,
+    VNPAY_HOST: String(config.VNPAY_HOST ?? VNPAY_CONFIG_KEY.VNPAY_HOST).trim(),
+    VNPAY_RETURN_URL: vnpayReturnUrl,
+    VNPAY_IPN_URL: vnpayIpnUrl,
+    VNPAY_LOCALE: String(
+      config.VNPAY_LOCALE ?? VNPAY_CONFIG_KEY.VNPAY_LOCALE,
+    ).trim(),
+    VNPAY_ORDER_TYPE: String(
+      config.VNPAY_ORDER_TYPE ?? VNPAY_CONFIG_KEY.VNPAY_ORDER_TYPE,
+    ).trim(),
+    VNPAY_PAYMENT_EXPIRE_MINUTES: parseNumber(
+      config.VNPAY_PAYMENT_EXPIRE_MINUTES,
+      VNPAY_CONFIG_KEY.VNPAY_PAYMENT_EXPIRE_MINUTES,
+      'VNPAY_PAYMENT_EXPIRE_MINUTES',
+    ),
   };
 }

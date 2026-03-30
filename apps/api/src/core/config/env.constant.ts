@@ -52,3 +52,10 @@ export const MAIL_CONFIG_KEY = {
   MAIL_SMTP_CONNECTION_TIMEOUT: 10000,
   MAIL_FROM_NAME: 'Omnichannel E-commerce',
 } as const;
+
+export const VNPAY_CONFIG_KEY = {
+  VNPAY_HOST: 'https://sandbox.vnpayment.vn',
+  VNPAY_LOCALE: 'vn',
+  VNPAY_ORDER_TYPE: 'other',
+  VNPAY_PAYMENT_EXPIRE_MINUTES: 15,
+} as const;
