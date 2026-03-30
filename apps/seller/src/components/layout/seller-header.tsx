@@ -4,7 +4,9 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
@@ -67,11 +69,30 @@ export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem>Thông tin tài khoản</DropdownMenuItem>
-              <DropdownMenuItem>Thiết lập cửa hàng</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Đăng xuất</DropdownMenuItem>
+            <DropdownMenuContent align="end" sideOffset={8} className="z-70 w-72 border-slate-700 bg-slate-900 text-slate-100 shadow-2xl">
+              <DropdownMenuLabel className="pb-3">
+                <div className="grid gap-2">
+                  <p className="text-sm font-semibold text-slate-100">Thông tin chủ shop</p>
+                  <div className="rounded-lg border border-slate-700 bg-slate-800 p-3">
+                    <div className="grid grid-cols-[96px_1fr] gap-y-1 text-xs">
+                      <span className="text-slate-400">Mã chủ shop</span>
+                      <span className="font-medium text-slate-100">SEL-2001</span>
+                      <span className="text-slate-400">Chủ shop</span>
+                      <span className="font-medium text-slate-100">Khaidz Store</span>
+                      <span className="text-slate-400">Email</span>
+                      <span className="truncate font-medium text-slate-100">khaidz.store@email.com</span>
+                    </div>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+
+              <DropdownMenuSeparator className="bg-slate-700" />
+              <DropdownMenuGroup>
+                <DropdownMenuItem className="text-slate-100 focus:bg-slate-800 focus:text-slate-100">Thông tin tài khoản</DropdownMenuItem>
+                <DropdownMenuItem className="text-slate-100 focus:bg-slate-800 focus:text-slate-100">Thiết lập cửa hàng</DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator className="bg-slate-700" />
+              <DropdownMenuItem className="text-rose-400 focus:bg-rose-500/15 focus:text-rose-300">Đăng xuất</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
