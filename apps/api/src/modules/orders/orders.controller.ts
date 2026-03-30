@@ -1,0 +1,50 @@
+import { Body, Controller, Post } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { ApiResponse, CheckoutOrdersResponse } from '@repo/shared-types';
+import { CurrentUser, Roles } from '../../core/decorators';
+import { createSuccessResponse } from '../../core/http/api-response.util';
+import {
+  ApiAuthSchemes,
+  ApiCommonErrorResponses,
+  ApiOkEnvelopeResponse,
+} from '../../core/http/swagger-response.decorator';
+import type { JwtPayload } from '../auth/types/jwt-payload.type';
+import { CheckoutOrdersDto } from './dto/checkout-orders.dto';
+import { CheckoutOrdersResponseSwaggerDto } from './dto/orders-swagger.dto';
+import { OrdersService } from './orders.service';
+
+@ApiTags('Customer - Orders')
+@Roles('CUSTOMER')
+@Controller('orders')
+export class OrdersController {
+  constructor(private readonly ordersService: OrdersService) {}
+
+  @Post('checkout')
+  @ApiOperation({
+    summary: 'Checkout selected cart items and split orders by shop',
+  })
+  @ApiAuthSchemes()
+  @ApiBody({ type: CheckoutOrdersDto })
+  @ApiOkEnvelopeResponse(
+    CheckoutOrdersResponseSwaggerDto,
+    'Checkout completed successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid payload or insufficient stock',
+    unauthorized: 'Authentication required',
+    notFound: 'Shipping address or cart item not found',
+  })
+  async checkout(
+    @CurrentUser() currentUser: JwtPayload,
+    @Body() payload: CheckoutOrdersDto,
+  ): Promise<ApiResponse<CheckoutOrdersResponse>> {
+    const response = await this.ordersService.checkout(
+      currentUser.sub,
+      payload,
+    );
+
+    return createSuccessResponse(response, {
+      message: 'Checkout completed successfully',
+    });
+  }
+}

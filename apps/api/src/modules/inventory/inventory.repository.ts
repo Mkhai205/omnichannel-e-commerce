@@ -45,6 +45,19 @@ export interface InventoryLogsQueryInput {
 export class InventoryRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  findVariantsByIds(variantIds: string[], tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.productVariant.findMany({
+      where: {
+        id: {
+          in: variantIds,
+        },
+      },
+      select: PRODUCT_VARIANT_SELECT,
+    });
+  }
+
   findShopByUserId(userId: string) {
     return this.prisma.shop.findUnique({
       where: { userId },
@@ -77,6 +90,28 @@ export class InventoryRepository {
       where: { id: variantId },
       data,
       select: PRODUCT_VARIANT_SELECT,
+    });
+  }
+
+  decrementVariantStockById(
+    variantId: string,
+    quantity: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.productVariant.updateMany({
+      where: {
+        id: variantId,
+        stockQuantity: {
+          gte: quantity,
+        },
+      },
+      data: {
+        stockQuantity: {
+          decrement: quantity,
+        },
+      },
     });
   }
 

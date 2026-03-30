@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import type { Prisma } from '@repo/database';
 import type {
   CreateInventoryLogRequest,
   InventoryLogItem,
@@ -11,9 +12,81 @@ import type {
 import type { InventoryLogRecord } from './inventory.repository';
 import { InventoryRepository } from './inventory.repository';
 
+export interface CheckoutInventoryDeductionItem {
+  variantId: string;
+  quantity: number;
+}
+
 @Injectable()
 export class SellerInventoryService {
   constructor(private readonly inventoryRepository: InventoryRepository) {}
+
+  async deductStockForCheckout(
+    items: CheckoutInventoryDeductionItem[],
+    tx?: Prisma.TransactionClient,
+  ): Promise<void> {
+    if (items.length === 0) {
+      return;
+    }
+
+    const mergedByVariantId = new Map<string, number>();
+
+    for (const item of items) {
+      if (item.quantity < 1) {
+        throw new BadRequestException('Quantity must be greater than 0');
+      }
+
+      mergedByVariantId.set(
+        item.variantId,
+        (mergedByVariantId.get(item.variantId) ?? 0) + item.quantity,
+      );
+    }
+
+    const variantIds = [...mergedByVariantId.keys()];
+    const variants = await this.inventoryRepository.findVariantsByIds(
+      variantIds,
+      tx,
+    );
+    const variantById = new Map(
+      variants.map((variant) => [variant.id, variant]),
+    );
+
+    for (const [variantId, quantity] of mergedByVariantId.entries()) {
+      const variant = variantById.get(variantId);
+
+      if (!variant) {
+        throw new NotFoundException(`Product variant not found: ${variantId}`);
+      }
+
+      if (variant.stockQuantity < quantity) {
+        throw new BadRequestException(
+          `Requested quantity exceeds stock (${variant.stockQuantity})`,
+        );
+      }
+
+      const result = await this.inventoryRepository.decrementVariantStockById(
+        variantId,
+        quantity,
+        tx,
+      );
+
+      if (result.count !== 1) {
+        throw new BadRequestException(
+          `Unable to deduct inventory for variant ${variantId}`,
+        );
+      }
+
+      await this.inventoryRepository.createInventoryLog(
+        {
+          variantId,
+          type: 'ORDER_DEDUCT',
+          quantityChanged: -quantity,
+          note: 'Stock deducted by checkout',
+        },
+        tx,
+      );
+    }
+  }
 
   async createMyInventoryLog(
     userId: string,
