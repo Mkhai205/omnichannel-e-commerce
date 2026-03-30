@@ -83,6 +83,14 @@ export const OrderStatus = {
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 
 
+export const SettlementStatus = {
+  PENDING: 'PENDING',
+  SETTLED: 'SETTLED'
+} as const
+
+export type SettlementStatus = (typeof SettlementStatus)[keyof typeof SettlementStatus]
+
+
 export const PaymentProvider = {
   VNPAY: 'VNPAY'
 } as const

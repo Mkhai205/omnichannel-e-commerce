@@ -197,20 +197,24 @@ model RefreshToken {
 }
 
 model Order {
-  id                String         @id @default(uuid()) @db.Uuid
-  orderNumber       String         @unique @map("order_number") @db.VarChar(50)
-  userId            String         @map("user_id") @db.Uuid
-  shopId            String         @map("shop_id") @db.Uuid
-  shippingAddressId String         @map("shipping_address_id") @db.Uuid
-  status            OrderStatus    @default(PENDING_PAYMENT)
-  subtotal          Decimal        @db.Decimal(12, 2)
-  totalAmount       Decimal        @map("total_amount") @db.Decimal(12, 2)
-  note              String?        @db.Text
-  createdAt         DateTime       @default(now()) @map("created_at")
-  updatedAt         DateTime       @updatedAt @map("updated_at")
-  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  shop              Shop           @relation(fields: [shopId], references: [id])
-  shippingAddress   Address        @relation(fields: [shippingAddressId], references: [id])
+  id                String           @id @default(uuid()) @db.Uuid
+  orderNumber       String           @unique @map("order_number") @db.VarChar(50)
+  userId            String           @map("user_id") @db.Uuid
+  shopId            String           @map("shop_id") @db.Uuid
+  shippingAddressId String           @map("shipping_address_id") @db.Uuid
+  status            OrderStatus      @default(PENDING_PAYMENT)
+  shippedAt         DateTime?        @map("shipped_at")
+  deliveredAt       DateTime?        @map("delivered_at")
+  settlementStatus  SettlementStatus @default(PENDING) @map("settlement_status")
+  settledAt         DateTime?        @map("settled_at")
+  subtotal          Decimal          @db.Decimal(12, 2)
+  totalAmount       Decimal          @map("total_amount") @db.Decimal(12, 2)
+  note              String?          @db.Text
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shop              Shop             @relation(fields: [shopId], references: [id])
+  shippingAddress   Address          @relation(fields: [shippingAddressId], references: [id])
   items             OrderItem[]
   paymentOrders     PaymentOrder[]
 
@@ -218,6 +222,8 @@ model Order {
   @@index([shopId])
   @@index([shippingAddressId])
   @@index([status])
+  @@index([shippedAt])
+  @@index([settlementStatus])
   @@index([createdAt])
   @@map("orders")
 }
@@ -350,6 +356,11 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+enum SettlementStatus {
+  PENDING
+  SETTLED
 }
 
 enum PaymentProvider {
