@@ -10,7 +10,7 @@ type SellerPageFrameProps = {
 export function SellerPageFrame({ children }: SellerPageFrameProps) {
   const pathname = usePathname();
 
-  if (pathname === "/login" || pathname.startsWith("/login/")) {
+  if (pathname === "/login" || pathname.startsWith("/login/") || pathname === "/register" || pathname.startsWith("/register/")) {
     return <>{children}</>;
   }
 
