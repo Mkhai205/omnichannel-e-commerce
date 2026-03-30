@@ -219,6 +219,10 @@ export class PaymentsService {
     return {
       orderId: order.id,
       orderStatus: order.status,
+      shippedAt: order.shippedAt?.toISOString() ?? null,
+      deliveredAt: order.deliveredAt?.toISOString() ?? null,
+      settlementStatus: order.settlementStatus,
+      settledAt: order.settledAt?.toISOString() ?? null,
       paymentId: latestPayment?.id,
       paymentStatus: latestPayment?.status,
       paymentProvider: latestPayment?.provider,

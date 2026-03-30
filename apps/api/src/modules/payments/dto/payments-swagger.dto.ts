@@ -39,6 +39,27 @@ export class PaymentStatusByOrderResponseSwaggerDto {
   @ApiProperty({ example: 'PENDING_PAYMENT' })
   orderStatus!: string;
 
+  @ApiPropertyOptional({
+    nullable: true,
+    example: '2026-03-30T14:25:00.000Z',
+  })
+  shippedAt?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example: '2026-03-30T14:28:00.000Z',
+  })
+  deliveredAt?: string | null;
+
+  @ApiPropertyOptional({ example: 'PENDING' })
+  settlementStatus?: string;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example: '2026-03-30T14:29:00.000Z',
+  })
+  settledAt?: string | null;
+
   @ApiPropertyOptional({ format: 'uuid' })
   paymentId?: string;
 

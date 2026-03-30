@@ -112,3 +112,72 @@ export class CheckoutOrdersResponseSwaggerDto {
   @ApiProperty({ type: CheckoutPaymentSwaggerDto })
   payment!: CheckoutPaymentSwaggerDto;
 }
+
+class PaginationMetaSwaggerDto {
+  @ApiProperty({ example: 1 })
+  page!: number;
+
+  @ApiProperty({ example: 20 })
+  limit!: number;
+
+  @ApiProperty({ example: 100 })
+  totalItems!: number;
+
+  @ApiProperty({ example: 5 })
+  totalPages!: number;
+}
+
+export class SellerOrderSwaggerDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ example: 'ORD-20260330-52A9D13B' })
+  orderNumber!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  userId!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  shopId!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  shippingAddressId!: string;
+
+  @ApiProperty({ example: 'PROCESSING' })
+  status!: string;
+
+  @ApiProperty({ example: '2598000.00' })
+  subtotal!: string;
+
+  @ApiProperty({ example: '2598000.00' })
+  totalAmount!: string;
+
+  @ApiProperty({ nullable: true, example: 'Please deliver in office hours.' })
+  note!: string | null;
+
+  @ApiProperty({ nullable: true, example: '2026-03-30T10:05:00.000Z' })
+  shippedAt!: string | null;
+
+  @ApiProperty({ nullable: true, example: '2026-03-30T10:08:00.000Z' })
+  deliveredAt!: string | null;
+
+  @ApiProperty({ example: 'PENDING' })
+  settlementStatus!: string;
+
+  @ApiProperty({ nullable: true, example: '2026-03-30T10:09:00.000Z' })
+  settledAt!: string | null;
+
+  @ApiProperty({ example: '2026-03-30T10:00:00.000Z' })
+  createdAt!: string;
+
+  @ApiProperty({ example: '2026-03-30T10:00:00.000Z' })
+  updatedAt!: string;
+}
+
+export class SellerOrdersListDataSwaggerDto {
+  @ApiProperty({ type: [SellerOrderSwaggerDto] })
+  data!: SellerOrderSwaggerDto[];
+
+  @ApiProperty({ type: PaginationMetaSwaggerDto })
+  meta!: PaginationMetaSwaggerDto;
+}

@@ -1,16 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
+import type { RunAutoDeliveryResponse } from '@repo/shared-types';
 import { ShippingRepository } from './shipping.repository';
 
 interface AutoShippingConfig {
   deliveryAfterMinutes: number;
   batchSize: number;
-}
-
-export interface AutoShippingResult {
-  scanned: number;
-  delivered: number;
-  settled: number;
-  processedOrderIds: string[];
 }
 
 @Injectable()
@@ -25,19 +19,31 @@ export class ShippingService {
 
   async processAutoDelivery(
     now: Date = new Date(),
-  ): Promise<AutoShippingResult> {
+  ): Promise<RunAutoDeliveryResponse> {
     const shippedCutoff = new Date(
       now.getTime() - this.config.deliveryAfterMinutes * 60 * 1000,
     );
+
+    const overdueShippedOrders =
+      await this.shippingRepository.countOverdueShippedOrders(shippedCutoff);
 
     const candidates = await this.shippingRepository.findAutoDeliverableOrders(
       shippedCutoff,
       this.config.batchSize,
     );
 
-    if (candidates.length === 0) {
+    const eligibleOrders = candidates.length;
+    const skippedWithoutSuccessfulPayment = Math.max(
+      0,
+      overdueShippedOrders - eligibleOrders,
+    );
+
+    if (eligibleOrders === 0) {
       return {
-        scanned: 0,
+        runAt: now.toISOString(),
+        overdueShippedOrders,
+        eligibleOrders,
+        skippedWithoutSuccessfulPayment,
         delivered: 0,
         settled: 0,
         processedOrderIds: [],
@@ -62,7 +68,10 @@ export class ShippingService {
         );
 
         return {
-          scanned: candidates.length,
+          runAt: now.toISOString(),
+          overdueShippedOrders,
+          eligibleOrders,
+          skippedWithoutSuccessfulPayment,
           delivered: deliveredUpdate.count,
           settled: settledUpdate.count,
           processedOrderIds,
@@ -71,7 +80,7 @@ export class ShippingService {
     );
 
     this.logger.log(
-      `[AUTO_SHIPPING] scanned=${result.scanned} delivered=${result.delivered} settled=${result.settled}`,
+      `[AUTO_SHIPPING] overdue=${result.overdueShippedOrders} eligible=${result.eligibleOrders} skipped_unpaid=${result.skippedWithoutSuccessfulPayment} delivered=${result.delivered} settled=${result.settled}`,
     );
 
     return result;

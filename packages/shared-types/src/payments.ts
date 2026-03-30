@@ -1,5 +1,5 @@
 import type { UUID } from "./common.js";
-import type { OrderStatus } from "./orders.js";
+import type { OrderStatus, SettlementStatus } from "./orders.js";
 
 export type PaymentProvider = "VNPAY";
 
@@ -25,6 +25,10 @@ export interface CreateVnpayPaymentUrlResponse {
 export interface PaymentStatusByOrderResponse {
     orderId: UUID;
     orderStatus: OrderStatus;
+    shippedAt?: string | null;
+    deliveredAt?: string | null;
+    settlementStatus?: SettlementStatus;
+    settledAt?: string | null;
     paymentId?: UUID;
     paymentStatus?: PaymentStatus;
     paymentProvider?: PaymentProvider;

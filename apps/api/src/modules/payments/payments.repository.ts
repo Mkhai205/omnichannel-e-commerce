@@ -46,6 +46,10 @@ const PAYMENT_SELECT = {
 const ORDER_WITH_LATEST_PAYMENT_SELECT = {
   id: true,
   status: true,
+  shippedAt: true,
+  deliveredAt: true,
+  settlementStatus: true,
+  settledAt: true,
   updatedAt: true,
   paymentOrders: {
     orderBy: {

@@ -19,6 +19,24 @@ export type ShippingOrderRecord = Prisma.OrderGetPayload<{
 export class ShippingRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  countOverdueShippedOrders(
+    shippedBeforeOrAt: Date,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.count({
+      where: {
+        status: 'SHIPPED',
+        shippedAt: {
+          lte: shippedBeforeOrAt,
+        },
+        deliveredAt: null,
+        settlementStatus: 'PENDING',
+      },
+    });
+  }
+
   findAutoDeliverableOrders(
     shippedBeforeOrAt: Date,
     limit: number,
@@ -33,6 +51,14 @@ export class ShippingRepository {
           lte: shippedBeforeOrAt,
         },
         deliveredAt: null,
+        settlementStatus: 'PENDING',
+        paymentOrders: {
+          some: {
+            payment: {
+              status: 'SUCCESS',
+            },
+          },
+        },
       },
       orderBy: {
         shippedAt: 'asc',
@@ -85,6 +111,8 @@ export class ShippingRepository {
           in: orderIds,
         },
         settlementStatus: 'PENDING',
+        status: 'DELIVERED',
+        settledAt: null,
       },
       data: {
         settlementStatus: 'SETTLED',

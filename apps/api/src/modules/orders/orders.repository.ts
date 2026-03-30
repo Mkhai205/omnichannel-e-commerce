@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@repo/database';
+import type { OrderStatus } from '@repo/shared-types';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
 
 const CHECKOUT_CART_ITEM_SELECT = {
@@ -42,6 +43,24 @@ const ORDER_SELECT = {
   updatedAt: true,
 } satisfies Prisma.OrderSelect;
 
+const SELLER_ORDER_SELECT = {
+  id: true,
+  orderNumber: true,
+  userId: true,
+  shopId: true,
+  shippingAddressId: true,
+  status: true,
+  shippedAt: true,
+  deliveredAt: true,
+  settlementStatus: true,
+  settledAt: true,
+  subtotal: true,
+  totalAmount: true,
+  note: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.OrderSelect;
+
 const ORDER_ITEM_SELECT = {
   id: true,
   orderId: true,
@@ -72,6 +91,10 @@ export type OrderRecord = Prisma.OrderGetPayload<{
   select: typeof ORDER_SELECT;
 }>;
 
+export type SellerOrderRecord = Prisma.OrderGetPayload<{
+  select: typeof SELLER_ORDER_SELECT;
+}>;
+
 export type OrderItemRecord = Prisma.OrderItemGetPayload<{
   select: typeof ORDER_ITEM_SELECT;
 }>;
@@ -79,6 +102,84 @@ export type OrderItemRecord = Prisma.OrderItemGetPayload<{
 @Injectable()
 export class OrdersRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  findSellerOrdersByUserId(
+    sellerUserId: string,
+    input: {
+      page: number;
+      limit: number;
+      status?: OrderStatus;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.findMany({
+      where: {
+        shop: {
+          userId: sellerUserId,
+        },
+        ...(input.status ? { status: input.status } : {}),
+      },
+      skip: (input.page - 1) * input.limit,
+      take: input.limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: SELLER_ORDER_SELECT,
+    });
+  }
+
+  countSellerOrdersByUserId(
+    sellerUserId: string,
+    status?: OrderStatus,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.count({
+      where: {
+        shop: {
+          userId: sellerUserId,
+        },
+        ...(status ? { status } : {}),
+      },
+    });
+  }
+
+  findSellerOrderByIdForUser(
+    sellerUserId: string,
+    orderId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.findFirst({
+      where: {
+        id: orderId,
+        shop: {
+          userId: sellerUserId,
+        },
+      },
+      select: SELLER_ORDER_SELECT,
+    });
+  }
+
+  updateOrderById(
+    orderId: string,
+    data: Prisma.OrderUncheckedUpdateInput,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.update({
+      where: {
+        id: orderId,
+      },
+      data,
+      select: SELLER_ORDER_SELECT,
+    });
+  }
 
   findAddressByIdForUser(
     addressId: string,

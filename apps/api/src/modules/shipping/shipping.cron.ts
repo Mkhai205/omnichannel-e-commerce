@@ -21,7 +21,10 @@ export class ShippingCron {
     this.isRunning = true;
 
     try {
-      await this.shippingService.processAutoDelivery();
+      const result = await this.shippingService.processAutoDelivery();
+      this.logger.log(
+        `[AUTO_SHIPPING] Tick completed runAt=${result.runAt} delivered=${result.delivered} settled=${result.settled}`,
+      );
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
