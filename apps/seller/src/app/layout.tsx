@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { SellerShell } from "@/components/layout/seller-shell";
+import { SellerPageFrame } from "@/components/layout/seller-page-frame";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,7 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SellerShell>{children}</SellerShell>
+        <SellerPageFrame>{children}</SellerPageFrame>
       </body>
     </html>
   );
