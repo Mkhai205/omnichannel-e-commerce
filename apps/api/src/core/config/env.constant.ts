@@ -1,5 +1,4 @@
 export const APP_CONFIG_KEY = {
-  APP_HOST: 'localhost',
   APP_PORT: 8000,
   APP_ENV: 'development',
   CORS_ORIGIN:

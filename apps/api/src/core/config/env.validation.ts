@@ -146,7 +146,6 @@ export function validateEnv(config: RawEnv): RawEnv {
   return {
     ...config,
     // Application configuration
-    APP_HOST: String(config.APP_HOST ?? APP_CONFIG_KEY.APP_HOST),
     APP_PORT: parseNumber(config.APP_PORT, APP_CONFIG_KEY.APP_PORT, 'APP_PORT'),
     APP_ENV: String(config.APP_ENV ?? APP_CONFIG_KEY.APP_ENV),
     CORS_ORIGIN: String(config.CORS_ORIGIN ?? APP_CONFIG_KEY.CORS_ORIGIN),
