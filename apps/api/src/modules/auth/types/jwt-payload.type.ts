@@ -4,7 +4,7 @@ export interface JwtPayload {
   sub: string;
   email: string;
   role: UserRole;
-  tokenType: 'access' | 'refresh';
+  tokenType: 'access' | 'refresh' | 'password_reset' | 'email_verify';
   jti?: string;
   iat?: number;
   exp?: number;

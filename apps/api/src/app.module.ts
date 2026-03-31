@@ -1,12 +1,23 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { validateEnv } from './core/config/env.validation';
 import { JwtAuthGuard, RolesGuard } from './core/guards';
 import { PrismaModule } from './infrastructure/database/prisma.module';
+import { MailModule } from './infrastructure/mail/mail.module';
+import { StorageModule } from './infrastructure/storage/storage.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { CartModule } from './modules/cart/cart.module';
+import { CatalogModule } from './modules/catalog/catalog.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { ShippingModule } from './modules/shipping/shipping.module';
+import { ShopModule } from './modules/shop/shop.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -16,8 +27,19 @@ import { AuthModule } from './modules/auth/auth.module';
       envFilePath: ['.env.local', '.env'],
       validate: validateEnv,
     }),
+    ScheduleModule.forRoot(),
     PrismaModule,
+    MailModule,
+    StorageModule,
     AuthModule,
+    CartModule,
+    CatalogModule,
+    InventoryModule,
+    OrdersModule,
+    PaymentsModule,
+    ShippingModule,
+    ShopModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [

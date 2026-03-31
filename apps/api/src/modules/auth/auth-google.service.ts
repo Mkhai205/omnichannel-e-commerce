@@ -8,7 +8,7 @@ import type { GoogleProfilePayload } from '@repo/shared-types';
 import { randomUUID } from 'crypto';
 import {
   AUTH_COOKIE_CONFIG_KEY,
-  GOOGLE_OAUTH_CONFIG_KEY,
+  FRONTEND_REDIRECT_URI_CONFIG_KEY,
 } from 'src/core/config/env.constant';
 
 interface GoogleTokenResponse {
@@ -33,14 +33,14 @@ export class AuthGoogleService {
   getLoginSuccessRedirect(): string {
     return this.configService.get<string>(
       'FRONTEND_LOGIN_SUCCESS_REDIRECT',
-      GOOGLE_OAUTH_CONFIG_KEY.FRONTEND_LOGIN_SUCCESS_REDIRECT,
+      FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_LOGIN_SUCCESS_REDIRECT,
     );
   }
 
   getLoginFailureRedirect(): string {
     return this.configService.get<string>(
       'FRONTEND_LOGIN_FAILURE_REDIRECT',
-      GOOGLE_OAUTH_CONFIG_KEY.FRONTEND_LOGIN_FAILURE_REDIRECT,
+      FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_LOGIN_FAILURE_REDIRECT,
     );
   }
 

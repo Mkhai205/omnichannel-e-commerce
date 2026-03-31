@@ -71,6 +71,38 @@ export class AuthTokenService {
     }
   }
 
+  async verifyPasswordResetToken(token: string): Promise<JwtPayload> {
+    try {
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
+        secret: this.getAccessSecret(),
+      });
+
+      if (payload.tokenType !== 'password_reset') {
+        throw new UnauthorizedException('Invalid reset password token');
+      }
+
+      return payload;
+    } catch {
+      throw new UnauthorizedException('Invalid reset password token');
+    }
+  }
+
+  async verifyEmailVerificationToken(token: string): Promise<JwtPayload> {
+    try {
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
+        secret: this.getAccessSecret(),
+      });
+
+      if (payload.tokenType !== 'email_verify') {
+        throw new UnauthorizedException('Invalid email verification token');
+      }
+
+      return payload;
+    } catch {
+      throw new UnauthorizedException('Invalid email verification token');
+    }
+  }
+
   async issueTokenPair(
     user: {
       id: string;
@@ -126,6 +158,44 @@ export class AuthTokenService {
     };
   }
 
+  async issuePasswordResetToken(user: {
+    id: string;
+    email: string;
+    role: UserRole;
+  }): Promise<string> {
+    const resetPayload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      tokenType: 'password_reset',
+      jti: randomUUID(),
+    };
+
+    return this.jwtService.signAsync(resetPayload, {
+      secret: this.getAccessSecret(),
+      expiresIn: this.getResetPasswordTokenExpiresInSeconds(),
+    });
+  }
+
+  async issueEmailVerificationToken(user: {
+    id: string;
+    email: string;
+    role: UserRole;
+  }): Promise<string> {
+    const verifyPayload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      tokenType: 'email_verify',
+      jti: randomUUID(),
+    };
+
+    return this.jwtService.signAsync(verifyPayload, {
+      secret: this.getAccessSecret(),
+      expiresIn: this.getVerifyEmailTokenExpiresInSeconds(),
+    });
+  }
+
   private getAccessExpiresInSeconds(): number {
     return this.configService.get<number>(
       'JWT_ACCESS_EXPIRES_IN_SECONDS',
@@ -137,6 +207,20 @@ export class AuthTokenService {
     return this.configService.get<number>(
       'JWT_REFRESH_EXPIRES_IN_SECONDS',
       JWT_CONFIG_KEY.JWT_REFRESH_EXPIRES_IN_SECONDS,
+    );
+  }
+
+  private getResetPasswordTokenExpiresInSeconds(): number {
+    return this.configService.get<number>(
+      'RESET_PASSWORD_TOKEN_EXPIRES_IN_SECONDS',
+      JWT_CONFIG_KEY.RESET_PASSWORD_TOKEN_EXPIRES_IN_SECONDS,
+    );
+  }
+
+  private getVerifyEmailTokenExpiresInSeconds(): number {
+    return this.configService.get<number>(
+      'VERIFY_EMAIL_TOKEN_EXPIRES_IN_SECONDS',
+      JWT_CONFIG_KEY.VERIFY_EMAIL_TOKEN_EXPIRES_IN_SECONDS,
     );
   }
 
