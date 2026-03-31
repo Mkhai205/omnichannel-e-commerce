@@ -15,6 +15,7 @@ Tạo các secrets sau tại **GitHub > Settings > Secrets and variables > Actio
 - `DOCKERHUB_USERNAME`: Tên người dùng Docker Hub.
 - `DOCKERHUB_TOKEN`: Access token Docker Hub.
 - `VPS_IP`: IP public của VPS.
+- `VPS_SSH_PORT`: Cổng SSH của VPS (ví dụ `8900`).
 - `VPS_USER`: User SSH trên VPS.
 - `SSH_PRIVATE_KEY`: Nội dung private key dùng để truy cập VPS.
 
