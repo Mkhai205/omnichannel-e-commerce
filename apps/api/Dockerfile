@@ -25,7 +25,7 @@ RUN pnpm --filter ./packages/database build
 RUN pnpm --filter ./apps/api build
 
 # Create a deployable, production-only folder for the API package.
-RUN pnpm --filter ./apps/api deploy --prod /deploy/api
+RUN pnpm --filter ./apps/api deploy --prod ./deploy/api
 
 
 FROM node:20-alpine AS runner
@@ -34,8 +34,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY --from=builder /deploy/api/dist ./dist
-COPY --from=builder /deploy/api/node_modules ./node_modules
+COPY --from=builder /workspace/apps/api/dist ./dist
+COPY --from=builder /workspace/deploy/api/node_modules ./node_modules
 
 EXPOSE 3000
 
