@@ -399,7 +399,11 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   Payment: 'Payment',
   PaymentOrder: 'PaymentOrder',
-  PaymentWebhookLog: 'PaymentWebhookLog'
+  PaymentWebhookLog: 'PaymentWebhookLog',
+  AdminWallet: 'AdminWallet',
+  AdminWalletLedger: 'AdminWalletLedger',
+  SellerWallet: 'SellerWallet',
+  SellerSettlement: 'SellerSettlement'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "shop" | "category" | "product" | "productVariant" | "cart" | "cartItem" | "inventoryLog" | "address" | "oauthAccount" | "refreshToken" | "order" | "orderItem" | "payment" | "paymentOrder" | "paymentWebhookLog"
+    modelProps: "user" | "shop" | "category" | "product" | "productVariant" | "cart" | "cartItem" | "inventoryLog" | "address" | "oauthAccount" | "refreshToken" | "order" | "orderItem" | "payment" | "paymentOrder" | "paymentWebhookLog" | "adminWallet" | "adminWalletLedger" | "sellerWallet" | "sellerSettlement"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1603,6 +1607,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AdminWallet: {
+      payload: Prisma.$AdminWalletPayload<ExtArgs>
+      fields: Prisma.AdminWalletFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdminWalletFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdminWalletFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletPayload>
+        }
+        findFirst: {
+          args: Prisma.AdminWalletFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdminWalletFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletPayload>
+        }
+        findMany: {
+          args: Prisma.AdminWalletFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletPayload>[]
+        }
+        create: {
+          args: Prisma.AdminWalletCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletPayload>
+        }
+        createMany: {
+          args: Prisma.AdminWalletCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AdminWalletCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletPayload>[]
+        }
+        delete: {
+          args: Prisma.AdminWalletDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletPayload>
+        }
+        update: {
+          args: Prisma.AdminWalletUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletPayload>
+        }
+        deleteMany: {
+          args: Prisma.AdminWalletDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdminWalletUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AdminWalletUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletPayload>[]
+        }
+        upsert: {
+          args: Prisma.AdminWalletUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletPayload>
+        }
+        aggregate: {
+          args: Prisma.AdminWalletAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminWallet>
+        }
+        groupBy: {
+          args: Prisma.AdminWalletGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminWalletGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdminWalletCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminWalletCountAggregateOutputType> | number
+        }
+      }
+    }
+    AdminWalletLedger: {
+      payload: Prisma.$AdminWalletLedgerPayload<ExtArgs>
+      fields: Prisma.AdminWalletLedgerFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdminWalletLedgerFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletLedgerPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdminWalletLedgerFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletLedgerPayload>
+        }
+        findFirst: {
+          args: Prisma.AdminWalletLedgerFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletLedgerPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdminWalletLedgerFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletLedgerPayload>
+        }
+        findMany: {
+          args: Prisma.AdminWalletLedgerFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletLedgerPayload>[]
+        }
+        create: {
+          args: Prisma.AdminWalletLedgerCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletLedgerPayload>
+        }
+        createMany: {
+          args: Prisma.AdminWalletLedgerCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AdminWalletLedgerCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletLedgerPayload>[]
+        }
+        delete: {
+          args: Prisma.AdminWalletLedgerDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletLedgerPayload>
+        }
+        update: {
+          args: Prisma.AdminWalletLedgerUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletLedgerPayload>
+        }
+        deleteMany: {
+          args: Prisma.AdminWalletLedgerDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdminWalletLedgerUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AdminWalletLedgerUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletLedgerPayload>[]
+        }
+        upsert: {
+          args: Prisma.AdminWalletLedgerUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminWalletLedgerPayload>
+        }
+        aggregate: {
+          args: Prisma.AdminWalletLedgerAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminWalletLedger>
+        }
+        groupBy: {
+          args: Prisma.AdminWalletLedgerGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminWalletLedgerGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdminWalletLedgerCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminWalletLedgerCountAggregateOutputType> | number
+        }
+      }
+    }
+    SellerWallet: {
+      payload: Prisma.$SellerWalletPayload<ExtArgs>
+      fields: Prisma.SellerWalletFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SellerWalletFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerWalletPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SellerWalletFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerWalletPayload>
+        }
+        findFirst: {
+          args: Prisma.SellerWalletFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerWalletPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SellerWalletFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerWalletPayload>
+        }
+        findMany: {
+          args: Prisma.SellerWalletFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerWalletPayload>[]
+        }
+        create: {
+          args: Prisma.SellerWalletCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerWalletPayload>
+        }
+        createMany: {
+          args: Prisma.SellerWalletCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SellerWalletCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerWalletPayload>[]
+        }
+        delete: {
+          args: Prisma.SellerWalletDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerWalletPayload>
+        }
+        update: {
+          args: Prisma.SellerWalletUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerWalletPayload>
+        }
+        deleteMany: {
+          args: Prisma.SellerWalletDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SellerWalletUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SellerWalletUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerWalletPayload>[]
+        }
+        upsert: {
+          args: Prisma.SellerWalletUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerWalletPayload>
+        }
+        aggregate: {
+          args: Prisma.SellerWalletAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSellerWallet>
+        }
+        groupBy: {
+          args: Prisma.SellerWalletGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerWalletGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SellerWalletCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerWalletCountAggregateOutputType> | number
+        }
+      }
+    }
+    SellerSettlement: {
+      payload: Prisma.$SellerSettlementPayload<ExtArgs>
+      fields: Prisma.SellerSettlementFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SellerSettlementFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerSettlementPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SellerSettlementFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerSettlementPayload>
+        }
+        findFirst: {
+          args: Prisma.SellerSettlementFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerSettlementPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SellerSettlementFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerSettlementPayload>
+        }
+        findMany: {
+          args: Prisma.SellerSettlementFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerSettlementPayload>[]
+        }
+        create: {
+          args: Prisma.SellerSettlementCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerSettlementPayload>
+        }
+        createMany: {
+          args: Prisma.SellerSettlementCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SellerSettlementCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerSettlementPayload>[]
+        }
+        delete: {
+          args: Prisma.SellerSettlementDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerSettlementPayload>
+        }
+        update: {
+          args: Prisma.SellerSettlementUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerSettlementPayload>
+        }
+        deleteMany: {
+          args: Prisma.SellerSettlementDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SellerSettlementUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SellerSettlementUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerSettlementPayload>[]
+        }
+        upsert: {
+          args: Prisma.SellerSettlementUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerSettlementPayload>
+        }
+        aggregate: {
+          args: Prisma.SellerSettlementAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSellerSettlement>
+        }
+        groupBy: {
+          args: Prisma.SellerSettlementGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerSettlementGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SellerSettlementCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerSettlementCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1880,6 +2180,68 @@ export const PaymentWebhookLogScalarFieldEnum = {
 } as const
 
 export type PaymentWebhookLogScalarFieldEnum = (typeof PaymentWebhookLogScalarFieldEnum)[keyof typeof PaymentWebhookLogScalarFieldEnum]
+
+
+export const AdminWalletScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  escrowBalance: 'escrowBalance',
+  commissionBalance: 'commissionBalance',
+  totalInflow: 'totalInflow',
+  totalReleasedSeller: 'totalReleasedSeller',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdminWalletScalarFieldEnum = (typeof AdminWalletScalarFieldEnum)[keyof typeof AdminWalletScalarFieldEnum]
+
+
+export const AdminWalletLedgerScalarFieldEnum = {
+  id: 'id',
+  adminWalletId: 'adminWalletId',
+  paymentId: 'paymentId',
+  orderId: 'orderId',
+  type: 'type',
+  idempotencyKey: 'idempotencyKey',
+  grossAmount: 'grossAmount',
+  commission: 'commission',
+  netAmount: 'netAmount',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type AdminWalletLedgerScalarFieldEnum = (typeof AdminWalletLedgerScalarFieldEnum)[keyof typeof AdminWalletLedgerScalarFieldEnum]
+
+
+export const SellerWalletScalarFieldEnum = {
+  id: 'id',
+  shopId: 'shopId',
+  availableBalance: 'availableBalance',
+  pendingBalance: 'pendingBalance',
+  totalCredited: 'totalCredited',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerWalletScalarFieldEnum = (typeof SellerWalletScalarFieldEnum)[keyof typeof SellerWalletScalarFieldEnum]
+
+
+export const SellerSettlementScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  shopId: 'shopId',
+  sellerWalletId: 'sellerWalletId',
+  idempotencyKey: 'idempotencyKey',
+  status: 'status',
+  grossAmount: 'grossAmount',
+  commissionAmount: 'commissionAmount',
+  netAmount: 'netAmount',
+  settledAt: 'settledAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerSettlementScalarFieldEnum = (typeof SellerSettlementScalarFieldEnum)[keyof typeof SellerSettlementScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2160,6 +2522,34 @@ export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'AdminWalletLedgerType'
+ */
+export type EnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminWalletLedgerType'>
+    
+
+
+/**
+ * Reference to a field of type 'AdminWalletLedgerType[]'
+ */
+export type ListEnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminWalletLedgerType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SellerSettlementStatus'
+ */
+export type EnumSellerSettlementStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SellerSettlementStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SellerSettlementStatus[]'
+ */
+export type ListEnumSellerSettlementStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SellerSettlementStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -2283,6 +2673,10 @@ export type GlobalOmitConfig = {
   payment?: Prisma.PaymentOmit
   paymentOrder?: Prisma.PaymentOrderOmit
   paymentWebhookLog?: Prisma.PaymentWebhookLogOmit
+  adminWallet?: Prisma.AdminWalletOmit
+  adminWalletLedger?: Prisma.AdminWalletLedgerOmit
+  sellerWallet?: Prisma.SellerWalletOmit
+  sellerSettlement?: Prisma.SellerSettlementOmit
 }
 
 /* Types for Logging */

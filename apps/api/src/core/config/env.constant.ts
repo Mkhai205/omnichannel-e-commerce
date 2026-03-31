@@ -59,3 +59,7 @@ export const VNPAY_CONFIG_KEY = {
   VNPAY_ORDER_TYPE: 'other',
   VNPAY_PAYMENT_EXPIRE_MINUTES: 15,
 } as const;
+
+export const SETTLEMENT_CONFIG_KEY = {
+  SETTLEMENT_ADMIN_COMMISSION_PERCENT: 5,
+} as const;

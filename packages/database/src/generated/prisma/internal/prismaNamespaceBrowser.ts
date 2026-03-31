@@ -66,7 +66,11 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   Payment: 'Payment',
   PaymentOrder: 'PaymentOrder',
-  PaymentWebhookLog: 'PaymentWebhookLog'
+  PaymentWebhookLog: 'PaymentWebhookLog',
+  AdminWallet: 'AdminWallet',
+  AdminWalletLedger: 'AdminWalletLedger',
+  SellerWallet: 'SellerWallet',
+  SellerSettlement: 'SellerSettlement'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -323,6 +327,68 @@ export const PaymentWebhookLogScalarFieldEnum = {
 } as const
 
 export type PaymentWebhookLogScalarFieldEnum = (typeof PaymentWebhookLogScalarFieldEnum)[keyof typeof PaymentWebhookLogScalarFieldEnum]
+
+
+export const AdminWalletScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  escrowBalance: 'escrowBalance',
+  commissionBalance: 'commissionBalance',
+  totalInflow: 'totalInflow',
+  totalReleasedSeller: 'totalReleasedSeller',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdminWalletScalarFieldEnum = (typeof AdminWalletScalarFieldEnum)[keyof typeof AdminWalletScalarFieldEnum]
+
+
+export const AdminWalletLedgerScalarFieldEnum = {
+  id: 'id',
+  adminWalletId: 'adminWalletId',
+  paymentId: 'paymentId',
+  orderId: 'orderId',
+  type: 'type',
+  idempotencyKey: 'idempotencyKey',
+  grossAmount: 'grossAmount',
+  commission: 'commission',
+  netAmount: 'netAmount',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type AdminWalletLedgerScalarFieldEnum = (typeof AdminWalletLedgerScalarFieldEnum)[keyof typeof AdminWalletLedgerScalarFieldEnum]
+
+
+export const SellerWalletScalarFieldEnum = {
+  id: 'id',
+  shopId: 'shopId',
+  availableBalance: 'availableBalance',
+  pendingBalance: 'pendingBalance',
+  totalCredited: 'totalCredited',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerWalletScalarFieldEnum = (typeof SellerWalletScalarFieldEnum)[keyof typeof SellerWalletScalarFieldEnum]
+
+
+export const SellerSettlementScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  shopId: 'shopId',
+  sellerWalletId: 'sellerWalletId',
+  idempotencyKey: 'idempotencyKey',
+  status: 'status',
+  grossAmount: 'grossAmount',
+  commissionAmount: 'commissionAmount',
+  netAmount: 'netAmount',
+  settledAt: 'settledAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerSettlementScalarFieldEnum = (typeof SellerSettlementScalarFieldEnum)[keyof typeof SellerSettlementScalarFieldEnum]
 
 
 export const SortOrder = {

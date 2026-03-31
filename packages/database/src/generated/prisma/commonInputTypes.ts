@@ -494,6 +494,40 @@ export type EnumPaymentStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumPaymentStatusFilter<$PrismaModel>
 }
 
+export type EnumAdminWalletLedgerTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.AdminWalletLedgerType | Prisma.EnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AdminWalletLedgerType[] | Prisma.ListEnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AdminWalletLedgerType[] | Prisma.ListEnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAdminWalletLedgerTypeFilter<$PrismaModel> | $Enums.AdminWalletLedgerType
+}
+
+export type EnumAdminWalletLedgerTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AdminWalletLedgerType | Prisma.EnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AdminWalletLedgerType[] | Prisma.ListEnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AdminWalletLedgerType[] | Prisma.ListEnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAdminWalletLedgerTypeWithAggregatesFilter<$PrismaModel> | $Enums.AdminWalletLedgerType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAdminWalletLedgerTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAdminWalletLedgerTypeFilter<$PrismaModel>
+}
+
+export type EnumSellerSettlementStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SellerSettlementStatus | Prisma.EnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SellerSettlementStatus[] | Prisma.ListEnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SellerSettlementStatus[] | Prisma.ListEnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSellerSettlementStatusFilter<$PrismaModel> | $Enums.SellerSettlementStatus
+}
+
+export type EnumSellerSettlementStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SellerSettlementStatus | Prisma.EnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SellerSettlementStatus[] | Prisma.ListEnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SellerSettlementStatus[] | Prisma.ListEnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSellerSettlementStatusWithAggregatesFilter<$PrismaModel> | $Enums.SellerSettlementStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSellerSettlementStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSellerSettlementStatusFilter<$PrismaModel>
+}
+
 export type NestedUuidFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -954,6 +988,40 @@ export type NestedEnumPaymentStatusWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPaymentStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPaymentStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumAdminWalletLedgerTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.AdminWalletLedgerType | Prisma.EnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AdminWalletLedgerType[] | Prisma.ListEnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AdminWalletLedgerType[] | Prisma.ListEnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAdminWalletLedgerTypeFilter<$PrismaModel> | $Enums.AdminWalletLedgerType
+}
+
+export type NestedEnumAdminWalletLedgerTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AdminWalletLedgerType | Prisma.EnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AdminWalletLedgerType[] | Prisma.ListEnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AdminWalletLedgerType[] | Prisma.ListEnumAdminWalletLedgerTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAdminWalletLedgerTypeWithAggregatesFilter<$PrismaModel> | $Enums.AdminWalletLedgerType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAdminWalletLedgerTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAdminWalletLedgerTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumSellerSettlementStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SellerSettlementStatus | Prisma.EnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SellerSettlementStatus[] | Prisma.ListEnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SellerSettlementStatus[] | Prisma.ListEnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSellerSettlementStatusFilter<$PrismaModel> | $Enums.SellerSettlementStatus
+}
+
+export type NestedEnumSellerSettlementStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SellerSettlementStatus | Prisma.EnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SellerSettlementStatus[] | Prisma.ListEnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SellerSettlementStatus[] | Prisma.ListEnumSellerSettlementStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSellerSettlementStatusWithAggregatesFilter<$PrismaModel> | $Enums.SellerSettlementStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSellerSettlementStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSellerSettlementStatusFilter<$PrismaModel>
 }
 
 

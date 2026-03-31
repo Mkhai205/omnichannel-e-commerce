@@ -22,6 +22,7 @@ import {
   VnpLocale,
   dateFormat,
 } from 'vnpay';
+import { FinanceService } from '../finance/finance.service';
 import { PaymentsRepository } from './payments.repository';
 import { VNPAY_CONFIG_KEY } from 'src/core/config/env.constant';
 
@@ -67,6 +68,7 @@ export class PaymentsService {
   constructor(
     private readonly paymentsRepository: PaymentsRepository,
     private readonly configService: ConfigService,
+    private readonly financeService: FinanceService,
   ) {
     const tmnCode = this.getRequiredConfig('VNPAY_TMN_CODE');
     const secureSecret = this.getRequiredConfig('VNPAY_SECURE_SECRET');
@@ -401,6 +403,15 @@ export class PaymentsService {
         if (isSuccess) {
           await this.paymentsRepository.updateOrdersToPaid(
             payment.orders.map((item) => item.orderId),
+            tx,
+          );
+
+          await this.financeService.creditAdminOnPaymentSuccess(
+            {
+              paymentId: payment.id,
+              txnRef: payment.txnRef,
+              grossAmount: payment.amount.toString(),
+            },
             tx,
           );
         }

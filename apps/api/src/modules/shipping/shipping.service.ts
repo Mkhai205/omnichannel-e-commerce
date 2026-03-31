@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { RunAutoDeliveryResponse } from '@repo/shared-types';
+import { FinanceService } from '../finance/finance.service';
 import { ShippingRepository } from './shipping.repository';
 
 interface AutoShippingConfig {
@@ -15,7 +16,10 @@ export class ShippingService {
     batchSize: 50,
   };
 
-  constructor(private readonly shippingRepository: ShippingRepository) {}
+  constructor(
+    private readonly shippingRepository: ShippingRepository,
+    private readonly financeService: FinanceService,
+  ) {}
 
   async processAutoDelivery(
     now: Date = new Date(),
@@ -66,6 +70,13 @@ export class ShippingService {
           now,
           tx,
         );
+
+        if (settledUpdate.count > 0) {
+          await this.financeService.settleSellerOnDeliveredOrders(
+            processedOrderIds,
+            tx,
+          );
+        }
 
         return {
           runAt: now.toISOString(),
