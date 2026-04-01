@@ -1,5 +1,4 @@
 export const APP_CONFIG_KEY = {
-  APP_HOST: 'localhost',
   APP_PORT: 8000,
   APP_ENV: 'development',
   CORS_ORIGIN:
@@ -58,4 +57,8 @@ export const VNPAY_CONFIG_KEY = {
   VNPAY_LOCALE: 'vn',
   VNPAY_ORDER_TYPE: 'other',
   VNPAY_PAYMENT_EXPIRE_MINUTES: 15,
+} as const;
+
+export const SETTLEMENT_CONFIG_KEY = {
+  SETTLEMENT_ADMIN_COMMISSION_PERCENT: 5,
 } as const;

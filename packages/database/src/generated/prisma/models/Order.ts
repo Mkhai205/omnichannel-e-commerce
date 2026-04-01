@@ -305,6 +305,8 @@ export type OrderWhereInput = {
   shippingAddress?: Prisma.XOR<Prisma.AddressScalarRelationFilter, Prisma.AddressWhereInput>
   items?: Prisma.OrderItemListRelationFilter
   paymentOrders?: Prisma.PaymentOrderListRelationFilter
+  adminWalletLogs?: Prisma.AdminWalletLedgerListRelationFilter
+  sellerSettlement?: Prisma.XOR<Prisma.SellerSettlementNullableScalarRelationFilter, Prisma.SellerSettlementWhereInput> | null
 }
 
 export type OrderOrderByWithRelationInput = {
@@ -328,6 +330,8 @@ export type OrderOrderByWithRelationInput = {
   shippingAddress?: Prisma.AddressOrderByWithRelationInput
   items?: Prisma.OrderItemOrderByRelationAggregateInput
   paymentOrders?: Prisma.PaymentOrderOrderByRelationAggregateInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerOrderByRelationAggregateInput
+  sellerSettlement?: Prisma.SellerSettlementOrderByWithRelationInput
 }
 
 export type OrderWhereUniqueInput = Prisma.AtLeast<{
@@ -354,6 +358,8 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   shippingAddress?: Prisma.XOR<Prisma.AddressScalarRelationFilter, Prisma.AddressWhereInput>
   items?: Prisma.OrderItemListRelationFilter
   paymentOrders?: Prisma.PaymentOrderListRelationFilter
+  adminWalletLogs?: Prisma.AdminWalletLedgerListRelationFilter
+  sellerSettlement?: Prisma.XOR<Prisma.SellerSettlementNullableScalarRelationFilter, Prisma.SellerSettlementWhereInput> | null
 }, "id" | "orderNumber">
 
 export type OrderOrderByWithAggregationInput = {
@@ -418,6 +424,8 @@ export type OrderCreateInput = {
   shippingAddress: Prisma.AddressCreateNestedOneWithoutOrdersAsShippingInput
   items?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
   paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateInput = {
@@ -438,6 +446,8 @@ export type OrderUncheckedCreateInput = {
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUpdateInput = {
@@ -458,6 +468,8 @@ export type OrderUpdateInput = {
   shippingAddress?: Prisma.AddressUpdateOneRequiredWithoutOrdersAsShippingNestedInput
   items?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
   paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateInput = {
@@ -478,6 +490,8 @@ export type OrderUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderCreateManyInput = {
@@ -608,6 +622,11 @@ export type OrderSumOrderByAggregateInput = {
 export type OrderScalarRelationFilter = {
   is?: Prisma.OrderWhereInput
   isNot?: Prisma.OrderWhereInput
+}
+
+export type OrderNullableScalarRelationFilter = {
+  is?: Prisma.OrderWhereInput | null
+  isNot?: Prisma.OrderWhereInput | null
 }
 
 export type OrderCreateNestedManyWithoutUserInput = {
@@ -772,6 +791,36 @@ export type OrderUpdateOneRequiredWithoutPaymentOrdersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutPaymentOrdersInput, Prisma.OrderUpdateWithoutPaymentOrdersInput>, Prisma.OrderUncheckedUpdateWithoutPaymentOrdersInput>
 }
 
+export type OrderCreateNestedOneWithoutAdminWalletLogsInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutAdminWalletLogsInput, Prisma.OrderUncheckedCreateWithoutAdminWalletLogsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutAdminWalletLogsInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneWithoutAdminWalletLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutAdminWalletLogsInput, Prisma.OrderUncheckedCreateWithoutAdminWalletLogsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutAdminWalletLogsInput
+  upsert?: Prisma.OrderUpsertWithoutAdminWalletLogsInput
+  disconnect?: Prisma.OrderWhereInput | boolean
+  delete?: Prisma.OrderWhereInput | boolean
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutAdminWalletLogsInput, Prisma.OrderUpdateWithoutAdminWalletLogsInput>, Prisma.OrderUncheckedUpdateWithoutAdminWalletLogsInput>
+}
+
+export type OrderCreateNestedOneWithoutSellerSettlementInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutSellerSettlementInput, Prisma.OrderUncheckedCreateWithoutSellerSettlementInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutSellerSettlementInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneRequiredWithoutSellerSettlementNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutSellerSettlementInput, Prisma.OrderUncheckedCreateWithoutSellerSettlementInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutSellerSettlementInput
+  upsert?: Prisma.OrderUpsertWithoutSellerSettlementInput
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutSellerSettlementInput, Prisma.OrderUpdateWithoutSellerSettlementInput>, Prisma.OrderUncheckedUpdateWithoutSellerSettlementInput>
+}
+
 export type OrderCreateWithoutUserInput = {
   id?: string
   orderNumber: string
@@ -789,6 +838,8 @@ export type OrderCreateWithoutUserInput = {
   shippingAddress: Prisma.AddressCreateNestedOneWithoutOrdersAsShippingInput
   items?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
   paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutUserInput = {
@@ -808,6 +859,8 @@ export type OrderUncheckedCreateWithoutUserInput = {
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutUserInput = {
@@ -874,6 +927,8 @@ export type OrderCreateWithoutShopInput = {
   shippingAddress: Prisma.AddressCreateNestedOneWithoutOrdersAsShippingInput
   items?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
   paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutShopInput = {
@@ -893,6 +948,8 @@ export type OrderUncheckedCreateWithoutShopInput = {
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutShopInput = {
@@ -938,6 +995,8 @@ export type OrderCreateWithoutShippingAddressInput = {
   shop: Prisma.ShopCreateNestedOneWithoutOrdersInput
   items?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
   paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutShippingAddressInput = {
@@ -957,6 +1016,8 @@ export type OrderUncheckedCreateWithoutShippingAddressInput = {
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutShippingAddressInput = {
@@ -1002,6 +1063,8 @@ export type OrderCreateWithoutItemsInput = {
   shop: Prisma.ShopCreateNestedOneWithoutOrdersInput
   shippingAddress: Prisma.AddressCreateNestedOneWithoutOrdersAsShippingInput
   paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutItemsInput = {
@@ -1021,6 +1084,8 @@ export type OrderUncheckedCreateWithoutItemsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutItemsInput = {
@@ -1056,6 +1121,8 @@ export type OrderUpdateWithoutItemsInput = {
   shop?: Prisma.ShopUpdateOneRequiredWithoutOrdersNestedInput
   shippingAddress?: Prisma.AddressUpdateOneRequiredWithoutOrdersAsShippingNestedInput
   paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutItemsInput = {
@@ -1075,6 +1142,8 @@ export type OrderUncheckedUpdateWithoutItemsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderCreateWithoutPaymentOrdersInput = {
@@ -1094,6 +1163,8 @@ export type OrderCreateWithoutPaymentOrdersInput = {
   shop: Prisma.ShopCreateNestedOneWithoutOrdersInput
   shippingAddress: Prisma.AddressCreateNestedOneWithoutOrdersAsShippingInput
   items?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementCreateNestedOneWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutPaymentOrdersInput = {
@@ -1113,6 +1184,8 @@ export type OrderUncheckedCreateWithoutPaymentOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedCreateNestedOneWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutPaymentOrdersInput = {
@@ -1148,6 +1221,8 @@ export type OrderUpdateWithoutPaymentOrdersInput = {
   shop?: Prisma.ShopUpdateOneRequiredWithoutOrdersNestedInput
   shippingAddress?: Prisma.AddressUpdateOneRequiredWithoutOrdersAsShippingNestedInput
   items?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutPaymentOrdersInput = {
@@ -1167,6 +1242,208 @@ export type OrderUncheckedUpdateWithoutPaymentOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedUpdateOneWithoutOrderNestedInput
+}
+
+export type OrderCreateWithoutAdminWalletLogsInput = {
+  id?: string
+  orderNumber: string
+  status?: $Enums.OrderStatus
+  shippedAt?: Date | string | null
+  deliveredAt?: Date | string | null
+  settlementStatus?: $Enums.SettlementStatus
+  settledAt?: Date | string | null
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutOrdersInput
+  shop: Prisma.ShopCreateNestedOneWithoutOrdersInput
+  shippingAddress: Prisma.AddressCreateNestedOneWithoutOrdersAsShippingInput
+  items?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementCreateNestedOneWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutAdminWalletLogsInput = {
+  id?: string
+  orderNumber: string
+  userId: string
+  shopId: string
+  shippingAddressId: string
+  status?: $Enums.OrderStatus
+  shippedAt?: Date | string | null
+  deliveredAt?: Date | string | null
+  settlementStatus?: $Enums.SettlementStatus
+  settledAt?: Date | string | null
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutOrderInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedCreateNestedOneWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutAdminWalletLogsInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutAdminWalletLogsInput, Prisma.OrderUncheckedCreateWithoutAdminWalletLogsInput>
+}
+
+export type OrderUpsertWithoutAdminWalletLogsInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutAdminWalletLogsInput, Prisma.OrderUncheckedUpdateWithoutAdminWalletLogsInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutAdminWalletLogsInput, Prisma.OrderUncheckedCreateWithoutAdminWalletLogsInput>
+  where?: Prisma.OrderWhereInput
+}
+
+export type OrderUpdateToOneWithWhereWithoutAdminWalletLogsInput = {
+  where?: Prisma.OrderWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutAdminWalletLogsInput, Prisma.OrderUncheckedUpdateWithoutAdminWalletLogsInput>
+}
+
+export type OrderUpdateWithoutAdminWalletLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  shippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  settlementStatus?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
+  settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
+  shop?: Prisma.ShopUpdateOneRequiredWithoutOrdersNestedInput
+  shippingAddress?: Prisma.AddressUpdateOneRequiredWithoutOrdersAsShippingNestedInput
+  items?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUpdateOneWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutAdminWalletLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  shopId?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingAddressId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  shippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  settlementStatus?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
+  settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedUpdateOneWithoutOrderNestedInput
+}
+
+export type OrderCreateWithoutSellerSettlementInput = {
+  id?: string
+  orderNumber: string
+  status?: $Enums.OrderStatus
+  shippedAt?: Date | string | null
+  deliveredAt?: Date | string | null
+  settlementStatus?: $Enums.SettlementStatus
+  settledAt?: Date | string | null
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutOrdersInput
+  shop: Prisma.ShopCreateNestedOneWithoutOrdersInput
+  shippingAddress: Prisma.AddressCreateNestedOneWithoutOrdersAsShippingInput
+  items?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
+  paymentOrders?: Prisma.PaymentOrderCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerCreateNestedManyWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutSellerSettlementInput = {
+  id?: string
+  orderNumber: string
+  userId: string
+  shopId: string
+  shippingAddressId: string
+  status?: $Enums.OrderStatus
+  shippedAt?: Date | string | null
+  deliveredAt?: Date | string | null
+  settlementStatus?: $Enums.SettlementStatus
+  settledAt?: Date | string | null
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutOrderInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedCreateNestedManyWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutSellerSettlementInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutSellerSettlementInput, Prisma.OrderUncheckedCreateWithoutSellerSettlementInput>
+}
+
+export type OrderUpsertWithoutSellerSettlementInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutSellerSettlementInput, Prisma.OrderUncheckedUpdateWithoutSellerSettlementInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutSellerSettlementInput, Prisma.OrderUncheckedCreateWithoutSellerSettlementInput>
+  where?: Prisma.OrderWhereInput
+}
+
+export type OrderUpdateToOneWithWhereWithoutSellerSettlementInput = {
+  where?: Prisma.OrderWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutSellerSettlementInput, Prisma.OrderUncheckedUpdateWithoutSellerSettlementInput>
+}
+
+export type OrderUpdateWithoutSellerSettlementInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  shippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  settlementStatus?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
+  settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
+  shop?: Prisma.ShopUpdateOneRequiredWithoutOrdersNestedInput
+  shippingAddress?: Prisma.AddressUpdateOneRequiredWithoutOrdersAsShippingNestedInput
+  items?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
+  paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutSellerSettlementInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  shopId?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingAddressId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  shippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  settlementStatus?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
+  settledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
+  paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderCreateManyUserInput = {
@@ -1203,6 +1480,8 @@ export type OrderUpdateWithoutUserInput = {
   shippingAddress?: Prisma.AddressUpdateOneRequiredWithoutOrdersAsShippingNestedInput
   items?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
   paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutUserInput = {
@@ -1222,6 +1501,8 @@ export type OrderUncheckedUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutUserInput = {
@@ -1275,6 +1556,8 @@ export type OrderUpdateWithoutShopInput = {
   shippingAddress?: Prisma.AddressUpdateOneRequiredWithoutOrdersAsShippingNestedInput
   items?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
   paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutShopInput = {
@@ -1294,6 +1577,8 @@ export type OrderUncheckedUpdateWithoutShopInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutShopInput = {
@@ -1347,6 +1632,8 @@ export type OrderUpdateWithoutShippingAddressInput = {
   shop?: Prisma.ShopUpdateOneRequiredWithoutOrdersNestedInput
   items?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
   paymentOrders?: Prisma.PaymentOrderUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutShippingAddressInput = {
@@ -1366,6 +1653,8 @@ export type OrderUncheckedUpdateWithoutShippingAddressInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   paymentOrders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutOrderNestedInput
+  adminWalletLogs?: Prisma.AdminWalletLedgerUncheckedUpdateManyWithoutOrderNestedInput
+  sellerSettlement?: Prisma.SellerSettlementUncheckedUpdateOneWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutShippingAddressInput = {
@@ -1393,11 +1682,13 @@ export type OrderUncheckedUpdateManyWithoutShippingAddressInput = {
 export type OrderCountOutputType = {
   items: number
   paymentOrders: number
+  adminWalletLogs: number
 }
 
 export type OrderCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | OrderCountOutputTypeCountItemsArgs
   paymentOrders?: boolean | OrderCountOutputTypeCountPaymentOrdersArgs
+  adminWalletLogs?: boolean | OrderCountOutputTypeCountAdminWalletLogsArgs
 }
 
 /**
@@ -1424,6 +1715,13 @@ export type OrderCountOutputTypeCountPaymentOrdersArgs<ExtArgs extends runtime.T
   where?: Prisma.PaymentOrderWhereInput
 }
 
+/**
+ * OrderCountOutputType without action
+ */
+export type OrderCountOutputTypeCountAdminWalletLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AdminWalletLedgerWhereInput
+}
+
 
 export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1446,6 +1744,8 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   shippingAddress?: boolean | Prisma.AddressDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Order$itemsArgs<ExtArgs>
   paymentOrders?: boolean | Prisma.Order$paymentOrdersArgs<ExtArgs>
+  adminWalletLogs?: boolean | Prisma.Order$adminWalletLogsArgs<ExtArgs>
+  sellerSettlement?: boolean | Prisma.Order$sellerSettlementArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
 
@@ -1516,6 +1816,8 @@ export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   shippingAddress?: boolean | Prisma.AddressDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Order$itemsArgs<ExtArgs>
   paymentOrders?: boolean | Prisma.Order$paymentOrdersArgs<ExtArgs>
+  adminWalletLogs?: boolean | Prisma.Order$adminWalletLogsArgs<ExtArgs>
+  sellerSettlement?: boolean | Prisma.Order$sellerSettlementArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1537,6 +1839,8 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     shippingAddress: Prisma.$AddressPayload<ExtArgs>
     items: Prisma.$OrderItemPayload<ExtArgs>[]
     paymentOrders: Prisma.$PaymentOrderPayload<ExtArgs>[]
+    adminWalletLogs: Prisma.$AdminWalletLedgerPayload<ExtArgs>[]
+    sellerSettlement: Prisma.$SellerSettlementPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1953,6 +2257,8 @@ export interface Prisma__OrderClient<T, Null = never, ExtArgs extends runtime.Ty
   shippingAddress<T extends Prisma.AddressDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AddressDefaultArgs<ExtArgs>>): Prisma.Prisma__AddressClient<runtime.Types.Result.GetResult<Prisma.$AddressPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   items<T extends Prisma.Order$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   paymentOrders<T extends Prisma.Order$paymentOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$paymentOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  adminWalletLogs<T extends Prisma.Order$adminWalletLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$adminWalletLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminWalletLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sellerSettlement<T extends Prisma.Order$sellerSettlementArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$sellerSettlementArgs<ExtArgs>>): Prisma.Prisma__SellerSettlementClient<runtime.Types.Result.GetResult<Prisma.$SellerSettlementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2443,6 +2749,49 @@ export type Order$paymentOrdersArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.PaymentOrderScalarFieldEnum | Prisma.PaymentOrderScalarFieldEnum[]
+}
+
+/**
+ * Order.adminWalletLogs
+ */
+export type Order$adminWalletLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdminWalletLedger
+   */
+  select?: Prisma.AdminWalletLedgerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AdminWalletLedger
+   */
+  omit?: Prisma.AdminWalletLedgerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminWalletLedgerInclude<ExtArgs> | null
+  where?: Prisma.AdminWalletLedgerWhereInput
+  orderBy?: Prisma.AdminWalletLedgerOrderByWithRelationInput | Prisma.AdminWalletLedgerOrderByWithRelationInput[]
+  cursor?: Prisma.AdminWalletLedgerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AdminWalletLedgerScalarFieldEnum | Prisma.AdminWalletLedgerScalarFieldEnum[]
+}
+
+/**
+ * Order.sellerSettlement
+ */
+export type Order$sellerSettlementArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SellerSettlement
+   */
+  select?: Prisma.SellerSettlementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SellerSettlement
+   */
+  omit?: Prisma.SellerSettlementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SellerSettlementInclude<ExtArgs> | null
+  where?: Prisma.SellerSettlementWhereInput
 }
 
 /**

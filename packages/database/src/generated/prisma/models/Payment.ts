@@ -307,6 +307,7 @@ export type PaymentWhereInput = {
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   orders?: Prisma.PaymentOrderListRelationFilter
   webhookLogs?: Prisma.PaymentWebhookLogListRelationFilter
+  adminWalletLedgers?: Prisma.AdminWalletLedgerListRelationFilter
 }
 
 export type PaymentOrderByWithRelationInput = {
@@ -330,6 +331,7 @@ export type PaymentOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   orders?: Prisma.PaymentOrderOrderByRelationAggregateInput
   webhookLogs?: Prisma.PaymentWebhookLogOrderByRelationAggregateInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerOrderByRelationAggregateInput
 }
 
 export type PaymentWhereUniqueInput = Prisma.AtLeast<{
@@ -356,6 +358,7 @@ export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   orders?: Prisma.PaymentOrderListRelationFilter
   webhookLogs?: Prisma.PaymentWebhookLogListRelationFilter
+  adminWalletLedgers?: Prisma.AdminWalletLedgerListRelationFilter
 }, "id" | "txnRef">
 
 export type PaymentOrderByWithAggregationInput = {
@@ -426,6 +429,7 @@ export type PaymentCreateInput = {
   user: Prisma.UserCreateNestedOneWithoutPaymentsInput
   orders?: Prisma.PaymentOrderCreateNestedManyWithoutPaymentInput
   webhookLogs?: Prisma.PaymentWebhookLogCreateNestedManyWithoutPaymentInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerCreateNestedManyWithoutPaymentInput
 }
 
 export type PaymentUncheckedCreateInput = {
@@ -448,6 +452,7 @@ export type PaymentUncheckedCreateInput = {
   updatedAt?: Date | string
   orders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPaymentInput
   webhookLogs?: Prisma.PaymentWebhookLogUncheckedCreateNestedManyWithoutPaymentInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUncheckedCreateNestedManyWithoutPaymentInput
 }
 
 export type PaymentUpdateInput = {
@@ -470,6 +475,7 @@ export type PaymentUpdateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutPaymentsNestedInput
   orders?: Prisma.PaymentOrderUpdateManyWithoutPaymentNestedInput
   webhookLogs?: Prisma.PaymentWebhookLogUpdateManyWithoutPaymentNestedInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUpdateManyWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateInput = {
@@ -492,6 +498,7 @@ export type PaymentUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPaymentNestedInput
   webhookLogs?: Prisma.PaymentWebhookLogUncheckedUpdateManyWithoutPaymentNestedInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
 export type PaymentCreateManyInput = {
@@ -717,6 +724,22 @@ export type PaymentUpdateOneWithoutWebhookLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentUpdateToOneWithWhereWithoutWebhookLogsInput, Prisma.PaymentUpdateWithoutWebhookLogsInput>, Prisma.PaymentUncheckedUpdateWithoutWebhookLogsInput>
 }
 
+export type PaymentCreateNestedOneWithoutAdminWalletLedgersInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutAdminWalletLedgersInput, Prisma.PaymentUncheckedCreateWithoutAdminWalletLedgersInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutAdminWalletLedgersInput
+  connect?: Prisma.PaymentWhereUniqueInput
+}
+
+export type PaymentUpdateOneWithoutAdminWalletLedgersNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutAdminWalletLedgersInput, Prisma.PaymentUncheckedCreateWithoutAdminWalletLedgersInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutAdminWalletLedgersInput
+  upsert?: Prisma.PaymentUpsertWithoutAdminWalletLedgersInput
+  disconnect?: Prisma.PaymentWhereInput | boolean
+  delete?: Prisma.PaymentWhereInput | boolean
+  connect?: Prisma.PaymentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentUpdateToOneWithWhereWithoutAdminWalletLedgersInput, Prisma.PaymentUpdateWithoutAdminWalletLedgersInput>, Prisma.PaymentUncheckedUpdateWithoutAdminWalletLedgersInput>
+}
+
 export type PaymentCreateWithoutUserInput = {
   id?: string
   provider: $Enums.PaymentProvider
@@ -736,6 +759,7 @@ export type PaymentCreateWithoutUserInput = {
   updatedAt?: Date | string
   orders?: Prisma.PaymentOrderCreateNestedManyWithoutPaymentInput
   webhookLogs?: Prisma.PaymentWebhookLogCreateNestedManyWithoutPaymentInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerCreateNestedManyWithoutPaymentInput
 }
 
 export type PaymentUncheckedCreateWithoutUserInput = {
@@ -757,6 +781,7 @@ export type PaymentUncheckedCreateWithoutUserInput = {
   updatedAt?: Date | string
   orders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPaymentInput
   webhookLogs?: Prisma.PaymentWebhookLogUncheckedCreateNestedManyWithoutPaymentInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUncheckedCreateNestedManyWithoutPaymentInput
 }
 
 export type PaymentCreateOrConnectWithoutUserInput = {
@@ -827,6 +852,7 @@ export type PaymentCreateWithoutOrdersInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPaymentsInput
   webhookLogs?: Prisma.PaymentWebhookLogCreateNestedManyWithoutPaymentInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerCreateNestedManyWithoutPaymentInput
 }
 
 export type PaymentUncheckedCreateWithoutOrdersInput = {
@@ -848,6 +874,7 @@ export type PaymentUncheckedCreateWithoutOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   webhookLogs?: Prisma.PaymentWebhookLogUncheckedCreateNestedManyWithoutPaymentInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUncheckedCreateNestedManyWithoutPaymentInput
 }
 
 export type PaymentCreateOrConnectWithoutOrdersInput = {
@@ -885,6 +912,7 @@ export type PaymentUpdateWithoutOrdersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPaymentsNestedInput
   webhookLogs?: Prisma.PaymentWebhookLogUpdateManyWithoutPaymentNestedInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUpdateManyWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateWithoutOrdersInput = {
@@ -906,6 +934,7 @@ export type PaymentUncheckedUpdateWithoutOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   webhookLogs?: Prisma.PaymentWebhookLogUncheckedUpdateManyWithoutPaymentNestedInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
 export type PaymentCreateWithoutWebhookLogsInput = {
@@ -927,6 +956,7 @@ export type PaymentCreateWithoutWebhookLogsInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPaymentsInput
   orders?: Prisma.PaymentOrderCreateNestedManyWithoutPaymentInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerCreateNestedManyWithoutPaymentInput
 }
 
 export type PaymentUncheckedCreateWithoutWebhookLogsInput = {
@@ -948,6 +978,7 @@ export type PaymentUncheckedCreateWithoutWebhookLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   orders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPaymentInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUncheckedCreateNestedManyWithoutPaymentInput
 }
 
 export type PaymentCreateOrConnectWithoutWebhookLogsInput = {
@@ -985,6 +1016,7 @@ export type PaymentUpdateWithoutWebhookLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPaymentsNestedInput
   orders?: Prisma.PaymentOrderUpdateManyWithoutPaymentNestedInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUpdateManyWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateWithoutWebhookLogsInput = {
@@ -1006,6 +1038,111 @@ export type PaymentUncheckedUpdateWithoutWebhookLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPaymentNestedInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUncheckedUpdateManyWithoutPaymentNestedInput
+}
+
+export type PaymentCreateWithoutAdminWalletLedgersInput = {
+  id?: string
+  provider: $Enums.PaymentProvider
+  status?: $Enums.PaymentStatus
+  txnRef: string
+  gatewayTransactionNo?: string | null
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  bankCode?: string | null
+  orderInfo: string
+  paidAt?: Date | string | null
+  failedReason?: string | null
+  requestPayload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  responsePayload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPaymentsInput
+  orders?: Prisma.PaymentOrderCreateNestedManyWithoutPaymentInput
+  webhookLogs?: Prisma.PaymentWebhookLogCreateNestedManyWithoutPaymentInput
+}
+
+export type PaymentUncheckedCreateWithoutAdminWalletLedgersInput = {
+  id?: string
+  userId: string
+  provider: $Enums.PaymentProvider
+  status?: $Enums.PaymentStatus
+  txnRef: string
+  gatewayTransactionNo?: string | null
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  bankCode?: string | null
+  orderInfo: string
+  paidAt?: Date | string | null
+  failedReason?: string | null
+  requestPayload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  responsePayload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  orders?: Prisma.PaymentOrderUncheckedCreateNestedManyWithoutPaymentInput
+  webhookLogs?: Prisma.PaymentWebhookLogUncheckedCreateNestedManyWithoutPaymentInput
+}
+
+export type PaymentCreateOrConnectWithoutAdminWalletLedgersInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutAdminWalletLedgersInput, Prisma.PaymentUncheckedCreateWithoutAdminWalletLedgersInput>
+}
+
+export type PaymentUpsertWithoutAdminWalletLedgersInput = {
+  update: Prisma.XOR<Prisma.PaymentUpdateWithoutAdminWalletLedgersInput, Prisma.PaymentUncheckedUpdateWithoutAdminWalletLedgersInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutAdminWalletLedgersInput, Prisma.PaymentUncheckedCreateWithoutAdminWalletLedgersInput>
+  where?: Prisma.PaymentWhereInput
+}
+
+export type PaymentUpdateToOneWithWhereWithoutAdminWalletLedgersInput = {
+  where?: Prisma.PaymentWhereInput
+  data: Prisma.XOR<Prisma.PaymentUpdateWithoutAdminWalletLedgersInput, Prisma.PaymentUncheckedUpdateWithoutAdminWalletLedgersInput>
+}
+
+export type PaymentUpdateWithoutAdminWalletLedgersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumPaymentProviderFieldUpdateOperationsInput | $Enums.PaymentProvider
+  status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  txnRef?: Prisma.StringFieldUpdateOperationsInput | string
+  gatewayTransactionNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderInfo?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestPayload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  responsePayload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPaymentsNestedInput
+  orders?: Prisma.PaymentOrderUpdateManyWithoutPaymentNestedInput
+  webhookLogs?: Prisma.PaymentWebhookLogUpdateManyWithoutPaymentNestedInput
+}
+
+export type PaymentUncheckedUpdateWithoutAdminWalletLedgersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumPaymentProviderFieldUpdateOperationsInput | $Enums.PaymentProvider
+  status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  txnRef?: Prisma.StringFieldUpdateOperationsInput | string
+  gatewayTransactionNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderInfo?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestPayload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  responsePayload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPaymentNestedInput
+  webhookLogs?: Prisma.PaymentWebhookLogUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
 export type PaymentCreateManyUserInput = {
@@ -1046,6 +1183,7 @@ export type PaymentUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.PaymentOrderUpdateManyWithoutPaymentNestedInput
   webhookLogs?: Prisma.PaymentWebhookLogUpdateManyWithoutPaymentNestedInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUpdateManyWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateWithoutUserInput = {
@@ -1067,6 +1205,7 @@ export type PaymentUncheckedUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.PaymentOrderUncheckedUpdateManyWithoutPaymentNestedInput
   webhookLogs?: Prisma.PaymentWebhookLogUncheckedUpdateManyWithoutPaymentNestedInput
+  adminWalletLedgers?: Prisma.AdminWalletLedgerUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateManyWithoutUserInput = {
@@ -1096,11 +1235,13 @@ export type PaymentUncheckedUpdateManyWithoutUserInput = {
 export type PaymentCountOutputType = {
   orders: number
   webhookLogs: number
+  adminWalletLedgers: number
 }
 
 export type PaymentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   orders?: boolean | PaymentCountOutputTypeCountOrdersArgs
   webhookLogs?: boolean | PaymentCountOutputTypeCountWebhookLogsArgs
+  adminWalletLedgers?: boolean | PaymentCountOutputTypeCountAdminWalletLedgersArgs
 }
 
 /**
@@ -1127,6 +1268,13 @@ export type PaymentCountOutputTypeCountWebhookLogsArgs<ExtArgs extends runtime.T
   where?: Prisma.PaymentWebhookLogWhereInput
 }
 
+/**
+ * PaymentCountOutputType without action
+ */
+export type PaymentCountOutputTypeCountAdminWalletLedgersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AdminWalletLedgerWhereInput
+}
+
 
 export type PaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1149,6 +1297,7 @@ export type PaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   orders?: boolean | Prisma.Payment$ordersArgs<ExtArgs>
   webhookLogs?: boolean | Prisma.Payment$webhookLogsArgs<ExtArgs>
+  adminWalletLedgers?: boolean | Prisma.Payment$adminWalletLedgersArgs<ExtArgs>
   _count?: boolean | Prisma.PaymentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
 
@@ -1219,6 +1368,7 @@ export type PaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   orders?: boolean | Prisma.Payment$ordersArgs<ExtArgs>
   webhookLogs?: boolean | Prisma.Payment$webhookLogsArgs<ExtArgs>
+  adminWalletLedgers?: boolean | Prisma.Payment$adminWalletLedgersArgs<ExtArgs>
   _count?: boolean | Prisma.PaymentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PaymentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1234,6 +1384,7 @@ export type $PaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     user: Prisma.$UserPayload<ExtArgs>
     orders: Prisma.$PaymentOrderPayload<ExtArgs>[]
     webhookLogs: Prisma.$PaymentWebhookLogPayload<ExtArgs>[]
+    adminWalletLedgers: Prisma.$AdminWalletLedgerPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1650,6 +1801,7 @@ export interface Prisma__PaymentClient<T, Null = never, ExtArgs extends runtime.
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   orders<T extends Prisma.Payment$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   webhookLogs<T extends Prisma.Payment$webhookLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$webhookLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentWebhookLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  adminWalletLedgers<T extends Prisma.Payment$adminWalletLedgersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$adminWalletLedgersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminWalletLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2142,6 +2294,30 @@ export type Payment$webhookLogsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.PaymentWebhookLogScalarFieldEnum | Prisma.PaymentWebhookLogScalarFieldEnum[]
+}
+
+/**
+ * Payment.adminWalletLedgers
+ */
+export type Payment$adminWalletLedgersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdminWalletLedger
+   */
+  select?: Prisma.AdminWalletLedgerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AdminWalletLedger
+   */
+  omit?: Prisma.AdminWalletLedgerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminWalletLedgerInclude<ExtArgs> | null
+  where?: Prisma.AdminWalletLedgerWhereInput
+  orderBy?: Prisma.AdminWalletLedgerOrderByWithRelationInput | Prisma.AdminWalletLedgerOrderByWithRelationInput[]
+  cursor?: Prisma.AdminWalletLedgerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AdminWalletLedgerScalarFieldEnum | Prisma.AdminWalletLedgerScalarFieldEnum[]
 }
 
 /**

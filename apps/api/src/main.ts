@@ -32,18 +32,17 @@ async function bootstrap() {
   app.use(cookieParser());
 
   const configService = app.get(ConfigService);
-  const corsOrigin = configService.get<string>('CORS_ORIGIN');
+  // const corsOrigin = configService.get<string>('CORS_ORIGIN');
 
-  app.enableCors({
-    credentials: true,
-    origin: corsOrigin ?? true,
-  });
+  // app.enableCors({
+  //   credentials: true,
+  //   origin: corsOrigin ?? true,
+  // });
 
   const appEnv = configService.get<string>('APP_ENV', APP_CONFIG_KEY.APP_ENV);
   const swaggerEnabled =
     configService.get<string>('SWAGGER_ENABLED') ??
     (appEnv === 'production' ? 'false' : 'true');
-  const host = configService.get<string>('APP_HOST', APP_CONFIG_KEY.APP_HOST);
   const port = configService.get<number>('APP_PORT', APP_CONFIG_KEY.APP_PORT);
 
   if (swaggerEnabled === 'true') {
@@ -77,11 +76,11 @@ async function bootstrap() {
     });
   }
 
-  await app.listen(port, host);
-  logger.log(`🚀 API listening on http://${host}:${port}`);
+  await app.listen(port);
+  logger.log(`🚀 API listening on http://localhost:${port}`);
 
   if (swaggerEnabled === 'true') {
-    logger.log(`📘 Swagger UI: http://${host}:${port}/${docsPath}`);
+    logger.log(`📘 Swagger UI: http://$localhost:${port}/${docsPath}`);
   }
 }
 void bootstrap();

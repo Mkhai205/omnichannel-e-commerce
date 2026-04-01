@@ -106,3 +106,19 @@ export const PaymentStatus = {
 } as const
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const AdminWalletLedgerType = {
+  PAYMENT_INFLOW: 'PAYMENT_INFLOW',
+  SELLER_SETTLEMENT: 'SELLER_SETTLEMENT'
+} as const
+
+export type AdminWalletLedgerType = (typeof AdminWalletLedgerType)[keyof typeof AdminWalletLedgerType]
+
+
+export const SellerSettlementStatus = {
+  COMPLETED: 'COMPLETED',
+  REVERSED: 'REVERSED'
+} as const
+
+export type SellerSettlementStatus = (typeof SellerSettlementStatus)[keyof typeof SellerSettlementStatus]

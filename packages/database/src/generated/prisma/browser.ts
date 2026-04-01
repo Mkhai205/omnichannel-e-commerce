@@ -97,3 +97,23 @@ export type PaymentOrder = Prisma.PaymentOrderModel
  * 
  */
 export type PaymentWebhookLog = Prisma.PaymentWebhookLogModel
+/**
+ * Model AdminWallet
+ * 
+ */
+export type AdminWallet = Prisma.AdminWalletModel
+/**
+ * Model AdminWalletLedger
+ * 
+ */
+export type AdminWalletLedger = Prisma.AdminWalletLedgerModel
+/**
+ * Model SellerWallet
+ * 
+ */
+export type SellerWallet = Prisma.SellerWalletModel
+/**
+ * Model SellerSettlement
+ * 
+ */
+export type SellerSettlement = Prisma.SellerSettlementModel

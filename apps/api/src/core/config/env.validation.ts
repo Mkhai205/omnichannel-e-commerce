@@ -7,6 +7,7 @@ import {
   JWT_CONFIG_KEY,
   MAIL_CONFIG_KEY,
   MINIO_CONFIG_KEY,
+  SETTLEMENT_CONFIG_KEY,
   VNPAY_CONFIG_KEY,
 } from './env.constant';
 
@@ -145,7 +146,6 @@ export function validateEnv(config: RawEnv): RawEnv {
   return {
     ...config,
     // Application configuration
-    APP_HOST: String(config.APP_HOST ?? APP_CONFIG_KEY.APP_HOST),
     APP_PORT: parseNumber(config.APP_PORT, APP_CONFIG_KEY.APP_PORT, 'APP_PORT'),
     APP_ENV: String(config.APP_ENV ?? APP_CONFIG_KEY.APP_ENV),
     CORS_ORIGIN: String(config.CORS_ORIGIN ?? APP_CONFIG_KEY.CORS_ORIGIN),
@@ -292,6 +292,12 @@ export function validateEnv(config: RawEnv): RawEnv {
       config.VNPAY_PAYMENT_EXPIRE_MINUTES,
       VNPAY_CONFIG_KEY.VNPAY_PAYMENT_EXPIRE_MINUTES,
       'VNPAY_PAYMENT_EXPIRE_MINUTES',
+    ),
+    // Settlement configuration
+    SETTLEMENT_ADMIN_COMMISSION_PERCENT: parseNumber(
+      config.SETTLEMENT_ADMIN_COMMISSION_PERCENT,
+      SETTLEMENT_CONFIG_KEY.SETTLEMENT_ADMIN_COMMISSION_PERCENT,
+      'SETTLEMENT_ADMIN_COMMISSION_PERCENT',
     ),
   };
 }

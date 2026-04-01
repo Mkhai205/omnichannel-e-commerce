@@ -1,40 +1,53 @@
 services:
-    db:
-        image: postgres:16-alpine
+    postgres:
+        image: postgres:15-alpine
         restart: always
-        environment:
-            POSTGRES_USER: ${POSTGRES_USER:-postgres}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_password}
-            POSTGRES_DB: ${POSTGRES_DB}
+        env_file:
+            - .env
         ports:
             - "${POSTGRES_DB_PORT}:5432"
         volumes:
-            - postgres_data:/var/lib/postgresql/data
+            - pgdata:/var/lib/postgresql/data
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB}"]
-            interval: 5s
+            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+            interval: 10s
             timeout: 5s
             retries: 5
+        networks:
+            - ecommerce-network
 
-    # 2. Storage: MinIO
     minio:
-        image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+        image: minio/minio
         restart: always
         command: server /data --console-address ":9001"
-        environment:
-            MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-            MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+        env_file:
+            - .env
         ports:
-            - "${MINIO_API_PORT}:9000" # Port cho API gọi
-            - "${MINIO_UI_PORT}:9001" # Port cho giao diện Web Admin
+            - "${MINIO_API_PORT}:9000"
+            - "${MINIO_UI_PORT}:9001"
         volumes:
             - minio_data:/data
-        healthcheck:
-            test: ["CMD", "mc", "ready", "local"]
-            interval: 5s
-            timeout: 5s
-            retries: 5
+        networks:
+            - ecommerce-network
+
+    api:
+        image: ${DOCKERHUB_USERNAME}/ecommerce-api:latest
+        restart: always
+        env_file:
+            - .env
+        ports:
+            - "${API_PORT}:${APP_PORT}"
+        depends_on:
+            - postgres
+            - minio
+        networks:
+            - ecommerce-network
 
 volumes:
-    postgres_data:
+    pgdata:
     minio_data:
+
+networks:
+    ecommerce-network:
+        name: ecommerce-network
+        driver: bridge
