@@ -24,6 +24,8 @@ export interface CheckoutOrderItem {
     productId: UUID;
     productName: string;
     variantSku: string;
+    imageKey?: string | null;
+    imageUrl?: string | null;
     quantity: number;
     unitPrice: string;
     lineTotal: string;

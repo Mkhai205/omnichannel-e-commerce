@@ -2,6 +2,8 @@ import type { PaginatedResponse, UUID } from "./common.js";
 
 export type ProductStatus = "DRAFT" | "ACTIVE" | "HIDDEN";
 
+export type CatalogImageEntityType = "CATEGORY" | "PRODUCT" | "PRODUCT_VARIANT";
+
 export type InventoryLogType = "IMPORT" | "EXPORT" | "RETURN" | "ORDER_DEDUCT";
 
 export type VariantAttributes = Record<string, string>;
@@ -13,6 +15,8 @@ export interface CategoryItem {
     parentId?: UUID | null;
     name: string;
     slug: string;
+    imageKey?: string | null;
+    imageUrl?: string | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -23,6 +27,8 @@ export interface ProductVariantItem {
     sku: string;
     attributes: VariantAttributes;
     price: string;
+    imageKey?: string | null;
+    imageUrl?: string | null;
     stockQuantity: number;
     createdAt: string;
     updatedAt: string;
@@ -34,6 +40,8 @@ export interface ProductItem {
     categoryId: UUID;
     name: string;
     description?: string | null;
+    imageKey?: string | null;
+    imageUrl?: string | null;
     omnichannelSyncStatus: OmnichannelSyncStatus;
     status: ProductStatus;
     createdAt: string;
@@ -79,12 +87,14 @@ export interface CreateCategoryRequest {
     parentId?: UUID;
     name: string;
     slug: string;
+    imageKey?: string | null;
 }
 
 export interface CreateProductRequest {
     categoryId: UUID;
     name: string;
     description?: string;
+    imageKey?: string | null;
     status?: ProductStatus;
     omnichannelSyncStatus?: OmnichannelSyncStatus;
 }
@@ -93,6 +103,7 @@ export interface UpdateProductRequest {
     categoryId?: UUID;
     name?: string;
     description?: string;
+    imageKey?: string | null;
     status?: ProductStatus;
     omnichannelSyncStatus?: OmnichannelSyncStatus;
 }
@@ -105,12 +116,14 @@ export interface CreateProductVariantRequest {
     sku: string;
     attributes: VariantAttributes;
     price: string;
+    imageKey?: string | null;
     stockQuantity?: number;
 }
 
 export interface UpdateProductVariantRequest {
     attributes?: VariantAttributes;
     price?: string;
+    imageKey?: string | null;
     stockQuantity?: number;
 }
 
@@ -118,6 +131,17 @@ export interface CreateInventoryLogRequest {
     type: InventoryLogType;
     quantityChanged: number;
     note?: string;
+}
+
+export interface UploadCatalogImageRequest {
+    entityType: CatalogImageEntityType;
+    entityId: UUID;
+}
+
+export interface UploadCatalogImageResult {
+    bucketName: string;
+    objectKey: string;
+    imageUrl?: string | null;
 }
 
 export type CategoriesListResponse = PaginatedResponse<CategoryItem>;

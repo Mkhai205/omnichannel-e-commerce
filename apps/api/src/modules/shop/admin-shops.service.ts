@@ -10,12 +10,17 @@ import type {
   AdminUpdateShopStatusRequest,
   ShopDetail,
 } from '@repo/shared-types';
+import { resolveShopAvatarUrl } from '../../core/http/shop-avatar-url.helper';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import type { AdminShopRecord, ShopDetailRecord } from './shops.repository';
 import { ShopsRepository } from './shops.repository';
 
 @Injectable()
 export class AdminShopsService {
-  constructor(private readonly shopsRepository: ShopsRepository) {}
+  constructor(
+    private readonly shopsRepository: ShopsRepository,
+    private readonly storageService: StorageService,
+  ) {}
 
   async getAdminShops(
     filters: AdminShopsFilterRequest,
@@ -112,6 +117,8 @@ export class AdminShopsService {
       shopName: shop.shopName,
       slug: shop.slug,
       description: shop.description,
+      avatarKey: shop.avatarKey,
+      avatarUrl: resolveShopAvatarUrl(this.storageService, shop.avatarKey),
       businessLicense: shop.businessLicense,
       status: shop.status,
       rejectionReason: shop.rejectionReason,
@@ -129,6 +136,8 @@ export class AdminShopsService {
       shopName: shop.shopName,
       slug: shop.slug,
       description: shop.description,
+      avatarKey: shop.avatarKey,
+      avatarUrl: resolveShopAvatarUrl(this.storageService, shop.avatarKey),
       businessLicense: shop.businessLicense,
       status: shop.status,
       rejectionReason: shop.rejectionReason,

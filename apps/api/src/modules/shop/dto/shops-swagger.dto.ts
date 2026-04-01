@@ -12,6 +12,19 @@ export class PublicShopSwaggerDto {
 
   @ApiPropertyOptional({ example: 'Welcome to my shop!' })
   description?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example: 'shops/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/avatar.jpg',
+  })
+  avatarKey?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example:
+      'http://localhost:9000/products/shops/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/avatar.jpg',
+  })
+  avatarUrl?: string | null;
 }
 
 export class ShopDetailSwaggerDto {
@@ -29,6 +42,19 @@ export class ShopDetailSwaggerDto {
 
   @ApiPropertyOptional({ example: 'Welcome to my shop!' })
   description?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example: 'shops/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/avatar.jpg',
+  })
+  avatarKey?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example:
+      'http://localhost:9000/products/shops/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/avatar.jpg',
+  })
+  avatarUrl?: string | null;
 
   @ApiPropertyOptional({
     example: 'https://minio.local/licenses/shop-license.png',
@@ -87,4 +113,21 @@ export class AdminShopsListDataSwaggerDto {
 
   @ApiProperty({ type: PaginationMetaSwaggerDto })
   meta!: PaginationMetaSwaggerDto;
+}
+
+export class UploadShopAvatarResultSwaggerDto {
+  @ApiProperty({ example: 'products' })
+  bucketName!: string;
+
+  @ApiProperty({
+    example: 'shops/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/avatar.jpg',
+  })
+  objectKey!: string;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example:
+      'http://localhost:9000/products/shops/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/avatar.jpg',
+  })
+  avatarUrl?: string | null;
 }

@@ -20,6 +20,7 @@ export type VariantSeedInput = {
     sku: string;
     attributes: Prisma.InputJsonValue;
     price: string;
+    imageKey: string;
     stockQuantity: number;
 };
 

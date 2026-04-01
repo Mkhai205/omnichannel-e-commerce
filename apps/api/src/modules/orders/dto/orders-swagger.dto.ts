@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CheckoutOrderItemSwaggerDto {
   @ApiProperty({ format: 'uuid' })
@@ -18,6 +18,20 @@ export class CheckoutOrderItemSwaggerDto {
 
   @ApiProperty({ example: 'PEG40-BLK-42' })
   variantSku!: string;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example:
+      'products/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/variants/5f19831d-23de-4d7e-a3f8-f4f98978cbce.jpg',
+  })
+  imageKey?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example:
+      'http://localhost:9000/products/products/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/variants/5f19831d-23de-4d7e-a3f8-f4f98978cbce.jpg',
+  })
+  imageUrl?: string | null;
 
   @ApiProperty({ example: 2 })
   quantity!: number;
