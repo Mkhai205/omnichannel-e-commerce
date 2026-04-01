@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { faker } from "@faker-js/faker";
+import { faker } from "./seed/faker.js";
 import { createPrismaClient } from "./client.js";
 import { cleanDatabase } from "./seed/cleanup.js";
 import { getRequiredDatabaseUrl, parseSeedValue } from "./seed/config.js";

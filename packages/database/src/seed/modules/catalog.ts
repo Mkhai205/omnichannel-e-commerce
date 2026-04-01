@@ -1,8 +1,23 @@
-import { faker } from "@faker-js/faker";
+import { faker } from "../faker.js";
 import type { Prisma, PrismaClient } from "../../generated/prisma/client.js";
 import { EXTRA_PRODUCT_COUNT, SEED_IDS } from "../constants.js";
 import type { CatalogSeedResult, VariantSeedInput } from "../types.js";
 import { formatCents } from "../utils.js";
+import {
+    randomVietnameseColor,
+    randomVietnameseMaterial,
+    randomVietnameseProductDescription,
+    randomVietnameseProductName,
+} from "../vietnamese.js";
+
+const CATEGORY_KEY_BY_ID: Record<string, string> = {
+    [SEED_IDS.categories.electronics]: "electronics",
+    [SEED_IDS.categories.smartphones]: "smartphones",
+    [SEED_IDS.categories.laptops]: "laptops",
+    [SEED_IDS.categories.menFashion]: "menFashion",
+    [SEED_IDS.categories.kitchen]: "kitchen",
+    [SEED_IDS.categories.homeLiving]: "homeLiving",
+};
 
 function buildFixedCatalog(): {
     products: Prisma.ProductCreateManyInput[];
@@ -13,8 +28,8 @@ function buildFixedCatalog(): {
             id: SEED_IDS.products.smartphoneA,
             shopId: SEED_IDS.shops.approved,
             categoryId: SEED_IDS.categories.smartphones,
-            name: `${faker.commerce.productAdjective()} ${faker.commerce.productMaterial()} Phone`,
-            description: faker.commerce.productDescription(),
+            name: randomVietnameseProductName("smartphones"),
+            description: randomVietnameseProductDescription(),
             omnichannelSyncStatus: { tiktok: "pending", lazada: "success" },
             status: "ACTIVE",
         },
@@ -22,8 +37,8 @@ function buildFixedCatalog(): {
             id: SEED_IDS.products.smartphoneB,
             shopId: SEED_IDS.shops.approved,
             categoryId: SEED_IDS.categories.smartphones,
-            name: `${faker.commerce.productAdjective()} Camera Phone`,
-            description: faker.commerce.productDescription(),
+            name: randomVietnameseProductName("smartphones"),
+            description: randomVietnameseProductDescription(),
             omnichannelSyncStatus: { tiktok: "success", shopee: "pending" },
             status: "ACTIVE",
         },
@@ -31,8 +46,8 @@ function buildFixedCatalog(): {
             id: SEED_IDS.products.laptopA,
             shopId: SEED_IDS.shops.approved,
             categoryId: SEED_IDS.categories.laptops,
-            name: `${faker.commerce.productAdjective()} Work Laptop`,
-            description: faker.commerce.productDescription(),
+            name: randomVietnameseProductName("laptops"),
+            description: randomVietnameseProductDescription(),
             omnichannelSyncStatus: { tiktok: "disabled" },
             status: "ACTIVE",
         },
@@ -40,8 +55,8 @@ function buildFixedCatalog(): {
             id: SEED_IDS.products.jacketA,
             shopId: SEED_IDS.shops.approved,
             categoryId: SEED_IDS.categories.menFashion,
-            name: `${faker.commerce.productAdjective()} Jacket`,
-            description: faker.commerce.productDescription(),
+            name: randomVietnameseProductName("menFashion"),
+            description: randomVietnameseProductDescription(),
             omnichannelSyncStatus: {},
             status: "DRAFT",
         },
@@ -49,8 +64,8 @@ function buildFixedCatalog(): {
             id: SEED_IDS.products.blenderA,
             shopId: SEED_IDS.shops.approved,
             categoryId: SEED_IDS.categories.kitchen,
-            name: `${faker.commerce.productAdjective()} Blender`,
-            description: faker.commerce.productDescription(),
+            name: randomVietnameseProductName("kitchen"),
+            description: randomVietnameseProductDescription(),
             omnichannelSyncStatus: { lazada: "pending" },
             status: "ACTIVE",
         },
@@ -58,8 +73,8 @@ function buildFixedCatalog(): {
             id: SEED_IDS.products.speakerA,
             shopId: SEED_IDS.shops.approved,
             categoryId: SEED_IDS.categories.electronics,
-            name: `${faker.commerce.productAdjective()} Bluetooth Speaker`,
-            description: faker.commerce.productDescription(),
+            name: randomVietnameseProductName("electronics"),
+            description: randomVietnameseProductDescription(),
             omnichannelSyncStatus: {},
             status: "HIDDEN",
         },
@@ -70,7 +85,7 @@ function buildFixedCatalog(): {
             id: SEED_IDS.variants.smartphoneA128,
             productId: SEED_IDS.products.smartphoneA,
             sku: "SEED-SMARTA-128",
-            attributes: { color: faker.color.human(), storage: "128GB" },
+            attributes: { color: randomVietnameseColor(), storage: "128GB" },
             price: "999.00",
             stockQuantity: 30,
         },
@@ -78,7 +93,7 @@ function buildFixedCatalog(): {
             id: SEED_IDS.variants.smartphoneA256,
             productId: SEED_IDS.products.smartphoneA,
             sku: "SEED-SMARTA-256",
-            attributes: { color: faker.color.human(), storage: "256GB" },
+            attributes: { color: randomVietnameseColor(), storage: "256GB" },
             price: "1199.00",
             stockQuantity: 24,
         },
@@ -86,7 +101,7 @@ function buildFixedCatalog(): {
             id: SEED_IDS.variants.smartphoneB128,
             productId: SEED_IDS.products.smartphoneB,
             sku: "SEED-SMARTB-128",
-            attributes: { color: faker.color.human(), storage: "128GB" },
+            attributes: { color: randomVietnameseColor(), storage: "128GB" },
             price: "899.00",
             stockQuantity: 28,
         },
@@ -94,7 +109,7 @@ function buildFixedCatalog(): {
             id: SEED_IDS.variants.smartphoneB256,
             productId: SEED_IDS.products.smartphoneB,
             sku: "SEED-SMARTB-256",
-            attributes: { color: faker.color.human(), storage: "256GB" },
+            attributes: { color: randomVietnameseColor(), storage: "256GB" },
             price: "1099.00",
             stockQuantity: 20,
         },
@@ -118,7 +133,7 @@ function buildFixedCatalog(): {
             id: SEED_IDS.variants.jacketAM,
             productId: SEED_IDS.products.jacketA,
             sku: "SEED-JACKETA-M",
-            attributes: { size: "M", color: faker.color.human() },
+            attributes: { size: "M", color: randomVietnameseColor() },
             price: "129.00",
             stockQuantity: 40,
         },
@@ -126,7 +141,7 @@ function buildFixedCatalog(): {
             id: SEED_IDS.variants.jacketAL,
             productId: SEED_IDS.products.jacketA,
             sku: "SEED-JACKETA-L",
-            attributes: { size: "L", color: faker.color.human() },
+            attributes: { size: "L", color: randomVietnameseColor() },
             price: "129.00",
             stockQuantity: 35,
         },
@@ -134,7 +149,7 @@ function buildFixedCatalog(): {
             id: SEED_IDS.variants.blenderAWhite,
             productId: SEED_IDS.products.blenderA,
             sku: "SEED-BLENDERA-WHITE",
-            attributes: { color: "White", power: "600W" },
+            attributes: { color: "Trắng", power: "600W" },
             price: "159.00",
             stockQuantity: 21,
         },
@@ -142,7 +157,7 @@ function buildFixedCatalog(): {
             id: SEED_IDS.variants.blenderABlack,
             productId: SEED_IDS.products.blenderA,
             sku: "SEED-BLENDERA-BLACK",
-            attributes: { color: "Black", power: "600W" },
+            attributes: { color: "Đen", power: "600W" },
             price: "159.00",
             stockQuantity: 19,
         },
@@ -150,7 +165,7 @@ function buildFixedCatalog(): {
             id: SEED_IDS.variants.speakerABlack,
             productId: SEED_IDS.products.speakerA,
             sku: "SEED-SPEAKERA-BLACK",
-            attributes: { color: "Black", connectivity: "Bluetooth 5.3" },
+            attributes: { color: "Đen", connectivity: "Bluetooth 5.3" },
             price: "89.00",
             stockQuantity: 50,
         },
@@ -158,7 +173,7 @@ function buildFixedCatalog(): {
             id: SEED_IDS.variants.speakerABlue,
             productId: SEED_IDS.products.speakerA,
             sku: "SEED-SPEAKERA-BLUE",
-            attributes: { color: "Blue", connectivity: "Bluetooth 5.3" },
+            attributes: { color: "Xanh dương", connectivity: "Bluetooth 5.3" },
             price: "89.00",
             stockQuantity: 44,
         },
@@ -189,6 +204,7 @@ function buildExtraCatalog(): {
     for (let productIndex = 1; productIndex <= EXTRA_PRODUCT_COUNT; productIndex += 1) {
         const productId = faker.string.uuid();
         const categoryId = faker.helpers.arrayElement(categoryPool);
+        const categoryKey = CATEGORY_KEY_BY_ID[categoryId] ?? "electronics";
         const productStatus = faker.helpers.weightedArrayElement([
             { value: "ACTIVE" as const, weight: 8 },
             { value: "DRAFT" as const, weight: 1 },
@@ -199,8 +215,8 @@ function buildExtraCatalog(): {
             id: productId,
             shopId: SEED_IDS.shops.approved,
             categoryId,
-            name: `${faker.commerce.productAdjective()} ${faker.commerce.productName()}`,
-            description: faker.commerce.productDescription(),
+            name: randomVietnameseProductName(categoryKey),
+            description: randomVietnameseProductDescription(),
             omnichannelSyncStatus: {
                 tiktok: faker.helpers.arrayElement(["pending", "success", "failed"]),
                 lazada: faker.helpers.arrayElement(["pending", "success", "disabled"]),
@@ -220,9 +236,9 @@ function buildExtraCatalog(): {
                 productId,
                 sku,
                 attributes: {
-                    color: faker.color.human(),
+                    color: randomVietnameseColor(),
                     size: faker.helpers.arrayElement(["S", "M", "L", "XL"]),
-                    material: faker.commerce.productMaterial(),
+                    material: randomVietnameseMaterial(),
                 },
                 price: formatCents(BigInt(priceCents)),
                 stockQuantity,
@@ -260,14 +276,14 @@ export async function seedCatalog(prisma: PrismaClient): Promise<CatalogSeedResu
         variantId: variant.id,
         type: "IMPORT",
         quantityChanged: variant.stockQuantity,
-        note: "Initial stock import from seed",
+        note: "Nhập kho ban đầu từ seed",
     }));
 
     inventoryLogs.push({
         variantId: SEED_IDS.variants.smartphoneA128,
         type: "ORDER_DEDUCT",
         quantityChanged: -2,
-        note: "Seed simulation for checkout deduction",
+        note: "Mô phỏng trừ tồn khi thanh toán",
     });
 
     await prisma.inventoryLog.createMany({ data: inventoryLogs });

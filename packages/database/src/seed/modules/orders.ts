@@ -1,8 +1,8 @@
-import { faker } from "@faker-js/faker";
 import type { Prisma, PrismaClient } from "../../generated/prisma/client.js";
 import { SEED_IDS } from "../constants.js";
 import type { VariantSeedInput } from "../types.js";
 import { calculateLineTotal, formatCents, parseMoneyToCents } from "../utils.js";
+import { randomOrderNote } from "../vietnamese.js";
 
 export async function seedOrders(
     prisma: PrismaClient,
@@ -82,7 +82,7 @@ export async function seedOrders(
             settlementStatus: "PENDING",
             subtotal: formatCents(subtotalByOrderId.get(SEED_IDS.orders.pendingPayment) ?? 0n),
             totalAmount: formatCents(subtotalByOrderId.get(SEED_IDS.orders.pendingPayment) ?? 0n),
-            note: faker.lorem.sentence(),
+            note: randomOrderNote(),
         },
         {
             id: SEED_IDS.orders.paidA,
@@ -94,7 +94,7 @@ export async function seedOrders(
             settlementStatus: "PENDING",
             subtotal: formatCents(subtotalByOrderId.get(SEED_IDS.orders.paidA) ?? 0n),
             totalAmount: formatCents(subtotalByOrderId.get(SEED_IDS.orders.paidA) ?? 0n),
-            note: faker.lorem.sentence(),
+            note: randomOrderNote(),
         },
         {
             id: SEED_IDS.orders.paidB,
@@ -106,7 +106,7 @@ export async function seedOrders(
             settlementStatus: "PENDING",
             subtotal: formatCents(subtotalByOrderId.get(SEED_IDS.orders.paidB) ?? 0n),
             totalAmount: formatCents(subtotalByOrderId.get(SEED_IDS.orders.paidB) ?? 0n),
-            note: faker.lorem.sentence(),
+            note: randomOrderNote(),
         },
     ];
 

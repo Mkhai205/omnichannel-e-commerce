@@ -1,12 +1,13 @@
-import { faker } from "@faker-js/faker";
+import { faker } from "../faker.js";
 import type { Prisma, PrismaClient } from "../../generated/prisma/client.js";
 import { SEED_IDS } from "../constants.js";
 import { slugify } from "../utils.js";
+import { randomVietnameseShopDescription, randomVietnameseShopName } from "../vietnamese.js";
 
 export async function seedShops(prisma: PrismaClient): Promise<number> {
-    const approvedShopName = `${faker.company.name()} Store`;
-    const pendingShopName = `${faker.company.name()} Depot`;
-    const rejectedShopName = `${faker.company.name()} Outlet`;
+    const approvedShopName = randomVietnameseShopName();
+    const pendingShopName = randomVietnameseShopName();
+    const rejectedShopName = randomVietnameseShopName();
 
     const shops: Prisma.ShopCreateManyInput[] = [
         {
@@ -14,7 +15,7 @@ export async function seedShops(prisma: PrismaClient): Promise<number> {
             userId: SEED_IDS.users.sellerApproved,
             shopName: approvedShopName,
             slug: `${slugify(approvedShopName)}-approved`,
-            description: faker.company.catchPhrase(),
+            description: randomVietnameseShopDescription(),
             businessLicense: faker.string.alphanumeric({ length: 12 }).toUpperCase(),
             status: "APPROVED",
             rejectionReason: null,
@@ -24,7 +25,7 @@ export async function seedShops(prisma: PrismaClient): Promise<number> {
             userId: SEED_IDS.users.sellerPending,
             shopName: pendingShopName,
             slug: `${slugify(pendingShopName)}-pending`,
-            description: faker.company.catchPhrase(),
+            description: randomVietnameseShopDescription(),
             businessLicense: faker.string.alphanumeric({ length: 12 }).toUpperCase(),
             status: "PENDING",
             rejectionReason: null,
@@ -34,10 +35,10 @@ export async function seedShops(prisma: PrismaClient): Promise<number> {
             userId: SEED_IDS.users.sellerRejected,
             shopName: rejectedShopName,
             slug: `${slugify(rejectedShopName)}-rejected`,
-            description: faker.company.catchPhrase(),
+            description: randomVietnameseShopDescription(),
             businessLicense: faker.string.alphanumeric({ length: 12 }).toUpperCase(),
             status: "REJECTED",
-            rejectionReason: "Missing legal paperwork",
+            rejectionReason: "Thiếu hồ sơ pháp lý",
         },
     ];
 

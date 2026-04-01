@@ -1,4 +1,4 @@
-export const DEFAULT_PASSWORD_HASH = "$2b$10$CwTycUXWue0Thq9StjUM0uJ8qT8nS9KuX3sI5Yucs5cjox96D65S6";
+export const DEFAULT_SEED_PASSWORD = "password";
 
 export const DEFAULT_SEED_VALUE = 20260401;
 export const EXTRA_PRODUCT_COUNT = 30;

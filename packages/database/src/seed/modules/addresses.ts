@@ -1,7 +1,7 @@
-import { faker } from "@faker-js/faker";
 import type { Prisma, PrismaClient } from "../../generated/prisma/client.js";
 import { SEED_IDS } from "../constants.js";
 import { uniquePhone } from "../utils.js";
+import { randomVietnameseAddress, randomVietnameseFullName } from "../vietnamese.js";
 
 export async function seedAddresses(prisma: PrismaClient): Promise<number> {
     const customerUsers = [
@@ -32,20 +32,24 @@ export async function seedAddresses(prisma: PrismaClient): Promise<number> {
         },
     ] as const;
 
-    const addresses: Prisma.AddressCreateManyInput[] = customerUsers.map((customer, index) => ({
-        id: customer.addressId,
-        userId: customer.id,
-        type: index === 0 ? "HOME" : "OTHER",
-        recipientName: faker.person.fullName(),
-        recipientPhone: uniquePhone(customer.phoneIndex),
-        streetAddress: faker.location.streetAddress(),
-        wardDistrict: faker.location.county(),
-        city: faker.location.city(),
-        state: faker.location.state(),
-        postalCode: faker.location.zipCode("#####"),
-        country: "Vietnam",
-        isDefault: true,
-    }));
+    const addresses: Prisma.AddressCreateManyInput[] = customerUsers.map((customer, index) => {
+        const localizedAddress = randomVietnameseAddress();
+
+        return {
+            id: customer.addressId,
+            userId: customer.id,
+            type: index === 0 ? "HOME" : "OTHER",
+            recipientName: randomVietnameseFullName(),
+            recipientPhone: uniquePhone(customer.phoneIndex),
+            streetAddress: localizedAddress.streetAddress,
+            wardDistrict: localizedAddress.wardDistrict,
+            city: localizedAddress.city,
+            state: localizedAddress.state,
+            postalCode: localizedAddress.postalCode,
+            country: localizedAddress.country,
+            isDefault: true,
+        };
+    });
 
     await prisma.address.createMany({ data: addresses });
 

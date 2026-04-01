@@ -87,5 +87,5 @@ Run this only when you accept replacing existing local data.
 
 ## Notes
 
-- Demo account password hash is pre-generated in seed script for local development.
+- Demo account raw password is defined in [packages/database/src/seed/constants.ts](packages/database/src/seed/constants.ts) and bcrypt hash is generated at seed runtime.
 - Order money fields are calculated via cents-based helpers to keep decimal precision stable.
