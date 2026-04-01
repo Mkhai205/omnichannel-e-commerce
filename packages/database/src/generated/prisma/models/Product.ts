@@ -30,6 +30,7 @@ export type ProductMinAggregateOutputType = {
   categoryId: string | null
   name: string | null
   description: string | null
+  imageKey: string | null
   status: $Enums.ProductStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -41,6 +42,7 @@ export type ProductMaxAggregateOutputType = {
   categoryId: string | null
   name: string | null
   description: string | null
+  imageKey: string | null
   status: $Enums.ProductStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -52,6 +54,7 @@ export type ProductCountAggregateOutputType = {
   categoryId: number
   name: number
   description: number
+  imageKey: number
   omnichannelSyncStatus: number
   status: number
   createdAt: number
@@ -66,6 +69,7 @@ export type ProductMinAggregateInputType = {
   categoryId?: true
   name?: true
   description?: true
+  imageKey?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -77,6 +81,7 @@ export type ProductMaxAggregateInputType = {
   categoryId?: true
   name?: true
   description?: true
+  imageKey?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -88,6 +93,7 @@ export type ProductCountAggregateInputType = {
   categoryId?: true
   name?: true
   description?: true
+  imageKey?: true
   omnichannelSyncStatus?: true
   status?: true
   createdAt?: true
@@ -173,6 +179,7 @@ export type ProductGroupByOutputType = {
   categoryId: string
   name: string
   description: string | null
+  imageKey: string | null
   omnichannelSyncStatus: runtime.JsonValue
   status: $Enums.ProductStatus
   createdAt: Date
@@ -206,6 +213,7 @@ export type ProductWhereInput = {
   categoryId?: Prisma.UuidFilter<"Product"> | string
   name?: Prisma.StringFilter<"Product"> | string
   description?: Prisma.StringNullableFilter<"Product"> | string | null
+  imageKey?: Prisma.StringNullableFilter<"Product"> | string | null
   omnichannelSyncStatus?: Prisma.JsonFilter<"Product">
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
@@ -221,6 +229,7 @@ export type ProductOrderByWithRelationInput = {
   categoryId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  imageKey?: Prisma.SortOrderInput | Prisma.SortOrder
   omnichannelSyncStatus?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -239,6 +248,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   categoryId?: Prisma.UuidFilter<"Product"> | string
   name?: Prisma.StringFilter<"Product"> | string
   description?: Prisma.StringNullableFilter<"Product"> | string | null
+  imageKey?: Prisma.StringNullableFilter<"Product"> | string | null
   omnichannelSyncStatus?: Prisma.JsonFilter<"Product">
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
@@ -254,6 +264,7 @@ export type ProductOrderByWithAggregationInput = {
   categoryId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  imageKey?: Prisma.SortOrderInput | Prisma.SortOrder
   omnichannelSyncStatus?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -272,6 +283,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   categoryId?: Prisma.UuidWithAggregatesFilter<"Product"> | string
   name?: Prisma.StringWithAggregatesFilter<"Product"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
+  imageKey?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   omnichannelSyncStatus?: Prisma.JsonWithAggregatesFilter<"Product">
   status?: Prisma.EnumProductStatusWithAggregatesFilter<"Product"> | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
@@ -282,6 +294,7 @@ export type ProductCreateInput = {
   id?: string
   name: string
   description?: string | null
+  imageKey?: string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   createdAt?: Date | string
@@ -297,6 +310,7 @@ export type ProductUncheckedCreateInput = {
   categoryId: string
   name: string
   description?: string | null
+  imageKey?: string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   createdAt?: Date | string
@@ -308,6 +322,7 @@ export type ProductUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -323,6 +338,7 @@ export type ProductUncheckedUpdateInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -336,6 +352,7 @@ export type ProductCreateManyInput = {
   categoryId: string
   name: string
   description?: string | null
+  imageKey?: string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   createdAt?: Date | string
@@ -346,6 +363,7 @@ export type ProductUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -358,6 +376,7 @@ export type ProductUncheckedUpdateManyInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -380,6 +399,7 @@ export type ProductCountOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  imageKey?: Prisma.SortOrder
   omnichannelSyncStatus?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -392,6 +412,7 @@ export type ProductMaxOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  imageKey?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -403,6 +424,7 @@ export type ProductMinOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  imageKey?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -519,6 +541,7 @@ export type ProductCreateWithoutShopInput = {
   id?: string
   name: string
   description?: string | null
+  imageKey?: string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   createdAt?: Date | string
@@ -532,6 +555,7 @@ export type ProductUncheckedCreateWithoutShopInput = {
   categoryId: string
   name: string
   description?: string | null
+  imageKey?: string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   createdAt?: Date | string
@@ -574,6 +598,7 @@ export type ProductScalarWhereInput = {
   categoryId?: Prisma.UuidFilter<"Product"> | string
   name?: Prisma.StringFilter<"Product"> | string
   description?: Prisma.StringNullableFilter<"Product"> | string | null
+  imageKey?: Prisma.StringNullableFilter<"Product"> | string | null
   omnichannelSyncStatus?: Prisma.JsonFilter<"Product">
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
@@ -584,6 +609,7 @@ export type ProductCreateWithoutCategoryInput = {
   id?: string
   name: string
   description?: string | null
+  imageKey?: string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   createdAt?: Date | string
@@ -597,6 +623,7 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   shopId: string
   name: string
   description?: string | null
+  imageKey?: string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   createdAt?: Date | string
@@ -634,6 +661,7 @@ export type ProductCreateWithoutVariantsInput = {
   id?: string
   name: string
   description?: string | null
+  imageKey?: string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   createdAt?: Date | string
@@ -648,6 +676,7 @@ export type ProductUncheckedCreateWithoutVariantsInput = {
   categoryId: string
   name: string
   description?: string | null
+  imageKey?: string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   createdAt?: Date | string
@@ -674,6 +703,7 @@ export type ProductUpdateWithoutVariantsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -688,6 +718,7 @@ export type ProductUncheckedUpdateWithoutVariantsInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -699,6 +730,7 @@ export type ProductCreateManyShopInput = {
   categoryId: string
   name: string
   description?: string | null
+  imageKey?: string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   createdAt?: Date | string
@@ -709,6 +741,7 @@ export type ProductUpdateWithoutShopInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -722,6 +755,7 @@ export type ProductUncheckedUpdateWithoutShopInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -734,6 +768,7 @@ export type ProductUncheckedUpdateManyWithoutShopInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -745,6 +780,7 @@ export type ProductCreateManyCategoryInput = {
   shopId: string
   name: string
   description?: string | null
+  imageKey?: string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.ProductStatus
   createdAt?: Date | string
@@ -755,6 +791,7 @@ export type ProductUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -768,6 +805,7 @@ export type ProductUncheckedUpdateWithoutCategoryInput = {
   shopId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -780,6 +818,7 @@ export type ProductUncheckedUpdateManyWithoutCategoryInput = {
   shopId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   omnichannelSyncStatus?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -823,6 +862,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   categoryId?: boolean
   name?: boolean
   description?: boolean
+  imageKey?: boolean
   omnichannelSyncStatus?: boolean
   status?: boolean
   createdAt?: boolean
@@ -839,6 +879,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   categoryId?: boolean
   name?: boolean
   description?: boolean
+  imageKey?: boolean
   omnichannelSyncStatus?: boolean
   status?: boolean
   createdAt?: boolean
@@ -853,6 +894,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   categoryId?: boolean
   name?: boolean
   description?: boolean
+  imageKey?: boolean
   omnichannelSyncStatus?: boolean
   status?: boolean
   createdAt?: boolean
@@ -867,13 +909,14 @@ export type ProductSelectScalar = {
   categoryId?: boolean
   name?: boolean
   description?: boolean
+  imageKey?: boolean
   omnichannelSyncStatus?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "shopId" | "categoryId" | "name" | "description" | "omnichannelSyncStatus" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "shopId" | "categoryId" | "name" | "description" | "imageKey" | "omnichannelSyncStatus" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   shop?: boolean | Prisma.ShopDefaultArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
@@ -902,6 +945,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     categoryId: string
     name: string
     description: string | null
+    imageKey: string | null
     omnichannelSyncStatus: runtime.JsonValue
     status: $Enums.ProductStatus
     createdAt: Date
@@ -1337,6 +1381,7 @@ export interface ProductFieldRefs {
   readonly categoryId: Prisma.FieldRef<"Product", 'String'>
   readonly name: Prisma.FieldRef<"Product", 'String'>
   readonly description: Prisma.FieldRef<"Product", 'String'>
+  readonly imageKey: Prisma.FieldRef<"Product", 'String'>
   readonly omnichannelSyncStatus: Prisma.FieldRef<"Product", 'Json'>
   readonly status: Prisma.FieldRef<"Product", 'ProductStatus'>
   readonly createdAt: Prisma.FieldRef<"Product", 'DateTime'>

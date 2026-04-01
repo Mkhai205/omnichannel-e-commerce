@@ -26,13 +26,19 @@ function createRepositoryMock(): MockedCartRepository {
 describe('CartService', () => {
   let service: CartService;
   let repository: MockedCartRepository;
+  const storageService = {
+    getPublicUrl: jest.fn(
+      (bucketName: string, objectName: string) =>
+        `http://localhost:9000/${bucketName}/${objectName}`,
+    ),
+  };
 
   beforeEach(() => {
     repository = createRepositoryMock();
     repository.runInTransaction.mockImplementation(async (operation) =>
       operation({} as never),
     );
-    service = new CartService(repository);
+    service = new CartService(repository, storageService as never);
   });
 
   it('should return empty cart summary for first time customer', async () => {

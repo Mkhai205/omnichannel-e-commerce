@@ -26,6 +26,16 @@ export class UpdateProductDto implements UpdateProductRequest {
   @IsString()
   description?: string;
 
+  @ApiPropertyOptional({
+    example: 'products/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/main.jpg',
+    maxLength: 500,
+    nullable: true,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  imageKey?: string | null;
+
   @ApiPropertyOptional({ enum: ['DRAFT', 'ACTIVE', 'HIDDEN'] })
   @IsOptional()
   @IsIn(['DRAFT', 'ACTIVE', 'HIDDEN'])

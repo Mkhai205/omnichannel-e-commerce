@@ -8,6 +8,7 @@ const CATEGORY_SELECT = {
   parentId: true,
   name: true,
   slug: true,
+  imageKey: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.CategorySelect;
@@ -18,6 +19,7 @@ const PRODUCT_VARIANT_SELECT = {
   sku: true,
   attributes: true,
   price: true,
+  imageKey: true,
   stockQuantity: true,
   createdAt: true,
   updatedAt: true,
@@ -29,6 +31,7 @@ const PRODUCT_SELECT = {
   categoryId: true,
   name: true,
   description: true,
+  imageKey: true,
   omnichannelSyncStatus: true,
   status: true,
   createdAt: true,

@@ -7,6 +7,8 @@ import type {
   PublicProductsFilterRequest,
   PublicProductsListResponse,
 } from '@repo/shared-types';
+import { resolveCatalogImageUrl } from '../../core/http/catalog-image-url.helper';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import type {
   CategoryRecord,
   ProductRecord,
@@ -16,7 +18,10 @@ import { CatalogRepository } from './catalog.repository';
 
 @Injectable()
 export class PublicCatalogService {
-  constructor(private readonly catalogRepository: CatalogRepository) {}
+  constructor(
+    private readonly catalogRepository: CatalogRepository,
+    private readonly storageService: StorageService,
+  ) {}
 
   async getCategories(filters: {
     page?: number;
@@ -119,6 +124,12 @@ export class PublicCatalogService {
       parentId: category.parentId,
       name: category.name,
       slug: category.slug,
+      imageKey: category.imageKey,
+      imageUrl: resolveCatalogImageUrl(
+        this.storageService,
+        'CATEGORY',
+        category.imageKey,
+      ),
       createdAt: category.createdAt.toISOString(),
       updatedAt: category.updatedAt.toISOString(),
     };
@@ -131,21 +142,39 @@ export class PublicCatalogService {
       categoryId: product.categoryId,
       name: product.name,
       description: product.description,
+      imageKey: product.imageKey,
+      imageUrl: resolveCatalogImageUrl(
+        this.storageService,
+        'PRODUCT',
+        product.imageKey,
+      ),
       omnichannelSyncStatus: this.toStringRecord(product.omnichannelSyncStatus),
       status: product.status,
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
-      variants: product.variants.map((variant) => this.toVariantItem(variant)),
+      variants: product.variants.map((variant) =>
+        this.toVariantItem(variant, product.imageKey),
+      ),
     };
   }
 
-  private toVariantItem(variant: ProductVariantRecord): ProductVariantItem {
+  private toVariantItem(
+    variant: ProductVariantRecord,
+    fallbackProductImageKey?: string | null,
+  ): ProductVariantItem {
     return {
       id: variant.id,
       productId: variant.productId,
       sku: variant.sku,
       attributes: this.toStringRecord(variant.attributes),
       price: variant.price.toString(),
+      imageKey: variant.imageKey,
+      imageUrl: resolveCatalogImageUrl(
+        this.storageService,
+        'PRODUCT_VARIANT',
+        variant.imageKey,
+        fallbackProductImageKey,
+      ),
       stockQuantity: variant.stockQuantity,
       createdAt: variant.createdAt.toISOString(),
       updatedAt: variant.updatedAt.toISOString(),

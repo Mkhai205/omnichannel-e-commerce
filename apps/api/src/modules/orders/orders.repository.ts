@@ -14,10 +14,12 @@ const CHECKOUT_CART_ITEM_SELECT = {
       productId: true,
       sku: true,
       price: true,
+      imageKey: true,
       product: {
         select: {
           name: true,
           shopId: true,
+          imageKey: true,
         },
       },
     },
@@ -74,9 +76,11 @@ const ORDER_ITEM_SELECT = {
     select: {
       productId: true,
       sku: true,
+      imageKey: true,
       product: {
         select: {
           name: true,
+          imageKey: true,
         },
       },
     },

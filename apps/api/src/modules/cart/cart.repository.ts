@@ -15,10 +15,12 @@ const CART_ITEM_SELECT = {
       productId: true,
       sku: true,
       price: true,
+      imageKey: true,
       stockQuantity: true,
       product: {
         select: {
           name: true,
+          imageKey: true,
         },
       },
     },
@@ -50,10 +52,12 @@ const VARIANT_SELECT = {
   productId: true,
   sku: true,
   price: true,
+  imageKey: true,
   stockQuantity: true,
   product: {
     select: {
       name: true,
+      imageKey: true,
     },
   },
 } satisfies Prisma.ProductVariantSelect;

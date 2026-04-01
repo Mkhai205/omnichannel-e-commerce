@@ -12,6 +12,8 @@ import type {
   SellerOrdersFilterRequest,
   SellerOrdersListResponse,
 } from '@repo/shared-types';
+import { resolveCatalogImageUrl } from '../../core/http/catalog-image-url.helper';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import {
   SellerInventoryService,
   type CheckoutInventoryDeductionItem,
@@ -36,6 +38,7 @@ export class OrdersService {
     private readonly ordersRepository: OrdersRepository,
     private readonly sellerInventoryService: SellerInventoryService,
     private readonly paymentsService: PaymentsService,
+    private readonly storageService: StorageService,
   ) {}
 
   async checkout(
@@ -279,6 +282,16 @@ export class OrdersService {
       productId: orderItem.variant.productId,
       productName: orderItem.variant.product.name,
       variantSku: orderItem.variant.sku,
+      imageKey:
+        orderItem.variant.imageKey ??
+        orderItem.variant.product.imageKey ??
+        null,
+      imageUrl: resolveCatalogImageUrl(
+        this.storageService,
+        'PRODUCT_VARIANT',
+        orderItem.variant.imageKey,
+        orderItem.variant.product.imageKey,
+      ),
       quantity: orderItem.quantity,
       unitPrice: this.normalizeMoney(orderItem.unitPrice.toString()),
       lineTotal: this.normalizeMoney(orderItem.lineTotal.toString()),

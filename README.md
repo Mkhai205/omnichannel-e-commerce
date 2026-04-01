@@ -76,6 +76,9 @@ pnpm dev
 - `pnpm dev:web`: Start web app only
 - `pnpm dev:admin`: Start admin app only
 - `pnpm dev:seller`: Start seller app only
+- `pnpm db:seed`: Seed local database with deterministic fake data
+
+See seeding details in [docs/seed-data-guide.md](docs/seed-data-guide.md).
 
 ### Formatting
 
