@@ -9,6 +9,8 @@ export interface PublicShopItem {
     description?: string | null;
     avatarKey?: string | null;
     avatarUrl?: string | null;
+    coverKey?: string | null;
+    coverUrl?: string | null;
 }
 
 export interface ShopDetail {
@@ -19,6 +21,8 @@ export interface ShopDetail {
     description?: string | null;
     avatarKey?: string | null;
     avatarUrl?: string | null;
+    coverKey?: string | null;
+    coverUrl?: string | null;
     businessLicense?: string | null;
     status: ShopStatus;
     rejectionReason?: string | null;
@@ -43,6 +47,7 @@ export interface SellerUpdateShopRequest {
     shopName?: string;
     description?: string;
     avatarKey?: string | null;
+    coverKey?: string | null;
     businessLicense?: string;
 }
 
@@ -56,6 +61,12 @@ export interface UploadShopAvatarResult {
     bucketName: string;
     objectKey: string;
     avatarUrl?: string | null;
+}
+
+export interface UploadShopCoverResult {
+    bucketName: string;
+    objectKey: string;
+    coverUrl?: string | null;
 }
 
 export interface AdminShopsFilterRequest {

@@ -9,6 +9,7 @@ const PUBLIC_SHOP_SELECT = {
   slug: true,
   description: true,
   avatarKey: true,
+  coverKey: true,
 } satisfies Prisma.ShopSelect;
 
 const SHOP_DETAIL_SELECT = {
@@ -18,6 +19,7 @@ const SHOP_DETAIL_SELECT = {
   slug: true,
   description: true,
   avatarKey: true,
+  coverKey: true,
   businessLicense: true,
   status: true,
   rejectionReason: true,
@@ -32,6 +34,7 @@ const ADMIN_SHOP_SELECT = {
   slug: true,
   description: true,
   avatarKey: true,
+  coverKey: true,
   businessLicense: true,
   status: true,
   rejectionReason: true,

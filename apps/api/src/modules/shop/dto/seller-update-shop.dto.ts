@@ -27,6 +27,16 @@ export class SellerUpdateShopDto implements SellerUpdateShopRequest {
   avatarKey?: string | null;
 
   @ApiPropertyOptional({
+    maxLength: 500,
+    example: 'shops/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/cover.jpg',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  coverKey?: string | null;
+
+  @ApiPropertyOptional({
     maxLength: 255,
     example: 'https://minio.local/licenses/shop-license.png',
   })

@@ -113,6 +113,7 @@ export const ShopScalarFieldEnum = {
   slug: 'slug',
   description: 'description',
   avatarKey: 'avatarKey',
+  coverKey: 'coverKey',
   businessLicense: 'businessLicense',
   status: 'status',
   rejectionReason: 'rejectionReason',

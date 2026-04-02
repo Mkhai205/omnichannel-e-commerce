@@ -35,6 +35,7 @@ model Shop {
   slug            String             @unique @db.VarChar(255)
   description     String?            @db.Text
   avatarKey       String?            @map("avatar_key") @db.VarChar(500)
+  coverKey        String?            @map("cover_key") @db.VarChar(500)
   businessLicense String?            @map("business_license") @db.VarChar(255)
   status          ShopStatus         @default(PENDING)
   rejectionReason String?            @map("rejection_reason") @db.VarChar(500)

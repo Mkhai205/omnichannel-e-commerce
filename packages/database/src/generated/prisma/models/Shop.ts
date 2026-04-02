@@ -31,6 +31,7 @@ export type ShopMinAggregateOutputType = {
   slug: string | null
   description: string | null
   avatarKey: string | null
+  coverKey: string | null
   businessLicense: string | null
   status: $Enums.ShopStatus | null
   rejectionReason: string | null
@@ -45,6 +46,7 @@ export type ShopMaxAggregateOutputType = {
   slug: string | null
   description: string | null
   avatarKey: string | null
+  coverKey: string | null
   businessLicense: string | null
   status: $Enums.ShopStatus | null
   rejectionReason: string | null
@@ -59,6 +61,7 @@ export type ShopCountAggregateOutputType = {
   slug: number
   description: number
   avatarKey: number
+  coverKey: number
   businessLicense: number
   status: number
   rejectionReason: number
@@ -75,6 +78,7 @@ export type ShopMinAggregateInputType = {
   slug?: true
   description?: true
   avatarKey?: true
+  coverKey?: true
   businessLicense?: true
   status?: true
   rejectionReason?: true
@@ -89,6 +93,7 @@ export type ShopMaxAggregateInputType = {
   slug?: true
   description?: true
   avatarKey?: true
+  coverKey?: true
   businessLicense?: true
   status?: true
   rejectionReason?: true
@@ -103,6 +108,7 @@ export type ShopCountAggregateInputType = {
   slug?: true
   description?: true
   avatarKey?: true
+  coverKey?: true
   businessLicense?: true
   status?: true
   rejectionReason?: true
@@ -190,6 +196,7 @@ export type ShopGroupByOutputType = {
   slug: string
   description: string | null
   avatarKey: string | null
+  coverKey: string | null
   businessLicense: string | null
   status: $Enums.ShopStatus
   rejectionReason: string | null
@@ -225,6 +232,7 @@ export type ShopWhereInput = {
   slug?: Prisma.StringFilter<"Shop"> | string
   description?: Prisma.StringNullableFilter<"Shop"> | string | null
   avatarKey?: Prisma.StringNullableFilter<"Shop"> | string | null
+  coverKey?: Prisma.StringNullableFilter<"Shop"> | string | null
   businessLicense?: Prisma.StringNullableFilter<"Shop"> | string | null
   status?: Prisma.EnumShopStatusFilter<"Shop"> | $Enums.ShopStatus
   rejectionReason?: Prisma.StringNullableFilter<"Shop"> | string | null
@@ -245,6 +253,7 @@ export type ShopOrderByWithRelationInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  coverKey?: Prisma.SortOrderInput | Prisma.SortOrder
   businessLicense?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -268,6 +277,7 @@ export type ShopWhereUniqueInput = Prisma.AtLeast<{
   shopName?: Prisma.StringFilter<"Shop"> | string
   description?: Prisma.StringNullableFilter<"Shop"> | string | null
   avatarKey?: Prisma.StringNullableFilter<"Shop"> | string | null
+  coverKey?: Prisma.StringNullableFilter<"Shop"> | string | null
   businessLicense?: Prisma.StringNullableFilter<"Shop"> | string | null
   status?: Prisma.EnumShopStatusFilter<"Shop"> | $Enums.ShopStatus
   rejectionReason?: Prisma.StringNullableFilter<"Shop"> | string | null
@@ -288,6 +298,7 @@ export type ShopOrderByWithAggregationInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  coverKey?: Prisma.SortOrderInput | Prisma.SortOrder
   businessLicense?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -308,6 +319,7 @@ export type ShopScalarWhereWithAggregatesInput = {
   slug?: Prisma.StringWithAggregatesFilter<"Shop"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
   avatarKey?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
+  coverKey?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
   businessLicense?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
   status?: Prisma.EnumShopStatusWithAggregatesFilter<"Shop"> | $Enums.ShopStatus
   rejectionReason?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
@@ -321,6 +333,7 @@ export type ShopCreateInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -341,6 +354,7 @@ export type ShopUncheckedCreateInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -359,6 +373,7 @@ export type ShopUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -379,6 +394,7 @@ export type ShopUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -398,6 +414,7 @@ export type ShopCreateManyInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -411,6 +428,7 @@ export type ShopUpdateManyMutationInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -425,6 +443,7 @@ export type ShopUncheckedUpdateManyInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -444,6 +463,7 @@ export type ShopCountOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   avatarKey?: Prisma.SortOrder
+  coverKey?: Prisma.SortOrder
   businessLicense?: Prisma.SortOrder
   status?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -458,6 +478,7 @@ export type ShopMaxOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   avatarKey?: Prisma.SortOrder
+  coverKey?: Prisma.SortOrder
   businessLicense?: Prisma.SortOrder
   status?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -472,6 +493,7 @@ export type ShopMinOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   avatarKey?: Prisma.SortOrder
+  coverKey?: Prisma.SortOrder
   businessLicense?: Prisma.SortOrder
   status?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
@@ -596,6 +618,7 @@ export type ShopCreateWithoutUserInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -614,6 +637,7 @@ export type ShopUncheckedCreateWithoutUserInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -648,6 +672,7 @@ export type ShopUpdateWithoutUserInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -666,6 +691,7 @@ export type ShopUncheckedUpdateWithoutUserInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -684,6 +710,7 @@ export type ShopCreateWithoutProductsInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -703,6 +730,7 @@ export type ShopUncheckedCreateWithoutProductsInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -736,6 +764,7 @@ export type ShopUpdateWithoutProductsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -755,6 +784,7 @@ export type ShopUncheckedUpdateWithoutProductsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -772,6 +802,7 @@ export type ShopCreateWithoutWarehousesInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -791,6 +822,7 @@ export type ShopUncheckedCreateWithoutWarehousesInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -824,6 +856,7 @@ export type ShopUpdateWithoutWarehousesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -843,6 +876,7 @@ export type ShopUncheckedUpdateWithoutWarehousesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -860,6 +894,7 @@ export type ShopCreateWithoutOrdersInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -879,6 +914,7 @@ export type ShopUncheckedCreateWithoutOrdersInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -912,6 +948,7 @@ export type ShopUpdateWithoutOrdersInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -931,6 +968,7 @@ export type ShopUncheckedUpdateWithoutOrdersInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -948,6 +986,7 @@ export type ShopCreateWithoutSellerWalletInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -967,6 +1006,7 @@ export type ShopUncheckedCreateWithoutSellerWalletInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -1000,6 +1040,7 @@ export type ShopUpdateWithoutSellerWalletInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1019,6 +1060,7 @@ export type ShopUncheckedUpdateWithoutSellerWalletInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1036,6 +1078,7 @@ export type ShopCreateWithoutSettlementsInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -1055,6 +1098,7 @@ export type ShopUncheckedCreateWithoutSettlementsInput = {
   slug: string
   description?: string | null
   avatarKey?: string | null
+  coverKey?: string | null
   businessLicense?: string | null
   status?: $Enums.ShopStatus
   rejectionReason?: string | null
@@ -1088,6 +1132,7 @@ export type ShopUpdateWithoutSettlementsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1107,6 +1152,7 @@ export type ShopUncheckedUpdateWithoutSettlementsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1183,6 +1229,7 @@ export type ShopSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   slug?: boolean
   description?: boolean
   avatarKey?: boolean
+  coverKey?: boolean
   businessLicense?: boolean
   status?: boolean
   rejectionReason?: boolean
@@ -1204,6 +1251,7 @@ export type ShopSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   slug?: boolean
   description?: boolean
   avatarKey?: boolean
+  coverKey?: boolean
   businessLicense?: boolean
   status?: boolean
   rejectionReason?: boolean
@@ -1219,6 +1267,7 @@ export type ShopSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   slug?: boolean
   description?: boolean
   avatarKey?: boolean
+  coverKey?: boolean
   businessLicense?: boolean
   status?: boolean
   rejectionReason?: boolean
@@ -1234,6 +1283,7 @@ export type ShopSelectScalar = {
   slug?: boolean
   description?: boolean
   avatarKey?: boolean
+  coverKey?: boolean
   businessLicense?: boolean
   status?: boolean
   rejectionReason?: boolean
@@ -1241,7 +1291,7 @@ export type ShopSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ShopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "shopName" | "slug" | "description" | "avatarKey" | "businessLicense" | "status" | "rejectionReason" | "createdAt" | "updatedAt", ExtArgs["result"]["shop"]>
+export type ShopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "shopName" | "slug" | "description" | "avatarKey" | "coverKey" | "businessLicense" | "status" | "rejectionReason" | "createdAt" | "updatedAt", ExtArgs["result"]["shop"]>
 export type ShopInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   products?: boolean | Prisma.Shop$productsArgs<ExtArgs>
@@ -1275,6 +1325,7 @@ export type $ShopPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     slug: string
     description: string | null
     avatarKey: string | null
+    coverKey: string | null
     businessLicense: string | null
     status: $Enums.ShopStatus
     rejectionReason: string | null
@@ -1715,6 +1766,7 @@ export interface ShopFieldRefs {
   readonly slug: Prisma.FieldRef<"Shop", 'String'>
   readonly description: Prisma.FieldRef<"Shop", 'String'>
   readonly avatarKey: Prisma.FieldRef<"Shop", 'String'>
+  readonly coverKey: Prisma.FieldRef<"Shop", 'String'>
   readonly businessLicense: Prisma.FieldRef<"Shop", 'String'>
   readonly status: Prisma.FieldRef<"Shop", 'ShopStatus'>
   readonly rejectionReason: Prisma.FieldRef<"Shop", 'String'>

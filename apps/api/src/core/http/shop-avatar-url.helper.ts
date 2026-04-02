@@ -16,6 +16,20 @@ export function resolveShopAvatarUrl(
   }
 }
 
+export function resolveShopCoverUrl(
+  storageService: StorageService,
+  coverKey?: string | null,
+): string | null {
+  const resolvedObjectKey =
+    normalizeObjectKey(coverKey) ?? 'placeholders/shop-cover-default.png';
+
+  try {
+    return storageService.getPublicUrl(SHOP_MEDIA_BUCKET, resolvedObjectKey);
+  } catch {
+    return null;
+  }
+}
+
 function normalizeObjectKey(objectKey?: string | null): string | null {
   if (objectKey === undefined || objectKey === null) {
     return null;

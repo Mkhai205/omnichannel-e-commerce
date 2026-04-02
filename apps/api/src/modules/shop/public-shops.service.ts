@@ -4,7 +4,10 @@ import type {
   PublicShopsFilterRequest,
   PublicShopsListResponse,
 } from '@repo/shared-types';
-import { resolveShopAvatarUrl } from '../../core/http/shop-avatar-url.helper';
+import {
+  resolveShopAvatarUrl,
+  resolveShopCoverUrl,
+} from '../../core/http/shop-avatar-url.helper';
 import { StorageService } from '../../infrastructure/storage/storage.service';
 import type { PublicShopRecord } from './shops.repository';
 import { ShopsRepository } from './shops.repository';
@@ -81,6 +84,8 @@ export class PublicShopsService {
       description: shop.description,
       avatarKey: shop.avatarKey,
       avatarUrl: resolveShopAvatarUrl(this.storageService, shop.avatarKey),
+      coverKey: shop.coverKey,
+      coverUrl: resolveShopCoverUrl(this.storageService, shop.coverKey),
     };
   }
 }

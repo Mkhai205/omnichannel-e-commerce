@@ -10,8 +10,12 @@ import type {
   SellerUpdateShopRequest,
   ShopDetail,
   UploadShopAvatarResult,
+  UploadShopCoverResult,
 } from '@repo/shared-types';
-import { resolveShopAvatarUrl } from '../../core/http/shop-avatar-url.helper';
+import {
+  resolveShopAvatarUrl,
+  resolveShopCoverUrl,
+} from '../../core/http/shop-avatar-url.helper';
 import { StorageService } from '../../infrastructure/storage/storage.service';
 import type { ShopDetailRecord } from './shops.repository';
 import { ShopsRepository } from './shops.repository';
@@ -96,12 +100,14 @@ export class SellerShopsService {
     const description = payload.description?.trim();
     const businessLicense = payload.businessLicense?.trim();
     const avatarKey = this.normalizeAvatarKey(payload.avatarKey);
+    const coverKey = this.normalizeCoverKey(payload.coverKey);
 
     const hasPayload =
       payload.shopName !== undefined ||
       payload.description !== undefined ||
       payload.businessLicense !== undefined ||
-      payload.avatarKey !== undefined;
+      payload.avatarKey !== undefined ||
+      payload.coverKey !== undefined;
 
     if (!hasPayload) {
       throw new BadRequestException('At least one field must be provided');
@@ -112,6 +118,7 @@ export class SellerShopsService {
       slug?: string;
       description?: string;
       avatarKey?: string | null;
+      coverKey?: string | null;
       businessLicense?: string;
       status?: 'PENDING';
       rejectionReason?: null;
@@ -129,6 +136,10 @@ export class SellerShopsService {
 
     if (payload.avatarKey !== undefined) {
       updateData.avatarKey = avatarKey;
+    }
+
+    if (payload.coverKey !== undefined) {
+      updateData.coverKey = coverKey;
     }
 
     if (businessLicense) {
@@ -197,6 +208,54 @@ export class SellerShopsService {
     };
   }
 
+  async uploadMyShopCover(
+    userId: string,
+    file?: ShopAvatarUploadFile,
+  ): Promise<UploadShopCoverResult> {
+    if (!file || !file.buffer || file.size <= 0) {
+      throw new BadRequestException('Image file is required');
+    }
+
+    this.ensureSupportedImageMimeType(file.mimetype);
+
+    const shop = await this.shopsRepository.findShopByUserId(userId);
+
+    if (!shop) {
+      throw new NotFoundException('Shop not found');
+    }
+
+    const objectKey = `shops/${shop.id}/cover${this.resolveImageExtension(file)}`;
+
+    const uploaded = await this.storageService.uploadObject({
+      bucketName: 'products',
+      objectName: objectKey,
+      body: file.buffer,
+      size: file.size,
+      metadata: {
+        contentType: file.mimetype,
+        entityType: 'SHOP',
+        entityId: shop.id,
+        uploadedBy: userId,
+      },
+    });
+
+    await this.shopsRepository.updateShopById(shop.id, {
+      coverKey: uploaded.objectName,
+      ...(shop.status === 'REJECTED'
+        ? {
+            status: 'PENDING',
+            rejectionReason: null,
+          }
+        : {}),
+    });
+
+    return {
+      bucketName: uploaded.bucketName,
+      objectKey: uploaded.objectName,
+      coverUrl: resolveShopCoverUrl(this.storageService, uploaded.objectName),
+    };
+  }
+
   private async generateUniqueSlug(
     shopName: string,
     currentShopId?: string,
@@ -243,6 +302,8 @@ export class SellerShopsService {
       description: shop.description,
       avatarKey: shop.avatarKey,
       avatarUrl: resolveShopAvatarUrl(this.storageService, shop.avatarKey),
+      coverKey: shop.coverKey,
+      coverUrl: resolveShopCoverUrl(this.storageService, shop.coverKey),
       businessLicense: shop.businessLicense,
       status: shop.status,
       rejectionReason: shop.rejectionReason,
@@ -257,6 +318,16 @@ export class SellerShopsService {
     }
 
     const normalized = avatarKey.trim();
+
+    return normalized.length > 0 ? normalized : null;
+  }
+
+  private normalizeCoverKey(coverKey?: string | null): string | null {
+    if (coverKey === undefined || coverKey === null) {
+      return null;
+    }
+
+    const normalized = coverKey.trim();
 
     return normalized.length > 0 ? normalized : null;
   }
