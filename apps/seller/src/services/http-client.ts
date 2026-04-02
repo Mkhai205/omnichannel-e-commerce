@@ -26,6 +26,20 @@ function buildApiUrl(path: string): string {
     return `${getApiBaseUrl()}${normalizedPath}`;
 }
 
+function resolveRequestHeaders(init?: RequestInit): Headers {
+    const headers = new Headers(init?.headers);
+    const isFormDataBody =
+        typeof FormData !== "undefined" &&
+        typeof init?.body !== "undefined" &&
+        init.body instanceof FormData;
+
+    if (!isFormDataBody && !headers.has("Content-Type")) {
+        headers.set("Content-Type", "application/json");
+    }
+
+    return headers;
+}
+
 function shouldAttemptRefresh(path: string): boolean {
     return ![
         "/auth/login",
@@ -89,13 +103,12 @@ export async function requestApi<T>(
     init?: RequestInit,
     hasRetried = false,
 ): Promise<ApiResponse<T>> {
+    const headers = resolveRequestHeaders(init);
+
     const response = await fetch(buildApiUrl(path), {
         ...init,
         credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            ...(init?.headers ?? {}),
-        },
+        headers,
     });
 
     const payload = await parseApiResponse<T>(response);
