@@ -19,6 +19,7 @@ import type { OrderStatus, SellerOrderDetailResponse, SettlementStatus } from "@
 import { isApiRequestError } from "@/services/http-client";
 import {
     getSellerOrderDetail,
+    markSellerOrderAsDelivered,
     markSellerOrderAsProcessing,
     markSellerOrderAsShipped,
 } from "@/services/orders-service";
@@ -157,6 +158,7 @@ export default function SellerOrderDetailPage() {
 
     const canMoveToProcessing = detail?.status === "PAID";
     const canMoveToShipped = detail?.status === "PROCESSING";
+    const canMoveToDelivered = detail?.status === "SHIPPED";
 
     const handleMoveToProcessing = async () => {
         if (!detail || isMutating) {
@@ -194,6 +196,27 @@ export default function SellerOrderDetailPage() {
                 setErrorMessage(error.message);
             } else {
                 setErrorMessage("Không thể cập nhật trạng thái giao hàng.");
+            }
+        } finally {
+            setIsMutating(false);
+        }
+    };
+
+    const handleMoveToDelivered = async () => {
+        if (!detail || isMutating) {
+            return;
+        }
+
+        setIsMutating(true);
+
+        try {
+            await markSellerOrderAsDelivered(detail.id);
+            await fetchOrderDetail();
+        } catch (error) {
+            if (isApiRequestError(error)) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage("Không thể cập nhật trạng thái hoàn tất đơn hàng.");
             }
         } finally {
             setIsMutating(false);
@@ -243,7 +266,7 @@ export default function SellerOrderDetailPage() {
                                     <p className="text-xs text-slate-400">{detail.id}</p>
                                 </div>
 
-                                <div className="grid gap-3 sm:grid-cols-2">
+                                <div className="grid gap-3 sm:grid-cols-3">
                                     <div>
                                         <p className="text-xs uppercase tracking-[0.13em] text-slate-400">
                                             Ngày tạo
@@ -254,10 +277,18 @@ export default function SellerOrderDetailPage() {
                                     </div>
                                     <div>
                                         <p className="text-xs uppercase tracking-[0.13em] text-slate-400">
-                                            Ngày giao hàng
+                                            Ngày bàn giao vận chuyển
                                         </p>
                                         <p className="mt-1 text-sm text-slate-700">
                                             {formatDateTime(detail.shippedAt)}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs uppercase tracking-[0.13em] text-slate-400">
+                                            Ngày giao thành công
+                                        </p>
+                                        <p className="mt-1 text-sm text-slate-700">
+                                            {formatDateTime(detail.deliveredAt)}
                                         </p>
                                     </div>
                                 </div>
@@ -323,7 +354,17 @@ export default function SellerOrderDetailPage() {
                                         disabled={!canMoveToShipped || isMutating}
                                     >
                                         <Truck className="size-4" aria-hidden="true" />
-                                        Đánh dấu đã giao hàng
+                                        Đánh dấu đã bàn giao vận chuyển
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="justify-start border-slate-300"
+                                        onClick={handleMoveToDelivered}
+                                        disabled={!canMoveToDelivered || isMutating}
+                                    >
+                                        <PackageCheck className="size-4" aria-hidden="true" />
+                                        Xác nhận giao thành công
                                     </Button>
                                 </div>
                             </div>

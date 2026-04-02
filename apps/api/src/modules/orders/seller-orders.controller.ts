@@ -151,4 +151,28 @@ export class SellerOrdersController {
       message: 'Order shipped successfully',
     });
   }
+
+  @Patch(':orderId/deliver')
+  @ApiOperation({ summary: 'Move one seller order from SHIPPED to DELIVERED' })
+  @ApiAuthSchemes()
+  @ApiParam({ name: 'orderId', format: 'uuid' })
+  @ApiOkEnvelopeResponse(SellerOrderSwaggerDto, 'Order delivered successfully')
+  @ApiCommonErrorResponses({
+    badRequest: 'Order status is invalid for delivery',
+    unauthorized: 'Authentication required',
+    notFound: 'Order not found',
+  })
+  async markOrderAsDelivered(
+    @CurrentUser() currentUser: JwtPayload,
+    @Param('orderId', new ParseUUIDPipe()) orderId: string,
+  ): Promise<ApiResponse<SellerOrderItem>> {
+    const order = await this.ordersService.markMyOrderAsDelivered(
+      currentUser.sub,
+      orderId,
+    );
+
+    return createSuccessResponse(order, {
+      message: 'Order delivered successfully',
+    });
+  }
 }

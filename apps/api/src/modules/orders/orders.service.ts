@@ -217,6 +217,22 @@ export class OrdersService {
     );
   }
 
+  async markMyOrderAsDelivered(
+    sellerUserId: string,
+    orderId: string,
+  ): Promise<SellerOrderItem> {
+    return this.updateMyOrderStatus(
+      sellerUserId,
+      orderId,
+      'SHIPPED',
+      'DELIVERED',
+      'Order must be SHIPPED before moving to DELIVERED',
+      {
+        deliveredAt: new Date(),
+      },
+    );
+  }
+
   async getMyOrderDetail(
     sellerUserId: string,
     orderId: string,
@@ -379,11 +395,12 @@ export class OrdersService {
   private async updateMyOrderStatus(
     sellerUserId: string,
     orderId: string,
-    fromStatus: 'PAID' | 'PROCESSING',
-    toStatus: 'PROCESSING' | 'SHIPPED',
+    fromStatus: 'PAID' | 'PROCESSING' | 'SHIPPED',
+    toStatus: 'PROCESSING' | 'SHIPPED' | 'DELIVERED',
     invalidTransitionMessage: string,
     updateData: {
       shippedAt?: Date;
+      deliveredAt?: Date;
     },
   ): Promise<SellerOrderItem> {
     const updatedOrder = await this.ordersRepository.runInTransaction(

@@ -16,8 +16,12 @@ type OrdersTableProps = {
 type PaginationItem = number | "ellipsis";
 
 function getStatusClassName(status: OrderStatus) {
-    if (status === "PENDING_PAYMENT" || status === "PAID") {
+    if (status === "PENDING_PAYMENT") {
         return "bg-blue-100 text-blue-600";
+    }
+
+    if (status === "PAID") {
+        return "bg-green-100 text-green-700";
     }
 
     if (status === "PROCESSING" || status === "SHIPPED") {
