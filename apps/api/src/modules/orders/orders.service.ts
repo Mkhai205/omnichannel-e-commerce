@@ -8,6 +8,8 @@ import type {
   CheckoutOrderItem,
   CheckoutOrdersRequest,
   CheckoutOrdersResponse,
+  SellerOrderDetailItem,
+  SellerOrderDetailResponse,
   SellerOrderItem,
   SellerOrdersFilterRequest,
   SellerOrdersListResponse,
@@ -23,6 +25,7 @@ import {
   type CheckoutCartItemRecord,
   type OrderItemRecord,
   type OrderRecord,
+  type SellerOrderDetailRecord,
   type SellerOrderRecord,
   OrdersRepository,
 } from './orders.repository';
@@ -214,6 +217,22 @@ export class OrdersService {
     );
   }
 
+  async getMyOrderDetail(
+    sellerUserId: string,
+    orderId: string,
+  ): Promise<SellerOrderDetailResponse> {
+    const order = await this.ordersRepository.findSellerOrderDetailByIdForUser(
+      sellerUserId,
+      orderId,
+    );
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return this.toSellerOrderDetailResponse(order);
+  }
+
   private toInventoryDeductionItems(
     items: CheckoutCartItemRecord[],
   ): CheckoutInventoryDeductionItem[] {
@@ -300,6 +319,34 @@ export class OrdersService {
     };
   }
 
+  private toSellerOrderDetailItem(
+    orderItem: OrderItemRecord,
+  ): SellerOrderDetailItem {
+    return {
+      id: orderItem.id,
+      orderId: orderItem.orderId,
+      variantId: orderItem.variantId,
+      productId: orderItem.variant.productId,
+      productName: orderItem.variant.product.name,
+      variantSku: orderItem.variant.sku,
+      imageKey:
+        orderItem.variant.imageKey ??
+        orderItem.variant.product.imageKey ??
+        null,
+      imageUrl: resolveCatalogImageUrl(
+        this.storageService,
+        'PRODUCT_VARIANT',
+        orderItem.variant.imageKey,
+        orderItem.variant.product.imageKey,
+      ),
+      quantity: orderItem.quantity,
+      unitPrice: this.normalizeMoney(orderItem.unitPrice.toString()),
+      lineTotal: this.normalizeMoney(orderItem.lineTotal.toString()),
+      createdAt: orderItem.createdAt.toISOString(),
+      updatedAt: orderItem.updatedAt.toISOString(),
+    };
+  }
+
   private toSellerOrderItem(order: SellerOrderRecord): SellerOrderItem {
     return {
       id: order.id,
@@ -317,6 +364,15 @@ export class OrdersService {
       settledAt: order.settledAt?.toISOString() ?? null,
       createdAt: order.createdAt.toISOString(),
       updatedAt: order.updatedAt.toISOString(),
+    };
+  }
+
+  private toSellerOrderDetailResponse(
+    order: SellerOrderDetailRecord,
+  ): SellerOrderDetailResponse {
+    return {
+      ...this.toSellerOrderItem(order),
+      items: order.items.map((item) => this.toSellerOrderDetailItem(item)),
     };
   }
 

@@ -1,25 +1,14 @@
-export type OrderStatus = "CHỜ XÁC NHẬN" | "ĐANG GIAO" | "THÀNH CÔNG";
+import type { OrderStatus, SellerOrderItem } from "@repo/shared-types";
 
-export interface Stats {
-  pendingConfirmation: number;
-  shipping: number;
+export type OrderStatusFilterValue = "all" | OrderStatus;
+
+export type OrdersStatusOption = {
+    value: OrderStatusFilterValue;
+    label: string;
+};
+
+export interface OrdersFilterValues {
+    status: OrderStatusFilterValue;
 }
 
-export interface FilterValues {
-  channel: string;
-  status: string;
-  orderDate: string;
-}
-
-export interface OrderRow {
-  id: string;
-  orderedAt: string;
-  orderDateValue: string;
-  channel: string;
-  customerName: string;
-  customerLocation: string;
-  productPreviewLabels: string[];
-  totalAmount: number;
-  status: OrderStatus;
-  actionLabel: string;
-}
+export type SellerOrdersTableRow = SellerOrderItem;

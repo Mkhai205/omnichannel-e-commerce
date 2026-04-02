@@ -87,6 +87,13 @@ const ORDER_ITEM_SELECT = {
   },
 } satisfies Prisma.OrderItemSelect;
 
+const SELLER_ORDER_DETAIL_SELECT = {
+  ...SELLER_ORDER_SELECT,
+  items: {
+    select: ORDER_ITEM_SELECT,
+  },
+} satisfies Prisma.OrderSelect;
+
 export type CheckoutCartItemRecord = Prisma.CartItemGetPayload<{
   select: typeof CHECKOUT_CART_ITEM_SELECT;
 }>;
@@ -97,6 +104,10 @@ export type OrderRecord = Prisma.OrderGetPayload<{
 
 export type SellerOrderRecord = Prisma.OrderGetPayload<{
   select: typeof SELLER_ORDER_SELECT;
+}>;
+
+export type SellerOrderDetailRecord = Prisma.OrderGetPayload<{
+  select: typeof SELLER_ORDER_DETAIL_SELECT;
 }>;
 
 export type OrderItemRecord = Prisma.OrderItemGetPayload<{
@@ -166,6 +177,24 @@ export class OrdersRepository {
         },
       },
       select: SELLER_ORDER_SELECT,
+    });
+  }
+
+  findSellerOrderDetailByIdForUser(
+    sellerUserId: string,
+    orderId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.findFirst({
+      where: {
+        id: orderId,
+        shop: {
+          userId: sellerUserId,
+        },
+      },
+      select: SELLER_ORDER_DETAIL_SELECT,
     });
   }
 

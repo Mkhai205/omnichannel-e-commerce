@@ -58,7 +58,8 @@ export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
                 <div className="flex flex-1 flex-col overflow-y-auto px-4 py-5">
                     <nav className="flex flex-col gap-1">
                         {mainNav.map((item) => {
-                            const isActive = pathname === item.href;
+                            const isActive =
+                                pathname === item.href || pathname.startsWith(`${item.href}/`);
                             const Icon = item.icon;
 
                             return (

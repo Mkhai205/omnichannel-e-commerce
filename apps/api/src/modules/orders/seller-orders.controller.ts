@@ -9,6 +9,7 @@ import {
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import type {
   ApiResponse,
+  SellerOrderDetailResponse,
   SellerOrderItem,
   SellerOrdersListResponse,
 } from '@repo/shared-types';
@@ -21,6 +22,7 @@ import {
 } from '../../core/http/swagger-response.decorator';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
 import {
+  SellerOrderDetailSwaggerDto,
   SellerOrderSwaggerDto,
   SellerOrdersListDataSwaggerDto,
 } from './dto/orders-swagger.dto';
@@ -69,6 +71,33 @@ export class SellerOrdersController {
 
     return createSuccessResponse(response, {
       message: 'Seller orders list retrieved successfully',
+    });
+  }
+
+  @Get(':orderId')
+  @ApiOperation({ summary: 'Get seller order detail by id' })
+  @ApiAuthSchemes()
+  @ApiParam({ name: 'orderId', format: 'uuid' })
+  @ApiOkEnvelopeResponse(
+    SellerOrderDetailSwaggerDto,
+    'Seller order detail retrieved successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid order id',
+    unauthorized: 'Authentication required',
+    notFound: 'Order not found',
+  })
+  async getMyOrderDetail(
+    @CurrentUser() currentUser: JwtPayload,
+    @Param('orderId', new ParseUUIDPipe()) orderId: string,
+  ): Promise<ApiResponse<SellerOrderDetailResponse>> {
+    const response = await this.ordersService.getMyOrderDetail(
+      currentUser.sub,
+      orderId,
+    );
+
+    return createSuccessResponse(response, {
+      message: 'Seller order detail retrieved successfully',
     });
   }
 

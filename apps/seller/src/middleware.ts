@@ -9,12 +9,16 @@ import {
 
 const ACCESS_COOKIE_NAME =
     process.env.NEXT_PUBLIC_AUTH_ACCESS_COOKIE_NAME ?? "ecommerce_access_token";
+const REFRESH_COOKIE_NAME =
+    process.env.NEXT_PUBLIC_AUTH_REFRESH_COOKIE_NAME ?? "ecommerce_refresh_token";
 
 export function middleware(request: NextRequest) {
     const { pathname, search } = request.nextUrl;
 
     const isAuthRoute = isAuthPublicRoute(pathname);
-    const hasSessionCookie = Boolean(request.cookies.get(ACCESS_COOKIE_NAME));
+    const hasAccessCookie = Boolean(request.cookies.get(ACCESS_COOKIE_NAME));
+    const hasRefreshCookie = Boolean(request.cookies.get(REFRESH_COOKIE_NAME));
+    const hasSessionCookie = hasAccessCookie || hasRefreshCookie;
 
     if (!hasSessionCookie && !isAuthRoute) {
         const loginUrl = new URL(LOGIN_ROUTE, request.url);

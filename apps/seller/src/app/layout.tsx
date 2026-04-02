@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SellerPageFrame } from "@/components/layout/seller-page-frame";
 import "./globals.css";
+import { Agentation } from "agentation";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({
         <html lang="vi">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <SellerPageFrame>{children}</SellerPageFrame>
+                <Agentation />
             </body>
         </html>
     );

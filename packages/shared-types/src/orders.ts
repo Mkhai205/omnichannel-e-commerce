@@ -78,4 +78,24 @@ export interface SellerOrderItem {
     updatedAt: string;
 }
 
+export interface SellerOrderDetailItem {
+    id: UUID;
+    orderId: UUID;
+    variantId: UUID;
+    productId: UUID;
+    productName: string;
+    variantSku: string;
+    imageKey?: string | null;
+    imageUrl?: string | null;
+    quantity: number;
+    unitPrice: string;
+    lineTotal: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface SellerOrderDetailResponse extends SellerOrderItem {
+    items: SellerOrderDetailItem[];
+}
+
 export type SellerOrdersListResponse = PaginatedResponse<SellerOrderItem>;
