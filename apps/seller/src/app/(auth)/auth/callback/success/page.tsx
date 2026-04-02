@@ -31,7 +31,8 @@ export default function AuthCallbackSuccessPage() {
                     return;
                 }
 
-                router.replace("/auth/callback/error?message=Google%20login%20failed");
+                const errorMessage = encodeURIComponent("Đăng nhập Google thất bại");
+                router.replace(`/auth/callback/error?message=${errorMessage}`);
             }
         };
 
@@ -45,9 +46,9 @@ export default function AuthCallbackSuccessPage() {
     return (
         <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
             <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-                <h1 className="text-2xl font-semibold text-slate-900">Dang dang nhap...</h1>
+                <h1 className="text-2xl font-semibold text-slate-900">Đang đăng nhập...</h1>
                 <p className="mt-3 text-sm text-slate-600">
-                    He thong dang hoan tat phien Google login cho tai khoan seller.
+                    Hệ thống đang hoàn tất phiên đăng nhập Google cho tài khoản người bán.
                 </p>
             </section>
         </main>

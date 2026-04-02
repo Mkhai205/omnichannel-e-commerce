@@ -100,7 +100,7 @@ export function SellerProtectedGate({ children }: SellerProtectedGateProps) {
     if (isChecking) {
         return (
             <div className="flex min-h-[calc(100dvh-8rem)] items-center justify-center">
-                <p className="text-sm text-slate-600">Dang kiem tra phien dang nhap...</p>
+                <p className="text-sm text-slate-600">Đang kiểm tra phiên đăng nhập...</p>
             </div>
         );
     }

@@ -66,7 +66,7 @@ export function RegisterFormCard() {
 
             router.replace(`/verify-email?email=${encodeURIComponent(form.businessEmail.trim())}`);
         } catch (error) {
-            const fallbackMessage = "Dang ky that bai. Vui long thu lai.";
+            const fallbackMessage = "Đăng ký thất bại. Vui lòng thử lại.";
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message || fallbackMessage);
             } else {
@@ -151,7 +151,7 @@ export function RegisterFormCard() {
                         htmlFor="store-name"
                         className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500"
                     >
-                        Tên của hàng
+                        Tên cửa hàng
                     </label>
                     <Input
                         id="store-name"
@@ -227,7 +227,7 @@ export function RegisterFormCard() {
                     disabled={!canSubmit || isSubmitting}
                     onClick={handleSubmit}
                 >
-                    {isSubmitting ? "Dang xu ly..." : "Tạo tài khoản bán hàng"}
+                    {isSubmitting ? "Đang xử lý..." : "Tạo tài khoản bán hàng"}
                 </Button>
 
                 {errorMessage ? <p className="text-sm text-rose-600">{errorMessage}</p> : null}

@@ -58,7 +58,7 @@ export default function SellerOnboardingPage() {
             window.sessionStorage.removeItem("seller_onboarding_store_name");
             router.replace("/");
         } catch (error) {
-            const fallbackMessage = "Khong the tao ho so shop luc nay. Vui long thu lai.";
+            const fallbackMessage = "Không thể tạo hồ sơ cửa hàng lúc này. Vui lòng thử lại.";
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message || fallbackMessage);
             } else {
@@ -73,22 +73,22 @@ export default function SellerOnboardingPage() {
         <section className="mx-auto w-full max-w-2xl">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
                 <h1 className="text-2xl font-semibold text-slate-900">
-                    Hoan tat onboarding seller
+                    Hoàn tất thiết lập người bán
                 </h1>
                 <p className="mt-2 text-sm text-slate-600">
-                    Ban can tao thong tin shop truoc khi truy cap cac tinh nang van hanh.
+                    Bạn cần tạo thông tin cửa hàng trước khi truy cập các tính năng vận hành.
                 </p>
 
                 <div className="mt-6 grid gap-4">
                     <div className="grid gap-2">
                         <label htmlFor="shop-name" className="text-sm font-medium text-slate-700">
-                            Ten shop
+                            Tên cửa hàng
                         </label>
                         <Input
                             id="shop-name"
                             value={shopName}
                             onChange={(event) => setShopName(event.target.value)}
-                            placeholder="Merchant Official Store"
+                            placeholder="Cửa hàng chính hãng"
                             className="h-11 border-slate-200"
                         />
                     </div>
@@ -98,14 +98,14 @@ export default function SellerOnboardingPage() {
                             htmlFor="shop-description"
                             className="text-sm font-medium text-slate-700"
                         >
-                            Mo ta shop (tuy chon)
+                            Mô tả cửa hàng (tùy chọn)
                         </label>
                         <textarea
                             id="shop-description"
                             rows={4}
                             value={description}
                             onChange={(event) => setDescription(event.target.value)}
-                            placeholder="Gioi thieu ngan gon ve cua hang cua ban"
+                            placeholder="Giới thiệu ngắn gọn về cửa hàng của bạn"
                             className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
                         />
                     </div>
@@ -115,13 +115,13 @@ export default function SellerOnboardingPage() {
                             htmlFor="business-license"
                             className="text-sm font-medium text-slate-700"
                         >
-                            Business license (tuy chon)
+                            Giấy phép kinh doanh (tùy chọn)
                         </label>
                         <Input
                             id="business-license"
                             value={businessLicense}
                             onChange={(event) => setBusinessLicense(event.target.value)}
-                            placeholder="So hoac duong dan giay phep kinh doanh"
+                            placeholder="Số hoặc đường dẫn giấy phép kinh doanh"
                             className="h-11 border-slate-200"
                         />
                     </div>
@@ -132,7 +132,7 @@ export default function SellerOnboardingPage() {
                         disabled={!canSubmit}
                         onClick={handleSubmit}
                     >
-                        {isSubmitting ? "Dang tao shop..." : "Hoan tat onboarding"}
+                        {isSubmitting ? "Đang tạo cửa hàng..." : "Hoàn tất thiết lập"}
                     </Button>
 
                     {errorMessage ? <p className="text-sm text-rose-600">{errorMessage}</p> : null}

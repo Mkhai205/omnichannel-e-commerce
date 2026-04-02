@@ -25,9 +25,9 @@ export default function ForgotPasswordPage() {
 
         try {
             await forgotPassword(email.trim().toLowerCase());
-            setSuccessMessage("Neu email ton tai, lien ket dat lai mat khau da duoc gui.");
+            setSuccessMessage("Nếu email tồn tại, liên kết đặt lại mật khẩu đã được gửi.");
         } catch (error) {
-            const fallbackMessage = "Khong the gui yeu cau luc nay. Vui long thu lai.";
+            const fallbackMessage = "Không thể gửi yêu cầu lúc này. Vui lòng thử lại.";
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message || fallbackMessage);
             } else {
@@ -41,9 +41,9 @@ export default function ForgotPasswordPage() {
     return (
         <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
             <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-                <h1 className="text-2xl font-semibold text-slate-900">Quen mat khau</h1>
+                <h1 className="text-2xl font-semibold text-slate-900">Quên mật khẩu</h1>
                 <p className="mt-2 text-sm text-slate-600">
-                    Nhap email de nhan lien ket dat lai mat khau.
+                    Nhập email để nhận liên kết đặt lại mật khẩu.
                 </p>
 
                 <div className="mt-6 grid gap-3">
@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
                         disabled={!canSubmit}
                         onClick={handleSubmit}
                     >
-                        {isSubmitting ? "Dang xu ly..." : "Gui yeu cau"}
+                        {isSubmitting ? "Đang xử lý..." : "Gửi yêu cầu"}
                     </Button>
                     {errorMessage ? <p className="text-sm text-rose-600">{errorMessage}</p> : null}
                     {successMessage ? (
@@ -70,7 +70,7 @@ export default function ForgotPasswordPage() {
 
                 <p className="mt-5 text-sm text-slate-600">
                     <Link href="/login" className="font-medium text-blue-700 hover:text-blue-600">
-                        Quay lai dang nhap
+                        Quay lại đăng nhập
                     </Link>
                 </p>
             </section>

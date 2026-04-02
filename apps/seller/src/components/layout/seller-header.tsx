@@ -53,7 +53,7 @@ export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
                         size="icon"
                         className="md:hidden"
                         onClick={onToggleSidebar}
-                        aria-label="Toggle sidebar"
+                        aria-label="Mở hoặc đóng thanh bên"
                     >
                         <Menu aria-hidden="true" />
                     </Button>
@@ -67,20 +67,20 @@ export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
                     </div>
 
                     <div className="flex items-center gap-1 md:gap-2">
+                        <Button type="button" variant="ghost" size="icon" aria-label="Thông báo">
+                            <Bell aria-hidden="true" />
+                        </Button>
+
                         <Button
                             type="button"
                             variant="ghost"
                             size="icon"
-                            aria-label="Notifications"
+                            aria-label="Trung tâm trợ giúp"
                         >
-                            <Bell aria-hidden="true" />
-                        </Button>
-
-                        <Button type="button" variant="ghost" size="icon" aria-label="Help center">
                             <HelpCircle aria-hidden="true" />
                         </Button>
 
-                        <Button type="button" variant="ghost" size="icon" aria-label="Settings">
+                        <Button type="button" variant="ghost" size="icon" aria-label="Cài đặt">
                             <Settings aria-hidden="true" />
                         </Button>
 

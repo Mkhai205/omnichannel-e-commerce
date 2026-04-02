@@ -42,9 +42,9 @@ export default function ResetPasswordPage() {
 
         try {
             await resetPassword(token, password);
-            setSuccessMessage("Dat lai mat khau thanh cong. Ban co the dang nhap lai.");
+            setSuccessMessage("Đặt lại mật khẩu thành công. Bạn có thể đăng nhập lại.");
         } catch (error) {
-            const fallbackMessage = "Dat lai mat khau that bai. Vui long thu lai.";
+            const fallbackMessage = "Đặt lại mật khẩu thất bại. Vui lòng thử lại.";
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message || fallbackMessage);
             } else {
@@ -59,7 +59,7 @@ export default function ResetPasswordPage() {
         return (
             <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
                 <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-                    <p className="text-sm text-slate-600">Dang tai du lieu...</p>
+                    <p className="text-sm text-slate-600">Đang tải dữ liệu...</p>
                 </section>
             </main>
         );
@@ -69,15 +69,15 @@ export default function ResetPasswordPage() {
         return (
             <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
                 <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-                    <h1 className="text-2xl font-semibold text-slate-900">Lien ket khong hop le</h1>
+                    <h1 className="text-2xl font-semibold text-slate-900">Liên kết không hợp lệ</h1>
                     <p className="mt-2 text-sm text-slate-600">
-                        Lien ket reset password thieu token hoac da het han.
+                        Liên kết đặt lại mật khẩu thiếu token hoặc đã hết hạn.
                     </p>
                     <Link
                         href="/forgot-password"
                         className="mt-6 inline-block text-sm font-medium text-blue-700 hover:text-blue-600"
                     >
-                        Gui lai lien ket dat mat khau
+                        Gửi lại liên kết đặt mật khẩu
                     </Link>
                 </section>
             </main>
@@ -87,21 +87,21 @@ export default function ResetPasswordPage() {
     return (
         <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
             <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-                <h1 className="text-2xl font-semibold text-slate-900">Dat lai mat khau</h1>
+                <h1 className="text-2xl font-semibold text-slate-900">Đặt lại mật khẩu</h1>
 
                 <div className="mt-6 grid gap-3">
                     <Input
                         type="password"
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
-                        placeholder="Mat khau moi (toi thieu 8 ky tu)"
+                        placeholder="Mật khẩu mới (tối thiểu 8 ký tự)"
                         className="h-11 border-slate-200"
                     />
                     <Input
                         type="password"
                         value={confirmPassword}
                         onChange={(event) => setConfirmPassword(event.target.value)}
-                        placeholder="Nhap lai mat khau moi"
+                        placeholder="Nhập lại mật khẩu mới"
                         className="h-11 border-slate-200"
                     />
 
@@ -111,7 +111,7 @@ export default function ResetPasswordPage() {
                         disabled={!canSubmit}
                         onClick={handleSubmit}
                     >
-                        {isSubmitting ? "Dang cap nhat..." : "Xac nhan"}
+                        {isSubmitting ? "Đang cập nhật..." : "Xác nhận"}
                     </Button>
 
                     {errorMessage ? <p className="text-sm text-rose-600">{errorMessage}</p> : null}
@@ -122,7 +122,7 @@ export default function ResetPasswordPage() {
 
                 <p className="mt-5 text-sm text-slate-600">
                     <Link href="/login" className="font-medium text-blue-700 hover:text-blue-600">
-                        Quay lai dang nhap
+                        Quay lại đăng nhập
                     </Link>
                 </p>
             </section>

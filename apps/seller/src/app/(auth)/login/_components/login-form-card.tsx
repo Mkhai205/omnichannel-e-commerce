@@ -43,7 +43,7 @@ export function LoginFormCard() {
             const myShop = await getMySellerShop();
             router.replace(myShop ? "/" : "/onboarding");
         } catch (error) {
-            const fallbackMessage = "Dang nhap that bai. Vui long thu lai.";
+            const fallbackMessage = "Đăng nhập thất bại. Vui lòng thử lại.";
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message || fallbackMessage);
             } else {
@@ -147,7 +147,7 @@ export function LoginFormCard() {
                     onClick={handleSubmit}
                     disabled={!canSubmit || isSubmitting}
                 >
-                    {isSubmitting ? "Dang dang nhap..." : "Đăng nhập"}
+                    {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
                 </Button>
 
                 {errorMessage ? <p className="text-sm text-rose-600">{errorMessage}</p> : null}

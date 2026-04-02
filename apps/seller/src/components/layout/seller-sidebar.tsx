@@ -25,13 +25,13 @@ const mainNav = [
     { label: "Kho hàng", icon: Boxes, href: "/inventory" },
     { label: "Sản phẩm", icon: ClipboardCheck, href: "/products" },
     { label: "Giao hàng", icon: Truck, href: "/shipping" },
-    { label: "Marketing", icon: Megaphone, href: "/marketing" },
+    { label: "Tiếp thị", icon: Megaphone, href: "/marketing" },
     { label: "Thanh toán", icon: CreditCard, href: "/payments" },
     { label: "Khách hàng", icon: Headset, href: "/customer-service" },
     { label: "Thống kê", icon: BarChart3, href: "/analytics" },
 ];
 
-const supportNav = [{ label: "Support", icon: LifeBuoy, href: "/support" }];
+const supportNav = [{ label: "Hỗ trợ", icon: LifeBuoy, href: "/support" }];
 
 export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
     const pathname = usePathname();
@@ -40,7 +40,7 @@ export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
         <>
             <button
                 type="button"
-                aria-label="Close sidebar overlay"
+                aria-label="Đóng lớp phủ thanh bên"
                 className={cn(
                     "fixed inset-0 top-16 z-30 bg-black/25 transition-opacity md:hidden",
                     isOpen ? "opacity-100" : "pointer-events-none opacity-0",

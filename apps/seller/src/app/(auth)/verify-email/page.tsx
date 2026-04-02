@@ -41,7 +41,7 @@ export default function VerifyEmailPage() {
                 }
 
                 setStatus("error");
-                const fallbackMessage = "Xac minh email that bai hoac token da het han.";
+                const fallbackMessage = "Xác minh email thất bại hoặc token đã hết hạn.";
                 if (isApiRequestError(error)) {
                     setErrorMessage(error.message || fallbackMessage);
                 } else {
@@ -59,18 +59,18 @@ export default function VerifyEmailPage() {
 
     const title = useMemo(() => {
         if (status === "loading") {
-            return "Dang xac minh email...";
+            return "Đang xác minh email...";
         }
 
         if (status === "success") {
-            return "Email da duoc xac minh";
+            return "Email đã được xác minh";
         }
 
         if (status === "error") {
-            return "Khong the xac minh email";
+            return "Không thể xác minh email";
         }
 
-        return "Xac minh email";
+        return "Xác minh email";
     }, [status]);
 
     return (
@@ -80,26 +80,26 @@ export default function VerifyEmailPage() {
 
                 {status === "idle" ? (
                     <p className="mt-3 text-sm text-slate-600">
-                        Chung toi da gui email xac minh{email ? ` den ${email}` : ""}. Vui long mo
-                        hop thu va bam vao lien ket xac minh.
+                        Chúng tôi đã gửi email xác minh{email ? ` đến ${email}` : ""}. Vui lòng mở
+                        hộp thư và bấm vào liên kết xác minh.
                     </p>
                 ) : null}
 
                 {status === "loading" ? (
                     <p className="mt-3 text-sm text-slate-600">
-                        He thong dang xu ly lien ket xac minh cua ban.
+                        Hệ thống đang xử lý liên kết xác minh của bạn.
                     </p>
                 ) : null}
 
                 {status === "success" ? (
                     <p className="mt-3 text-sm text-emerald-700">
-                        Ban co the dang nhap de tiep tuc onboarding seller.
+                        Bạn có thể đăng nhập để tiếp tục thiết lập người bán.
                     </p>
                 ) : null}
 
                 {status === "error" ? (
                     <p className="mt-3 text-sm text-rose-600">
-                        {errorMessage ?? "Lien ket khong hop le hoac da het han."}
+                        {errorMessage ?? "Liên kết không hợp lệ hoặc đã hết hạn."}
                     </p>
                 ) : null}
 
@@ -108,7 +108,7 @@ export default function VerifyEmailPage() {
                         href="/login"
                         className="text-sm font-medium text-blue-700 hover:text-blue-600"
                     >
-                        Di den trang dang nhap
+                        Đi đến trang đăng nhập
                     </Link>
                 </div>
             </section>

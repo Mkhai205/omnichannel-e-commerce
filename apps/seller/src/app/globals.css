@@ -2,9 +2,26 @@
 @import "@repo/ui/styles.css";
 
 :root {
-    --background: #ffffff;
-    --foreground: #171717;
-    --primary: #047857;
+    color-scheme: light;
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    --primary: #2563eb;
+    --primary-foreground: #ffffff;
+    --secondary: #e2e8f0;
+    --secondary-foreground: #0f172a;
+    --muted: #e2e8f0;
+    --muted-foreground: #334155;
+    --accent: #dbeafe;
+    --accent-foreground: #1e3a8a;
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
+    --border: #cbd5e1;
+    --input: #cbd5e1;
+    --ring: #2563eb;
 }
 
 @theme inline {
@@ -12,17 +29,10 @@
     --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-    }
-}
-
 body {
     font-family: var(--font-geist-sans), sans-serif;
     margin: 0;
     min-height: 100dvh;
-    background: #f3f4f6;
+    background: var(--background);
     color: var(--foreground);
 }
