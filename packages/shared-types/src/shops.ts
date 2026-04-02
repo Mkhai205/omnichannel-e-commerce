@@ -46,6 +46,12 @@ export interface SellerUpdateShopRequest {
     businessLicense?: string;
 }
 
+export interface SellerCreateShopOnboardingRequest {
+    shopName: string;
+    description?: string;
+    businessLicense?: string;
+}
+
 export interface UploadShopAvatarResult {
     bucketName: string;
     objectKey: string;

@@ -1,18 +1,24 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { isAuthPublicRoute } from "@/lib/auth-routes";
+import { SellerProtectedGate } from "@/components/layout/seller-protected-gate";
 import { SellerShell } from "@/components/layout/seller-shell";
 
 type SellerPageFrameProps = {
-  children: React.ReactNode;
+    children: React.ReactNode;
 };
 
 export function SellerPageFrame({ children }: SellerPageFrameProps) {
-  const pathname = usePathname();
+    const pathname = usePathname();
 
-  if (pathname === "/login" || pathname.startsWith("/login/") || pathname === "/register" || pathname.startsWith("/register/")) {
-    return <>{children}</>;
-  }
+    if (isAuthPublicRoute(pathname)) {
+        return <>{children}</>;
+    }
 
-  return <SellerShell>{children}</SellerShell>;
+    return (
+        <SellerShell>
+            <SellerProtectedGate>{children}</SellerProtectedGate>
+        </SellerShell>
+    );
 }

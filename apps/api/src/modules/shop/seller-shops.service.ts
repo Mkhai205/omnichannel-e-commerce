@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { extname } from 'node:path';
 import type {
+  SellerCreateShopOnboardingRequest,
   SellerUpdateShopRequest,
   ShopDetail,
   UploadShopAvatarResult,
@@ -51,6 +52,34 @@ export class SellerShopsService {
     }
 
     return this.toShopDetail(shop);
+  }
+
+  async createOnboardingShop(
+    userId: string,
+    payload: SellerCreateShopOnboardingRequest,
+  ): Promise<ShopDetail> {
+    const existingShop = await this.shopsRepository.findShopByUserId(userId);
+
+    if (existingShop) {
+      return this.toShopDetail(existingShop);
+    }
+
+    const shopName = payload.shopName.trim();
+    const description = payload.description?.trim();
+    const businessLicense = payload.businessLicense?.trim();
+
+    const slug = await this.generateUniqueSlug(shopName);
+
+    const createdShop = await this.shopsRepository.createShop({
+      userId,
+      shopName,
+      slug,
+      description,
+      businessLicense,
+      status: 'PENDING',
+    });
+
+    return this.toShopDetail(createdShop);
   }
 
   async updateMyShop(
@@ -170,7 +199,7 @@ export class SellerShopsService {
 
   private async generateUniqueSlug(
     shopName: string,
-    currentShopId: string,
+    currentShopId?: string,
   ): Promise<string> {
     const baseSlug = this.slugify(shopName);
 
@@ -184,7 +213,7 @@ export class SellerShopsService {
     while (suffix <= 1000) {
       const existing = await this.shopsRepository.findShopBySlug(candidate);
 
-      if (!existing || existing.id === currentShopId) {
+      if (!existing || (currentShopId && existing.id === currentShopId)) {
         return candidate;
       }
 

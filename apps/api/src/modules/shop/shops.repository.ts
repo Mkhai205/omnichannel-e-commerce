@@ -129,6 +129,13 @@ export class ShopsRepository {
     });
   }
 
+  createShop(data: Prisma.ShopUncheckedCreateInput) {
+    return this.prisma.shop.create({
+      data,
+      select: SHOP_DETAIL_SELECT,
+    });
+  }
+
   findAdminShops(input: AdminShopsQueryInput) {
     return this.prisma.shop.findMany({
       where: this.buildAdminWhere(input),

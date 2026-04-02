@@ -11,6 +11,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
   ApiResponse,
+  SellerCreateShopOnboardingRequest,
   ShopDetail,
   UploadShopAvatarResult,
 } from '@repo/shared-types';
@@ -23,6 +24,7 @@ import {
   ApiOkEnvelopeResponse,
 } from '../../core/http/swagger-response.decorator';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
+import { SellerCreateShopDto } from './dto/seller-create-shop.dto';
 import { SellerUpdateShopDto } from './dto/seller-update-shop.dto';
 import {
   ShopDetailSwaggerDto,
@@ -38,6 +40,36 @@ import {
 @Controller('seller/shops')
 export class SellerShopsController {
   constructor(private readonly sellerShopsService: SellerShopsService) {}
+
+  @Post('onboarding')
+  @ApiOperation({
+    summary: 'Create initial seller shop during onboarding (idempotent)',
+  })
+  @ApiAuthSchemes()
+  @ApiBody({ type: SellerCreateShopDto })
+  @ApiCreatedEnvelopeResponse(
+    ShopDetailSwaggerDto,
+    'Seller onboarding shop created successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid onboarding payload',
+    unauthorized: 'Authentication required',
+    notFound: false,
+  })
+  async createOnboardingShop(
+    @CurrentUser() currentUser: JwtPayload,
+    @Body() payload: SellerCreateShopDto,
+  ): Promise<ApiResponse<ShopDetail>> {
+    const shop = await this.sellerShopsService.createOnboardingShop(
+      currentUser.sub,
+      payload as SellerCreateShopOnboardingRequest,
+    );
+
+    return createSuccessResponse(shop, {
+      statusCode: 201,
+      message: 'Seller onboarding shop created successfully',
+    });
+  }
 
   @Get('me')
   @ApiOperation({ summary: 'Get current seller shop details' })
