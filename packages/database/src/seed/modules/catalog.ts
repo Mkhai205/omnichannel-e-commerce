@@ -280,6 +280,25 @@ export async function seedCatalog(prisma: PrismaClient): Promise<CatalogSeedResu
     const products = [...fixed.products, ...extra.products];
     const variants = [...fixed.variants, ...extra.variants];
 
+    const shops = await prisma.shop.findMany({
+        select: {
+            id: true,
+        },
+    });
+
+    const defaultWarehouses = shops.map((shop) => ({
+        id: faker.string.uuid(),
+        shopId: shop.id,
+        name: "Kho mac dinh",
+        code: "DEFAULT",
+        isDefault: true,
+    }));
+    const warehouseIdByShopId = new Map(
+        defaultWarehouses.map((warehouse) => [warehouse.shopId, warehouse.id]),
+    );
+
+    await prisma.warehouse.createMany({ data: defaultWarehouses });
+
     await prisma.product.createMany({ data: products });
 
     await prisma.productVariant.createMany({
@@ -294,14 +313,60 @@ export async function seedCatalog(prisma: PrismaClient): Promise<CatalogSeedResu
         })),
     });
 
-    const inventoryLogs: Prisma.InventoryLogCreateManyInput[] = variants.map((variant) => ({
-        variantId: variant.id,
-        type: "IMPORT",
-        quantityChanged: variant.stockQuantity,
-        note: "Nhập kho ban đầu từ seed",
-    }));
+    const productShopById = new Map(products.map((product) => [product.id, product.shopId]));
+
+    await prisma.variantWarehouseInventory.createMany({
+        data: variants.map((variant) => {
+            const shopId = productShopById.get(variant.productId);
+
+            if (!shopId) {
+                throw new Error(`Missing shop for product ${variant.productId}`);
+            }
+
+            const warehouseId = warehouseIdByShopId.get(shopId);
+
+            if (!warehouseId) {
+                throw new Error(`Missing default warehouse for shop ${shopId}`);
+            }
+
+            return {
+                variantId: variant.id,
+                warehouseId,
+                stockQuantity: variant.stockQuantity,
+            };
+        }),
+    });
+
+    const inventoryLogs: Prisma.InventoryLogCreateManyInput[] = variants.map((variant) => {
+        const shopId = productShopById.get(variant.productId);
+
+        if (!shopId) {
+            throw new Error(`Missing shop for product ${variant.productId}`);
+        }
+
+        const warehouseId = warehouseIdByShopId.get(shopId);
+
+        if (!warehouseId) {
+            throw new Error(`Missing default warehouse for shop ${shopId}`);
+        }
+
+        return {
+            warehouseId,
+            variantId: variant.id,
+            type: "IMPORT",
+            quantityChanged: variant.stockQuantity,
+            note: "Nhập kho ban đầu từ seed",
+        };
+    });
+
+    const approvedWarehouseId = warehouseIdByShopId.get(SEED_IDS.shops.approved);
+
+    if (!approvedWarehouseId) {
+        throw new Error(`Missing default warehouse for shop ${SEED_IDS.shops.approved}`);
+    }
 
     inventoryLogs.push({
+        warehouseId: approvedWarehouseId,
         variantId: SEED_IDS.variants.smartphoneA128,
         type: "ORDER_DEDUCT",
         quantityChanged: -2,

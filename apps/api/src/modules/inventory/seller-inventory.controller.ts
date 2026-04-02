@@ -83,6 +83,7 @@ export class SellerInventoryController {
   @ApiParam({ name: 'variantId', format: 'uuid' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'warehouseId', required: false, type: String })
   @ApiOkEnvelopeResponse(
     InventoryLogsListDataSwaggerDto,
     'Inventory logs retrieved successfully',

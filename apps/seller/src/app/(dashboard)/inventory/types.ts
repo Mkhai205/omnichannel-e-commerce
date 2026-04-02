@@ -1,41 +1,47 @@
+import type { InventoryStockStatus } from "@repo/shared-types";
+
 export type InventoryActionId = "audit-report" | "stock-in" | "stock-out";
 
 export type InventoryActionStyle = "outline" | "primary";
 
-export type WarehouseFilter = "all" | "hcm" | "hn";
+export type WarehouseFilter = "all" | string;
 
-export type InventoryStatus = "CÒN HÀNG" | "SẮP HẾT" | "HẾT HÀNG";
+export type InventoryStatusFilter = "all" | InventoryStockStatus;
+
+export type InventoryStatus = InventoryStockStatus;
 
 export interface InventoryActionButton {
-  id: InventoryActionId;
-  label: string;
-  style: InventoryActionStyle;
+    id: InventoryActionId;
+    label: string;
+    style: InventoryActionStyle;
 }
 
 export interface InventoryOverviewStats {
-  totalInventoryValue: string;
-  totalInventoryCurrency: string;
-  monthlyGrowthPercent: string;
-  lowStockCount: number;
-  lowStockLabel: string;
-  lowStockCta: string;
-  inboundToday: number;
-  outboundToday: number;
-  inboundProgressPercent: number;
+    totalInventoryValue: string;
+    totalInventoryCurrency: string;
+    monthlyGrowthPercent: string;
+    lowStockCount: number;
+    lowStockLabel: string;
+    lowStockCta: string;
+    inboundToday: number;
+    outboundToday: number;
+    inboundProgressPercent: number;
 }
 
 export interface WarehouseFilterOption {
-  value: WarehouseFilter;
-  label: string;
+    value: WarehouseFilter;
+    label: string;
+    isDefault?: boolean;
 }
 
 export interface InventoryProductRow {
-  sku: string;
-  productName: string;
-  categoryLabel: string;
-  brandLabel: string;
-  warehouseName: string;
-  warehouseFilterValue: Exclude<WarehouseFilter, "all">;
-  currentStock: number;
-  status: InventoryStatus;
+    variantId: string;
+    sku: string;
+    productName: string;
+    categoryLabel: string;
+    brandLabel: string;
+    warehouseId: string;
+    warehouseName: string;
+    currentStock: number;
+    status: InventoryStatus;
 }

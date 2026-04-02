@@ -6,6 +6,10 @@ export type CatalogImageEntityType = "CATEGORY" | "PRODUCT" | "PRODUCT_VARIANT";
 
 export type InventoryLogType = "IMPORT" | "EXPORT" | "RETURN" | "ORDER_DEDUCT";
 
+export type SellerInventoryAdjustmentType = "IMPORT" | "EXPORT" | "RETURN";
+
+export type InventoryStockStatus = "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
+
 export type VariantAttributes = Record<string, string>;
 
 export type OmnichannelSyncStatus = Record<string, string>;
@@ -52,10 +56,41 @@ export interface ProductItem {
 export interface InventoryLogItem {
     id: UUID;
     variantId: UUID;
+    warehouseId: UUID;
     type: InventoryLogType;
     quantityChanged: number;
     note?: string | null;
     createdAt: string;
+}
+
+export interface SellerWarehouseItem {
+    id: UUID;
+    name: string;
+    code: string;
+    isDefault: boolean;
+}
+
+export interface SellerInventoryOverview {
+    totalInventoryValue: string;
+    totalInventoryCurrency: "VND";
+    monthlyGrowthPercent: number;
+    lowStockCount: number;
+    inboundToday: number;
+    outboundToday: number;
+    inboundProgressPercent: number;
+}
+
+export interface SellerInventoryItem {
+    variantId: UUID;
+    productId: UUID;
+    sku: string;
+    productName: string;
+    categoryLabel: string;
+    brandLabel: string;
+    warehouseId: UUID;
+    warehouseName: string;
+    currentStock: number;
+    status: InventoryStockStatus;
 }
 
 export interface PublicProductsFilterRequest {
@@ -72,6 +107,18 @@ export interface SellerProductsFilterRequest {
     search?: string;
     categoryId?: UUID;
     status?: ProductStatus;
+}
+
+export interface SellerInventoryFilterRequest {
+    page?: number;
+    limit?: number;
+    search?: string;
+    warehouseId?: UUID;
+    status?: InventoryStockStatus;
+}
+
+export interface SellerInventoryOverviewFilterRequest {
+    warehouseId?: UUID;
 }
 
 export interface AdminProductsFilterRequest {
@@ -130,6 +177,14 @@ export interface UpdateProductVariantRequest {
 export interface CreateInventoryLogRequest {
     type: InventoryLogType;
     quantityChanged: number;
+    warehouseId?: UUID;
+    note?: string;
+}
+
+export interface CreateSellerInventoryAdjustmentRequest {
+    warehouseId?: UUID;
+    type: SellerInventoryAdjustmentType;
+    quantity: number;
     note?: string;
 }
 
@@ -153,3 +208,5 @@ export type SellerProductsListResponse = PaginatedResponse<ProductItem>;
 export type AdminProductsListResponse = PaginatedResponse<ProductItem>;
 
 export type InventoryLogsListResponse = PaginatedResponse<InventoryLogItem>;
+
+export type SellerInventoryListResponse = PaginatedResponse<SellerInventoryItem>;

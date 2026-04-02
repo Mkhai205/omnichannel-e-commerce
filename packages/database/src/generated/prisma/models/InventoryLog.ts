@@ -37,6 +37,7 @@ export type InventoryLogSumAggregateOutputType = {
 export type InventoryLogMinAggregateOutputType = {
   id: string | null
   variantId: string | null
+  warehouseId: string | null
   type: $Enums.InventoryLogType | null
   quantityChanged: number | null
   note: string | null
@@ -46,6 +47,7 @@ export type InventoryLogMinAggregateOutputType = {
 export type InventoryLogMaxAggregateOutputType = {
   id: string | null
   variantId: string | null
+  warehouseId: string | null
   type: $Enums.InventoryLogType | null
   quantityChanged: number | null
   note: string | null
@@ -55,6 +57,7 @@ export type InventoryLogMaxAggregateOutputType = {
 export type InventoryLogCountAggregateOutputType = {
   id: number
   variantId: number
+  warehouseId: number
   type: number
   quantityChanged: number
   note: number
@@ -74,6 +77,7 @@ export type InventoryLogSumAggregateInputType = {
 export type InventoryLogMinAggregateInputType = {
   id?: true
   variantId?: true
+  warehouseId?: true
   type?: true
   quantityChanged?: true
   note?: true
@@ -83,6 +87,7 @@ export type InventoryLogMinAggregateInputType = {
 export type InventoryLogMaxAggregateInputType = {
   id?: true
   variantId?: true
+  warehouseId?: true
   type?: true
   quantityChanged?: true
   note?: true
@@ -92,6 +97,7 @@ export type InventoryLogMaxAggregateInputType = {
 export type InventoryLogCountAggregateInputType = {
   id?: true
   variantId?: true
+  warehouseId?: true
   type?: true
   quantityChanged?: true
   note?: true
@@ -188,6 +194,7 @@ export type InventoryLogGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 export type InventoryLogGroupByOutputType = {
   id: string
   variantId: string
+  warehouseId: string
   type: $Enums.InventoryLogType
   quantityChanged: number
   note: string | null
@@ -220,21 +227,25 @@ export type InventoryLogWhereInput = {
   NOT?: Prisma.InventoryLogWhereInput | Prisma.InventoryLogWhereInput[]
   id?: Prisma.UuidFilter<"InventoryLog"> | string
   variantId?: Prisma.UuidFilter<"InventoryLog"> | string
+  warehouseId?: Prisma.UuidFilter<"InventoryLog"> | string
   type?: Prisma.EnumInventoryLogTypeFilter<"InventoryLog"> | $Enums.InventoryLogType
   quantityChanged?: Prisma.IntFilter<"InventoryLog"> | number
   note?: Prisma.StringNullableFilter<"InventoryLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"InventoryLog"> | Date | string
   variant?: Prisma.XOR<Prisma.ProductVariantScalarRelationFilter, Prisma.ProductVariantWhereInput>
+  warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
 }
 
 export type InventoryLogOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   quantityChanged?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   variant?: Prisma.ProductVariantOrderByWithRelationInput
+  warehouse?: Prisma.WarehouseOrderByWithRelationInput
 }
 
 export type InventoryLogWhereUniqueInput = Prisma.AtLeast<{
@@ -243,16 +254,19 @@ export type InventoryLogWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.InventoryLogWhereInput[]
   NOT?: Prisma.InventoryLogWhereInput | Prisma.InventoryLogWhereInput[]
   variantId?: Prisma.UuidFilter<"InventoryLog"> | string
+  warehouseId?: Prisma.UuidFilter<"InventoryLog"> | string
   type?: Prisma.EnumInventoryLogTypeFilter<"InventoryLog"> | $Enums.InventoryLogType
   quantityChanged?: Prisma.IntFilter<"InventoryLog"> | number
   note?: Prisma.StringNullableFilter<"InventoryLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"InventoryLog"> | Date | string
   variant?: Prisma.XOR<Prisma.ProductVariantScalarRelationFilter, Prisma.ProductVariantWhereInput>
+  warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
 }, "id">
 
 export type InventoryLogOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   quantityChanged?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -270,6 +284,7 @@ export type InventoryLogScalarWhereWithAggregatesInput = {
   NOT?: Prisma.InventoryLogScalarWhereWithAggregatesInput | Prisma.InventoryLogScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"InventoryLog"> | string
   variantId?: Prisma.UuidWithAggregatesFilter<"InventoryLog"> | string
+  warehouseId?: Prisma.UuidWithAggregatesFilter<"InventoryLog"> | string
   type?: Prisma.EnumInventoryLogTypeWithAggregatesFilter<"InventoryLog"> | $Enums.InventoryLogType
   quantityChanged?: Prisma.IntWithAggregatesFilter<"InventoryLog"> | number
   note?: Prisma.StringNullableWithAggregatesFilter<"InventoryLog"> | string | null
@@ -283,11 +298,13 @@ export type InventoryLogCreateInput = {
   note?: string | null
   createdAt?: Date | string
   variant: Prisma.ProductVariantCreateNestedOneWithoutInventoryLogsInput
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutLogsInput
 }
 
 export type InventoryLogUncheckedCreateInput = {
   id?: string
   variantId: string
+  warehouseId: string
   type: $Enums.InventoryLogType
   quantityChanged: number
   note?: string | null
@@ -301,11 +318,13 @@ export type InventoryLogUpdateInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   variant?: Prisma.ProductVariantUpdateOneRequiredWithoutInventoryLogsNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutLogsNestedInput
 }
 
 export type InventoryLogUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   variantId?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumInventoryLogTypeFieldUpdateOperationsInput | $Enums.InventoryLogType
   quantityChanged?: Prisma.IntFieldUpdateOperationsInput | number
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -315,6 +334,7 @@ export type InventoryLogUncheckedUpdateInput = {
 export type InventoryLogCreateManyInput = {
   id?: string
   variantId: string
+  warehouseId: string
   type: $Enums.InventoryLogType
   quantityChanged: number
   note?: string | null
@@ -332,6 +352,7 @@ export type InventoryLogUpdateManyMutationInput = {
 export type InventoryLogUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   variantId?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumInventoryLogTypeFieldUpdateOperationsInput | $Enums.InventoryLogType
   quantityChanged?: Prisma.IntFieldUpdateOperationsInput | number
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -351,6 +372,7 @@ export type InventoryLogOrderByRelationAggregateInput = {
 export type InventoryLogCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   quantityChanged?: Prisma.SortOrder
   note?: Prisma.SortOrder
@@ -364,6 +386,7 @@ export type InventoryLogAvgOrderByAggregateInput = {
 export type InventoryLogMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   quantityChanged?: Prisma.SortOrder
   note?: Prisma.SortOrder
@@ -373,6 +396,7 @@ export type InventoryLogMaxOrderByAggregateInput = {
 export type InventoryLogMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   quantityChanged?: Prisma.SortOrder
   note?: Prisma.SortOrder
@@ -429,16 +453,60 @@ export type EnumInventoryLogTypeFieldUpdateOperationsInput = {
   set?: $Enums.InventoryLogType
 }
 
+export type InventoryLogCreateNestedManyWithoutWarehouseInput = {
+  create?: Prisma.XOR<Prisma.InventoryLogCreateWithoutWarehouseInput, Prisma.InventoryLogUncheckedCreateWithoutWarehouseInput> | Prisma.InventoryLogCreateWithoutWarehouseInput[] | Prisma.InventoryLogUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.InventoryLogCreateOrConnectWithoutWarehouseInput | Prisma.InventoryLogCreateOrConnectWithoutWarehouseInput[]
+  createMany?: Prisma.InventoryLogCreateManyWarehouseInputEnvelope
+  connect?: Prisma.InventoryLogWhereUniqueInput | Prisma.InventoryLogWhereUniqueInput[]
+}
+
+export type InventoryLogUncheckedCreateNestedManyWithoutWarehouseInput = {
+  create?: Prisma.XOR<Prisma.InventoryLogCreateWithoutWarehouseInput, Prisma.InventoryLogUncheckedCreateWithoutWarehouseInput> | Prisma.InventoryLogCreateWithoutWarehouseInput[] | Prisma.InventoryLogUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.InventoryLogCreateOrConnectWithoutWarehouseInput | Prisma.InventoryLogCreateOrConnectWithoutWarehouseInput[]
+  createMany?: Prisma.InventoryLogCreateManyWarehouseInputEnvelope
+  connect?: Prisma.InventoryLogWhereUniqueInput | Prisma.InventoryLogWhereUniqueInput[]
+}
+
+export type InventoryLogUpdateManyWithoutWarehouseNestedInput = {
+  create?: Prisma.XOR<Prisma.InventoryLogCreateWithoutWarehouseInput, Prisma.InventoryLogUncheckedCreateWithoutWarehouseInput> | Prisma.InventoryLogCreateWithoutWarehouseInput[] | Prisma.InventoryLogUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.InventoryLogCreateOrConnectWithoutWarehouseInput | Prisma.InventoryLogCreateOrConnectWithoutWarehouseInput[]
+  upsert?: Prisma.InventoryLogUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.InventoryLogUpsertWithWhereUniqueWithoutWarehouseInput[]
+  createMany?: Prisma.InventoryLogCreateManyWarehouseInputEnvelope
+  set?: Prisma.InventoryLogWhereUniqueInput | Prisma.InventoryLogWhereUniqueInput[]
+  disconnect?: Prisma.InventoryLogWhereUniqueInput | Prisma.InventoryLogWhereUniqueInput[]
+  delete?: Prisma.InventoryLogWhereUniqueInput | Prisma.InventoryLogWhereUniqueInput[]
+  connect?: Prisma.InventoryLogWhereUniqueInput | Prisma.InventoryLogWhereUniqueInput[]
+  update?: Prisma.InventoryLogUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.InventoryLogUpdateWithWhereUniqueWithoutWarehouseInput[]
+  updateMany?: Prisma.InventoryLogUpdateManyWithWhereWithoutWarehouseInput | Prisma.InventoryLogUpdateManyWithWhereWithoutWarehouseInput[]
+  deleteMany?: Prisma.InventoryLogScalarWhereInput | Prisma.InventoryLogScalarWhereInput[]
+}
+
+export type InventoryLogUncheckedUpdateManyWithoutWarehouseNestedInput = {
+  create?: Prisma.XOR<Prisma.InventoryLogCreateWithoutWarehouseInput, Prisma.InventoryLogUncheckedCreateWithoutWarehouseInput> | Prisma.InventoryLogCreateWithoutWarehouseInput[] | Prisma.InventoryLogUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.InventoryLogCreateOrConnectWithoutWarehouseInput | Prisma.InventoryLogCreateOrConnectWithoutWarehouseInput[]
+  upsert?: Prisma.InventoryLogUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.InventoryLogUpsertWithWhereUniqueWithoutWarehouseInput[]
+  createMany?: Prisma.InventoryLogCreateManyWarehouseInputEnvelope
+  set?: Prisma.InventoryLogWhereUniqueInput | Prisma.InventoryLogWhereUniqueInput[]
+  disconnect?: Prisma.InventoryLogWhereUniqueInput | Prisma.InventoryLogWhereUniqueInput[]
+  delete?: Prisma.InventoryLogWhereUniqueInput | Prisma.InventoryLogWhereUniqueInput[]
+  connect?: Prisma.InventoryLogWhereUniqueInput | Prisma.InventoryLogWhereUniqueInput[]
+  update?: Prisma.InventoryLogUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.InventoryLogUpdateWithWhereUniqueWithoutWarehouseInput[]
+  updateMany?: Prisma.InventoryLogUpdateManyWithWhereWithoutWarehouseInput | Prisma.InventoryLogUpdateManyWithWhereWithoutWarehouseInput[]
+  deleteMany?: Prisma.InventoryLogScalarWhereInput | Prisma.InventoryLogScalarWhereInput[]
+}
+
 export type InventoryLogCreateWithoutVariantInput = {
   id?: string
   type: $Enums.InventoryLogType
   quantityChanged: number
   note?: string | null
   createdAt?: Date | string
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutLogsInput
 }
 
 export type InventoryLogUncheckedCreateWithoutVariantInput = {
   id?: string
+  warehouseId: string
   type: $Enums.InventoryLogType
   quantityChanged: number
   note?: string | null
@@ -477,14 +545,60 @@ export type InventoryLogScalarWhereInput = {
   NOT?: Prisma.InventoryLogScalarWhereInput | Prisma.InventoryLogScalarWhereInput[]
   id?: Prisma.UuidFilter<"InventoryLog"> | string
   variantId?: Prisma.UuidFilter<"InventoryLog"> | string
+  warehouseId?: Prisma.UuidFilter<"InventoryLog"> | string
   type?: Prisma.EnumInventoryLogTypeFilter<"InventoryLog"> | $Enums.InventoryLogType
   quantityChanged?: Prisma.IntFilter<"InventoryLog"> | number
   note?: Prisma.StringNullableFilter<"InventoryLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"InventoryLog"> | Date | string
 }
 
+export type InventoryLogCreateWithoutWarehouseInput = {
+  id?: string
+  type: $Enums.InventoryLogType
+  quantityChanged: number
+  note?: string | null
+  createdAt?: Date | string
+  variant: Prisma.ProductVariantCreateNestedOneWithoutInventoryLogsInput
+}
+
+export type InventoryLogUncheckedCreateWithoutWarehouseInput = {
+  id?: string
+  variantId: string
+  type: $Enums.InventoryLogType
+  quantityChanged: number
+  note?: string | null
+  createdAt?: Date | string
+}
+
+export type InventoryLogCreateOrConnectWithoutWarehouseInput = {
+  where: Prisma.InventoryLogWhereUniqueInput
+  create: Prisma.XOR<Prisma.InventoryLogCreateWithoutWarehouseInput, Prisma.InventoryLogUncheckedCreateWithoutWarehouseInput>
+}
+
+export type InventoryLogCreateManyWarehouseInputEnvelope = {
+  data: Prisma.InventoryLogCreateManyWarehouseInput | Prisma.InventoryLogCreateManyWarehouseInput[]
+  skipDuplicates?: boolean
+}
+
+export type InventoryLogUpsertWithWhereUniqueWithoutWarehouseInput = {
+  where: Prisma.InventoryLogWhereUniqueInput
+  update: Prisma.XOR<Prisma.InventoryLogUpdateWithoutWarehouseInput, Prisma.InventoryLogUncheckedUpdateWithoutWarehouseInput>
+  create: Prisma.XOR<Prisma.InventoryLogCreateWithoutWarehouseInput, Prisma.InventoryLogUncheckedCreateWithoutWarehouseInput>
+}
+
+export type InventoryLogUpdateWithWhereUniqueWithoutWarehouseInput = {
+  where: Prisma.InventoryLogWhereUniqueInput
+  data: Prisma.XOR<Prisma.InventoryLogUpdateWithoutWarehouseInput, Prisma.InventoryLogUncheckedUpdateWithoutWarehouseInput>
+}
+
+export type InventoryLogUpdateManyWithWhereWithoutWarehouseInput = {
+  where: Prisma.InventoryLogScalarWhereInput
+  data: Prisma.XOR<Prisma.InventoryLogUpdateManyMutationInput, Prisma.InventoryLogUncheckedUpdateManyWithoutWarehouseInput>
+}
+
 export type InventoryLogCreateManyVariantInput = {
   id?: string
+  warehouseId: string
   type: $Enums.InventoryLogType
   quantityChanged: number
   note?: string | null
@@ -497,10 +611,12 @@ export type InventoryLogUpdateWithoutVariantInput = {
   quantityChanged?: Prisma.IntFieldUpdateOperationsInput | number
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutLogsNestedInput
 }
 
 export type InventoryLogUncheckedUpdateWithoutVariantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumInventoryLogTypeFieldUpdateOperationsInput | $Enums.InventoryLogType
   quantityChanged?: Prisma.IntFieldUpdateOperationsInput | number
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -509,6 +625,43 @@ export type InventoryLogUncheckedUpdateWithoutVariantInput = {
 
 export type InventoryLogUncheckedUpdateManyWithoutVariantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumInventoryLogTypeFieldUpdateOperationsInput | $Enums.InventoryLogType
+  quantityChanged?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type InventoryLogCreateManyWarehouseInput = {
+  id?: string
+  variantId: string
+  type: $Enums.InventoryLogType
+  quantityChanged: number
+  note?: string | null
+  createdAt?: Date | string
+}
+
+export type InventoryLogUpdateWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumInventoryLogTypeFieldUpdateOperationsInput | $Enums.InventoryLogType
+  quantityChanged?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  variant?: Prisma.ProductVariantUpdateOneRequiredWithoutInventoryLogsNestedInput
+}
+
+export type InventoryLogUncheckedUpdateWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumInventoryLogTypeFieldUpdateOperationsInput | $Enums.InventoryLogType
+  quantityChanged?: Prisma.IntFieldUpdateOperationsInput | number
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type InventoryLogUncheckedUpdateManyWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumInventoryLogTypeFieldUpdateOperationsInput | $Enums.InventoryLogType
   quantityChanged?: Prisma.IntFieldUpdateOperationsInput | number
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -520,61 +673,73 @@ export type InventoryLogUncheckedUpdateManyWithoutVariantInput = {
 export type InventoryLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   variantId?: boolean
+  warehouseId?: boolean
   type?: boolean
   quantityChanged?: boolean
   note?: boolean
   createdAt?: boolean
   variant?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inventoryLog"]>
 
 export type InventoryLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   variantId?: boolean
+  warehouseId?: boolean
   type?: boolean
   quantityChanged?: boolean
   note?: boolean
   createdAt?: boolean
   variant?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inventoryLog"]>
 
 export type InventoryLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   variantId?: boolean
+  warehouseId?: boolean
   type?: boolean
   quantityChanged?: boolean
   note?: boolean
   createdAt?: boolean
   variant?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inventoryLog"]>
 
 export type InventoryLogSelectScalar = {
   id?: boolean
   variantId?: boolean
+  warehouseId?: boolean
   type?: boolean
   quantityChanged?: boolean
   note?: boolean
   createdAt?: boolean
 }
 
-export type InventoryLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "variantId" | "type" | "quantityChanged" | "note" | "createdAt", ExtArgs["result"]["inventoryLog"]>
+export type InventoryLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "variantId" | "warehouseId" | "type" | "quantityChanged" | "note" | "createdAt", ExtArgs["result"]["inventoryLog"]>
 export type InventoryLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   variant?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
 }
 export type InventoryLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   variant?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
 }
 export type InventoryLogIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   variant?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
 }
 
 export type $InventoryLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "InventoryLog"
   objects: {
     variant: Prisma.$ProductVariantPayload<ExtArgs>
+    warehouse: Prisma.$WarehousePayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     variantId: string
+    warehouseId: string
     type: $Enums.InventoryLogType
     quantityChanged: number
     note: string | null
@@ -974,6 +1139,7 @@ readonly fields: InventoryLogFieldRefs;
 export interface Prisma__InventoryLogClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   variant<T extends Prisma.ProductVariantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProductVariantDefaultArgs<ExtArgs>>): Prisma.Prisma__ProductVariantClient<runtime.Types.Result.GetResult<Prisma.$ProductVariantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  warehouse<T extends Prisma.WarehouseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WarehouseDefaultArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1005,6 +1171,7 @@ export interface Prisma__InventoryLogClient<T, Null = never, ExtArgs extends run
 export interface InventoryLogFieldRefs {
   readonly id: Prisma.FieldRef<"InventoryLog", 'String'>
   readonly variantId: Prisma.FieldRef<"InventoryLog", 'String'>
+  readonly warehouseId: Prisma.FieldRef<"InventoryLog", 'String'>
   readonly type: Prisma.FieldRef<"InventoryLog", 'InventoryLogType'>
   readonly quantityChanged: Prisma.FieldRef<"InventoryLog", 'Int'>
   readonly note: Prisma.FieldRef<"InventoryLog", 'String'>

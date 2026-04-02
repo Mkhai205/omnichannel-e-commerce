@@ -392,6 +392,8 @@ export const ModelName = {
   Cart: 'Cart',
   CartItem: 'CartItem',
   InventoryLog: 'InventoryLog',
+  Warehouse: 'Warehouse',
+  VariantWarehouseInventory: 'VariantWarehouseInventory',
   Address: 'Address',
   OauthAccount: 'OauthAccount',
   RefreshToken: 'RefreshToken',
@@ -419,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "shop" | "category" | "product" | "productVariant" | "cart" | "cartItem" | "inventoryLog" | "address" | "oauthAccount" | "refreshToken" | "order" | "orderItem" | "payment" | "paymentOrder" | "paymentWebhookLog" | "adminWallet" | "adminWalletLedger" | "sellerWallet" | "sellerSettlement"
+    modelProps: "user" | "shop" | "category" | "product" | "productVariant" | "cart" | "cartItem" | "inventoryLog" | "warehouse" | "variantWarehouseInventory" | "address" | "oauthAccount" | "refreshToken" | "order" | "orderItem" | "payment" | "paymentOrder" | "paymentWebhookLog" | "adminWallet" | "adminWalletLedger" | "sellerWallet" | "sellerSettlement"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1012,6 +1014,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.InventoryLogCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.InventoryLogCountAggregateOutputType> | number
+        }
+      }
+    }
+    Warehouse: {
+      payload: Prisma.$WarehousePayload<ExtArgs>
+      fields: Prisma.WarehouseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WarehouseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehousePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WarehouseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehousePayload>
+        }
+        findFirst: {
+          args: Prisma.WarehouseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehousePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WarehouseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehousePayload>
+        }
+        findMany: {
+          args: Prisma.WarehouseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehousePayload>[]
+        }
+        create: {
+          args: Prisma.WarehouseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehousePayload>
+        }
+        createMany: {
+          args: Prisma.WarehouseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WarehouseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehousePayload>[]
+        }
+        delete: {
+          args: Prisma.WarehouseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehousePayload>
+        }
+        update: {
+          args: Prisma.WarehouseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehousePayload>
+        }
+        deleteMany: {
+          args: Prisma.WarehouseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WarehouseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WarehouseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehousePayload>[]
+        }
+        upsert: {
+          args: Prisma.WarehouseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehousePayload>
+        }
+        aggregate: {
+          args: Prisma.WarehouseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWarehouse>
+        }
+        groupBy: {
+          args: Prisma.WarehouseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WarehouseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WarehouseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WarehouseCountAggregateOutputType> | number
+        }
+      }
+    }
+    VariantWarehouseInventory: {
+      payload: Prisma.$VariantWarehouseInventoryPayload<ExtArgs>
+      fields: Prisma.VariantWarehouseInventoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VariantWarehouseInventoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VariantWarehouseInventoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VariantWarehouseInventoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VariantWarehouseInventoryPayload>
+        }
+        findFirst: {
+          args: Prisma.VariantWarehouseInventoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VariantWarehouseInventoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VariantWarehouseInventoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VariantWarehouseInventoryPayload>
+        }
+        findMany: {
+          args: Prisma.VariantWarehouseInventoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VariantWarehouseInventoryPayload>[]
+        }
+        create: {
+          args: Prisma.VariantWarehouseInventoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VariantWarehouseInventoryPayload>
+        }
+        createMany: {
+          args: Prisma.VariantWarehouseInventoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VariantWarehouseInventoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VariantWarehouseInventoryPayload>[]
+        }
+        delete: {
+          args: Prisma.VariantWarehouseInventoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VariantWarehouseInventoryPayload>
+        }
+        update: {
+          args: Prisma.VariantWarehouseInventoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VariantWarehouseInventoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.VariantWarehouseInventoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VariantWarehouseInventoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VariantWarehouseInventoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VariantWarehouseInventoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.VariantWarehouseInventoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VariantWarehouseInventoryPayload>
+        }
+        aggregate: {
+          args: Prisma.VariantWarehouseInventoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVariantWarehouseInventory>
+        }
+        groupBy: {
+          args: Prisma.VariantWarehouseInventoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VariantWarehouseInventoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VariantWarehouseInventoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VariantWarehouseInventoryCountAggregateOutputType> | number
         }
       }
     }
@@ -2043,6 +2193,7 @@ export type CartItemScalarFieldEnum = (typeof CartItemScalarFieldEnum)[keyof typ
 export const InventoryLogScalarFieldEnum = {
   id: 'id',
   variantId: 'variantId',
+  warehouseId: 'warehouseId',
   type: 'type',
   quantityChanged: 'quantityChanged',
   note: 'note',
@@ -2050,6 +2201,31 @@ export const InventoryLogScalarFieldEnum = {
 } as const
 
 export type InventoryLogScalarFieldEnum = (typeof InventoryLogScalarFieldEnum)[keyof typeof InventoryLogScalarFieldEnum]
+
+
+export const WarehouseScalarFieldEnum = {
+  id: 'id',
+  shopId: 'shopId',
+  name: 'name',
+  code: 'code',
+  isDefault: 'isDefault',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WarehouseScalarFieldEnum = (typeof WarehouseScalarFieldEnum)[keyof typeof WarehouseScalarFieldEnum]
+
+
+export const VariantWarehouseInventoryScalarFieldEnum = {
+  id: 'id',
+  variantId: 'variantId',
+  warehouseId: 'warehouseId',
+  stockQuantity: 'stockQuantity',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VariantWarehouseInventoryScalarFieldEnum = (typeof VariantWarehouseInventoryScalarFieldEnum)[keyof typeof VariantWarehouseInventoryScalarFieldEnum]
 
 
 export const AddressScalarFieldEnum = {
@@ -2435,6 +2611,13 @@ export type ListEnumInventoryLogTypeFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'AddressType'
  */
 export type EnumAddressTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AddressType'>
@@ -2445,13 +2628,6 @@ export type EnumAddressTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'AddressType[]'
  */
 export type ListEnumAddressTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AddressType[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -2669,6 +2845,8 @@ export type GlobalOmitConfig = {
   cart?: Prisma.CartOmit
   cartItem?: Prisma.CartItemOmit
   inventoryLog?: Prisma.InventoryLogOmit
+  warehouse?: Prisma.WarehouseOmit
+  variantWarehouseInventory?: Prisma.VariantWarehouseInventoryOmit
   address?: Prisma.AddressOmit
   oauthAccount?: Prisma.OauthAccountOmit
   refreshToken?: Prisma.RefreshTokenOmit

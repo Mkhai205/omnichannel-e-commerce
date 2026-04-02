@@ -573,10 +573,6 @@ export type EnumAddressTypeFieldUpdateOperationsInput = {
   set?: $Enums.AddressType
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type AddressCreateNestedOneWithoutOrdersAsShippingInput = {
   create?: Prisma.XOR<Prisma.AddressCreateWithoutOrdersAsShippingInput, Prisma.AddressUncheckedCreateWithoutOrdersAsShippingInput>
   connectOrCreate?: Prisma.AddressCreateOrConnectWithoutOrdersAsShippingInput

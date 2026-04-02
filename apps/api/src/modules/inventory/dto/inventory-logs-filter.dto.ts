@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, Max, Min } from 'class-validator';
+import { IsOptional, IsUUID, Max, Min } from 'class-validator';
 
 export class InventoryLogsFilterDto {
   @ApiPropertyOptional({ default: 1, minimum: 1 })
@@ -15,4 +15,9 @@ export class InventoryLogsFilterDto {
   @Min(1)
   @Max(100)
   limit?: number;
+
+  @ApiPropertyOptional({ format: 'uuid' })
+  @IsOptional()
+  @IsUUID()
+  warehouseId?: string;
 }
