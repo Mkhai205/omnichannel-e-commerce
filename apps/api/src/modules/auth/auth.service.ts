@@ -20,6 +20,10 @@ import { MailTemplateService } from '../../infrastructure/mail/mail-template.ser
 import { AuthGoogleService } from './auth-google.service';
 import { AuthRepository } from './auth.repository';
 import { AuthTokenService } from './auth-token.service';
+import {
+  GOOGLE_LOGIN_SOURCES,
+  type GoogleLoginSource,
+} from './dto/google-login-query.dto';
 import { REGISTRATION_ROLES } from './dto/register.dto';
 import { FRONTEND_REDIRECT_URI_CONFIG_KEY } from 'src/core/config/env.constant';
 
@@ -174,9 +178,11 @@ export class AuthService {
   async loginWithGoogleCode(
     code: string,
     meta: RequestMeta,
+    source: GoogleLoginSource = GOOGLE_LOGIN_SOURCES.USER,
   ): Promise<LoginResponse> {
     const googleUser = await this.authGoogleService.fetchGoogleUserInfo(code);
     const normalizedEmail = googleUser.email.toLowerCase();
+    const sellerLogin = source === GOOGLE_LOGIN_SOURCES.SELLER;
 
     let user = await this.authRepository.findUserByGoogleProviderId(
       googleUser.sub,
@@ -192,9 +198,14 @@ export class AuthService {
         fullName: googleUser.name,
         providerUserId: googleUser.sub,
         picture: googleUser.picture,
+        role: sellerLogin ? 'SELLER' : 'CUSTOMER',
       });
     } else {
       await this.ensureGoogleAccountLinked(user.id, googleUser);
+
+      if (sellerLogin && user.role === 'CUSTOMER') {
+        user = await this.authRepository.promoteCustomerToSeller(user.id);
+      }
     }
 
     this.assertUserCanLogin(user.status);

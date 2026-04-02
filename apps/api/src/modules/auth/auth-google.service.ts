@@ -4,12 +4,16 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { GoogleProfilePayload } from '@repo/shared-types';
+import type { GoogleProfilePayload, UserRole } from '@repo/shared-types';
 import { randomUUID } from 'crypto';
 import {
   AUTH_COOKIE_CONFIG_KEY,
   FRONTEND_REDIRECT_URI_CONFIG_KEY,
 } from 'src/core/config/env.constant';
+import {
+  GOOGLE_LOGIN_SOURCES,
+  type GoogleLoginSource,
+} from './dto/google-login-query.dto';
 
 interface GoogleTokenResponse {
   access_token?: string;
@@ -30,6 +34,13 @@ export class AuthGoogleService {
     );
   }
 
+  getOAuthSourceCookieName(): string {
+    return this.configService.get<string>(
+      'AUTH_COOKIE_OAUTH_SOURCE_NAME',
+      AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_OAUTH_SOURCE_NAME,
+    );
+  }
+
   getLoginSuccessRedirect(): string {
     return this.configService.get<string>(
       'FRONTEND_LOGIN_SUCCESS_REDIRECT',
@@ -42,6 +53,58 @@ export class AuthGoogleService {
       'FRONTEND_LOGIN_FAILURE_REDIRECT',
       FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_LOGIN_FAILURE_REDIRECT,
     );
+  }
+
+  getSellerLoginSuccessRedirect(): string {
+    return this.configService.get<string>(
+      'FRONTEND_SELLER_LOGIN_SUCCESS_REDIRECT',
+      FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_SELLER_LOGIN_SUCCESS_REDIRECT,
+    );
+  }
+
+  getSellerLoginFailureRedirect(): string {
+    return this.configService.get<string>(
+      'FRONTEND_SELLER_LOGIN_FAILURE_REDIRECT',
+      FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_SELLER_LOGIN_FAILURE_REDIRECT,
+    );
+  }
+
+  getLoginSuccessRedirectByRole(role: UserRole): string {
+    return role === 'SELLER'
+      ? this.getSellerLoginSuccessRedirect()
+      : this.getLoginSuccessRedirect();
+  }
+
+  getLoginFailureRedirectBySource(source: GoogleLoginSource): string {
+    return source === GOOGLE_LOGIN_SOURCES.SELLER
+      ? this.getSellerLoginFailureRedirect()
+      : this.getLoginFailureRedirect();
+  }
+
+  resolveLoginSource(query: {
+    source?: string;
+    app?: string;
+    role?: string;
+  }): GoogleLoginSource {
+    if (query.source === GOOGLE_LOGIN_SOURCES.SELLER) {
+      return GOOGLE_LOGIN_SOURCES.SELLER;
+    }
+
+    if (query.app?.trim().toLowerCase() === 'seller') {
+      return GOOGLE_LOGIN_SOURCES.SELLER;
+    }
+
+    if (query.role?.trim().toUpperCase() === 'SELLER') {
+      return GOOGLE_LOGIN_SOURCES.SELLER;
+    }
+
+    return GOOGLE_LOGIN_SOURCES.USER;
+  }
+
+  resolveLoginSourceFromCookie(source?: string): GoogleLoginSource {
+    return source === GOOGLE_LOGIN_SOURCES.SELLER
+      ? GOOGLE_LOGIN_SOURCES.SELLER
+      : GOOGLE_LOGIN_SOURCES.USER;
   }
 
   createGoogleAuthorizeUrl(state: string): string {

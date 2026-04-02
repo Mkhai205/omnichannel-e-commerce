@@ -13,6 +13,19 @@ export class CategorySwaggerDto {
   @ApiProperty({ example: 'dien-thoai' })
   slug!: string;
 
+  @ApiPropertyOptional({
+    nullable: true,
+    example: 'categories/89a2f95f-367f-4ad1-85d7-f86034fd9443/cover.jpg',
+  })
+  imageKey?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example:
+      'http://localhost:9000/products/categories/89a2f95f-367f-4ad1-85d7-f86034fd9443/cover.jpg',
+  })
+  imageUrl?: string | null;
+
   @ApiProperty({ example: '2026-03-28T00:00:00.000Z' })
   createdAt!: string;
 
@@ -40,6 +53,20 @@ export class ProductVariantSwaggerDto {
   @ApiProperty({ example: '32990000' })
   price!: string;
 
+  @ApiPropertyOptional({
+    nullable: true,
+    example:
+      'products/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/variants/5f19831d-23de-4d7e-a3f8-f4f98978cbce.jpg',
+  })
+  imageKey?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example:
+      'http://localhost:9000/products/products/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/variants/5f19831d-23de-4d7e-a3f8-f4f98978cbce.jpg',
+  })
+  imageUrl?: string | null;
+
   @ApiProperty({ example: 100 })
   stockQuantity!: number;
 
@@ -65,6 +92,19 @@ export class ProductSwaggerDto {
 
   @ApiPropertyOptional({ nullable: true })
   description?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example: 'products/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/main.jpg',
+  })
+  imageKey?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example:
+      'http://localhost:9000/products/products/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/main.jpg',
+  })
+  imageUrl?: string | null;
 
   @ApiProperty({
     type: 'object',
@@ -114,4 +154,22 @@ export class ProductsListDataSwaggerDto {
 
   @ApiProperty({ type: PaginationMetaSwaggerDto })
   meta!: PaginationMetaSwaggerDto;
+}
+
+export class UploadCatalogImageResultSwaggerDto {
+  @ApiProperty({ example: 'products' })
+  bucketName!: string;
+
+  @ApiProperty({
+    example:
+      'products/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/variants/5f19831d-23de-4d7e-a3f8-f4f98978cbce.jpg',
+  })
+  objectKey!: string;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example:
+      'http://localhost:9000/products/products/4f4c2f31-2a86-4711-a893-6d26e9bdf3f5/variants/5f19831d-23de-4d7e-a3f8-f4f98978cbce.jpg',
+  })
+  imageUrl?: string | null;
 }

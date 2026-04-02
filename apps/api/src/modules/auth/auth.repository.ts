@@ -20,6 +20,7 @@ interface CreateGoogleUserInput {
   fullName: string;
   providerUserId: string;
   picture?: string;
+  role: Extract<UserRole, 'CUSTOMER' | 'SELLER'>;
 }
 
 interface CreateRefreshTokenInput {
@@ -76,14 +77,13 @@ export class AuthRepository {
   }
 
   createGoogleUser(input: CreateGoogleUserInput) {
-    const role: UserRole = 'CUSTOMER';
     const status: UserStatus = 'ACTIVE';
 
     return this.prisma.user.create({
       data: {
         email: input.email,
         fullName: input.fullName,
-        role,
+        role: input.role,
         status,
         oauthAccounts: {
           create: {
@@ -172,6 +172,13 @@ export class AuthRepository {
     return this.prisma.user.update({
       where: { id: userId },
       data: { status: 'ACTIVE' },
+    });
+  }
+
+  promoteCustomerToSeller(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { role: 'SELLER' },
     });
   }
 }

@@ -110,6 +110,7 @@ export const ShopScalarFieldEnum = {
   shopName: 'shopName',
   slug: 'slug',
   description: 'description',
+  avatarKey: 'avatarKey',
   businessLicense: 'businessLicense',
   status: 'status',
   rejectionReason: 'rejectionReason',
@@ -125,6 +126,7 @@ export const CategoryScalarFieldEnum = {
   parentId: 'parentId',
   name: 'name',
   slug: 'slug',
+  imageKey: 'imageKey',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -138,6 +140,7 @@ export const ProductScalarFieldEnum = {
   categoryId: 'categoryId',
   name: 'name',
   description: 'description',
+  imageKey: 'imageKey',
   omnichannelSyncStatus: 'omnichannelSyncStatus',
   status: 'status',
   createdAt: 'createdAt',
@@ -153,6 +156,7 @@ export const ProductVariantScalarFieldEnum = {
   sku: 'sku',
   attributes: 'attributes',
   price: 'price',
+  imageKey: 'imageKey',
   stockQuantity: 'stockQuantity',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

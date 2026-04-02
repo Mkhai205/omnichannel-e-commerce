@@ -9,12 +9,17 @@ import type {
   ProductItem,
   UpdateProductStatusRequest,
 } from '@repo/shared-types';
+import { resolveCatalogImageUrl } from '../../core/http/catalog-image-url.helper';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import type { ProductRecord } from './catalog.repository';
 import { CatalogRepository } from './catalog.repository';
 
 @Injectable()
 export class AdminCatalogService {
-  constructor(private readonly catalogRepository: CatalogRepository) {}
+  constructor(
+    private readonly catalogRepository: CatalogRepository,
+    private readonly storageService: StorageService,
+  ) {}
 
   async getProducts(
     filters: AdminProductsFilterRequest,
@@ -99,6 +104,12 @@ export class AdminCatalogService {
       categoryId: product.categoryId,
       name: product.name,
       description: product.description,
+      imageKey: product.imageKey,
+      imageUrl: resolveCatalogImageUrl(
+        this.storageService,
+        'PRODUCT',
+        product.imageKey,
+      ),
       omnichannelSyncStatus: this.toStringRecord(product.omnichannelSyncStatus),
       status: product.status,
       createdAt: product.createdAt.toISOString(),
@@ -109,6 +120,13 @@ export class AdminCatalogService {
         sku: variant.sku,
         attributes: this.toStringRecord(variant.attributes),
         price: variant.price.toString(),
+        imageKey: variant.imageKey,
+        imageUrl: resolveCatalogImageUrl(
+          this.storageService,
+          'PRODUCT_VARIANT',
+          variant.imageKey,
+          product.imageKey,
+        ),
         stockQuantity: variant.stockQuantity,
         createdAt: variant.createdAt.toISOString(),
         updatedAt: variant.updatedAt.toISOString(),

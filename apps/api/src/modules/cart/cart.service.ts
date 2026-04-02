@@ -10,6 +10,8 @@ import type {
   CartSummary,
   UpdateCartItemRequest,
 } from '@repo/shared-types';
+import { resolveCatalogImageUrl } from '../../core/http/catalog-image-url.helper';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import type {
   CartItemRecord,
   CartRecord,
@@ -19,7 +21,10 @@ import { CartRepository } from './cart.repository';
 
 @Injectable()
 export class CartService {
-  constructor(private readonly cartRepository: CartRepository) {}
+  constructor(
+    private readonly cartRepository: CartRepository,
+    private readonly storageService: StorageService,
+  ) {}
 
   async getMyCart(userId: string): Promise<CartSummary> {
     const cart = await this.getOrCreateCartByUserId(userId);
@@ -210,6 +215,8 @@ export class CartService {
     const lineTotal = this.formatCents(
       this.parseMoneyToCents(unitPrice) * BigInt(item.quantity),
     );
+    const imageKey =
+      item.variant.imageKey ?? item.variant.product.imageKey ?? null;
 
     return {
       id: item.id,
@@ -218,6 +225,13 @@ export class CartService {
       productId: item.variant.productId,
       productName: item.variant.product.name,
       variantSku: item.variant.sku,
+      imageKey,
+      imageUrl: resolveCatalogImageUrl(
+        this.storageService,
+        'PRODUCT_VARIANT',
+        item.variant.imageKey,
+        item.variant.product.imageKey,
+      ),
       quantity: item.quantity,
       unitPrice,
       lineTotal,

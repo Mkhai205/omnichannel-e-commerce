@@ -7,9 +7,13 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -20,6 +24,7 @@ import type {
   ProductItem,
   ProductVariantItem,
   SellerProductsListResponse,
+  UploadCatalogImageResult,
 } from '@repo/shared-types';
 import { CurrentUser, Roles } from '../../core/decorators';
 import { createSuccessResponse } from '../../core/http/api-response.util';
@@ -37,10 +42,13 @@ import {
   ProductSwaggerDto,
   ProductsListDataSwaggerDto,
   ProductVariantSwaggerDto,
+  UploadCatalogImageResultSwaggerDto,
 } from './dto/catalog-swagger.dto';
 import { SellerProductsFilterDto } from './dto/seller-products-filter.dto';
+import { UploadCatalogImageDto } from './dto/upload-catalog-image.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { UpdateProductVariantDto } from './dto/update-product-variant.dto';
+import type { CatalogImageUploadFile } from './seller-catalog.service';
 
 @ApiTags('Seller - Catalog')
 @Roles('SELLER')
@@ -193,6 +201,65 @@ export class SellerCatalogController {
 
     return createSuccessResponse(variant, {
       message: 'Product variant updated successfully',
+    });
+  }
+
+  @Post('images/upload')
+  @ApiOperation({
+    summary: 'Upload catalog image to MinIO and return object key',
+  })
+  @ApiAuthSchemes()
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: {
+        fileSize: 5 * 1024 * 1024,
+      },
+    }),
+  )
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['entityType', 'entityId', 'file'],
+      properties: {
+        entityType: {
+          type: 'string',
+          enum: ['CATEGORY', 'PRODUCT', 'PRODUCT_VARIANT'],
+        },
+        entityId: {
+          type: 'string',
+          format: 'uuid',
+        },
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiCreatedEnvelopeResponse(
+    UploadCatalogImageResultSwaggerDto,
+    'Catalog image uploaded successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid upload payload or unsupported image file',
+    unauthorized: 'Authentication required',
+    notFound: 'Category, product, or variant not found',
+  })
+  async uploadCatalogImage(
+    @CurrentUser() currentUser: JwtPayload,
+    @Body() payload: UploadCatalogImageDto,
+    @UploadedFile() file?: CatalogImageUploadFile,
+  ): Promise<ApiResponse<UploadCatalogImageResult>> {
+    const result = await this.sellerCatalogService.uploadCatalogImage(
+      currentUser.sub,
+      payload,
+      file,
+    );
+
+    return createSuccessResponse(result, {
+      statusCode: 201,
+      message: 'Catalog image uploaded successfully',
     });
   }
 }

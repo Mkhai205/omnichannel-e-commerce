@@ -4,12 +4,17 @@ import type {
   PublicShopsFilterRequest,
   PublicShopsListResponse,
 } from '@repo/shared-types';
+import { resolveShopAvatarUrl } from '../../core/http/shop-avatar-url.helper';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import type { PublicShopRecord } from './shops.repository';
 import { ShopsRepository } from './shops.repository';
 
 @Injectable()
 export class PublicShopsService {
-  constructor(private readonly shopsRepository: ShopsRepository) {}
+  constructor(
+    private readonly shopsRepository: ShopsRepository,
+    private readonly storageService: StorageService,
+  ) {}
 
   async getPublicShops(
     filters: PublicShopsFilterRequest,
@@ -74,6 +79,8 @@ export class PublicShopsService {
       shopName: shop.shopName,
       slug: shop.slug,
       description: shop.description,
+      avatarKey: shop.avatarKey,
+      avatarUrl: resolveShopAvatarUrl(this.storageService, shop.avatarKey),
     };
   }
 }

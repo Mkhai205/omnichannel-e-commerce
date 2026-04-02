@@ -36,6 +36,10 @@ import { AuthGoogleService } from './auth-google.service';
 import { AuthService } from './auth.service';
 import { AuthTokenService } from './auth-token.service';
 import { GoogleCallbackDto } from './dto/google-callback.dto';
+import {
+  GOOGLE_LOGIN_SOURCES,
+  GoogleLoginQueryDto,
+} from './dto/google-login-query.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { LogoutDto } from './dto/logout.dto';
@@ -50,8 +54,10 @@ import {
 import {
   applyAuthCookies,
   clearAuthCookies,
+  clearOAuthSourceCookie,
   clearOAuthStateCookie,
   resolveRefreshToken,
+  setOAuthSourceCookie,
   setOAuthStateCookie,
 } from './utils/auth-cookie.util';
 
@@ -215,16 +221,35 @@ export class AuthController {
   @Public()
   @Get('google/login')
   @ApiOperation({ summary: 'Redirect user to Google OAuth consent screen' })
+  @ApiQuery({
+    name: 'source',
+    required: false,
+    enum: Object.values(GOOGLE_LOGIN_SOURCES),
+  })
+  @ApiQuery({ name: 'app', required: false, type: String })
+  @ApiQuery({ name: 'role', required: false, type: String })
   @ApiFoundResponse({ description: 'Redirect to Google OAuth' })
-  googleLogin(@Res() response: Response): void {
+  googleLogin(
+    @Query() query: GoogleLoginQueryDto,
+    @Res() response: Response,
+  ): void {
     const state = this.authGoogleService.generateOAuthState();
+    const source = this.authGoogleService.resolveLoginSource(query);
     const stateCookieName = this.authGoogleService.getOAuthStateCookieName();
+    const sourceCookieName = this.authGoogleService.getOAuthSourceCookieName();
     const redirectUrl = this.authGoogleService.createGoogleAuthorizeUrl(state);
 
     setOAuthStateCookie(
       response,
       stateCookieName,
       state,
+      this.authTokenService.isSecureCookie(),
+    );
+
+    setOAuthSourceCookie(
+      response,
+      sourceCookieName,
+      source,
       this.authTokenService.isSecureCookie(),
     );
 
@@ -253,22 +278,30 @@ export class AuthController {
     @Req() request: Request,
     @Res() response: Response,
   ): Promise<void> {
-    const failureRedirect = this.authGoogleService.getLoginFailureRedirect();
+    const sourceCookieName = this.authGoogleService.getOAuthSourceCookieName();
+    const source = this.authGoogleService.resolveLoginSourceFromCookie(
+      request.cookies?.[sourceCookieName] as string | undefined,
+    );
+    const failureRedirect =
+      this.authGoogleService.getLoginFailureRedirectBySource(source);
+    const stateCookieName = this.authGoogleService.getOAuthStateCookieName();
 
     if (query.error) {
+      clearOAuthStateCookie(response, stateCookieName);
+      clearOAuthSourceCookie(response, sourceCookieName);
       response.redirect(
         `${failureRedirect}?message=${encodeURIComponent(query.error)}`,
       );
       return;
     }
 
-    const stateCookieName = this.authGoogleService.getOAuthStateCookieName();
     const expectedState = request.cookies?.[stateCookieName] as
       | string
       | undefined;
 
     if (!expectedState || expectedState !== query.state) {
       clearOAuthStateCookie(response, stateCookieName);
+      clearOAuthSourceCookie(response, sourceCookieName);
       response.redirect(
         `${failureRedirect}?message=${encodeURIComponent('Invalid OAuth state')}`,
       );
@@ -276,21 +309,29 @@ export class AuthController {
     }
 
     try {
-      const result = await this.authService.loginWithGoogleCode(query.code, {
-        ipAddress: request.ip,
-        userAgent: request.headers['user-agent'],
-      });
+      const result = await this.authService.loginWithGoogleCode(
+        query.code,
+        {
+          ipAddress: request.ip,
+          userAgent: request.headers['user-agent'],
+        },
+        source,
+      );
 
       clearOAuthStateCookie(response, stateCookieName);
+      clearOAuthSourceCookie(response, sourceCookieName);
       applyAuthCookies(
         response,
         result.accessToken,
         result.refreshToken,
         this.getTokenCookieOptions(),
       );
-      response.redirect(this.authGoogleService.getLoginSuccessRedirect());
+      response.redirect(
+        this.authGoogleService.getLoginSuccessRedirectByRole(result.user.role),
+      );
     } catch {
       clearOAuthStateCookie(response, stateCookieName);
+      clearOAuthSourceCookie(response, sourceCookieName);
       response.redirect(
         `${failureRedirect}?message=${encodeURIComponent('Google login failed')}`,
       );

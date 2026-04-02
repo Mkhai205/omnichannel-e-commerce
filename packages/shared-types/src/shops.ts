@@ -7,6 +7,8 @@ export interface PublicShopItem {
     shopName: string;
     slug: string;
     description?: string | null;
+    avatarKey?: string | null;
+    avatarUrl?: string | null;
 }
 
 export interface ShopDetail {
@@ -15,6 +17,8 @@ export interface ShopDetail {
     shopName: string;
     slug: string;
     description?: string | null;
+    avatarKey?: string | null;
+    avatarUrl?: string | null;
     businessLicense?: string | null;
     status: ShopStatus;
     rejectionReason?: string | null;
@@ -38,7 +42,14 @@ export type PublicShopsListResponse = PaginatedResponse<PublicShopItem>;
 export interface SellerUpdateShopRequest {
     shopName?: string;
     description?: string;
+    avatarKey?: string | null;
     businessLicense?: string;
+}
+
+export interface UploadShopAvatarResult {
+    bucketName: string;
+    objectKey: string;
+    avatarUrl?: string | null;
 }
 
 export interface AdminShopsFilterRequest {
