@@ -9,3 +9,13 @@ export interface RunAutoDeliveryResponse {
     settled: number;
     processedOrderIds: UUID[];
 }
+
+export interface SellerShippingMetricsResponse {
+    pickupCount: number;
+    inTransitCount: number;
+    deliveredCount: number;
+    returnPendingCount: number;
+    pickupGrowthPercent: number;
+    inTransitGrowthPercent: number;
+    deliveryRatePercent: number;
+}

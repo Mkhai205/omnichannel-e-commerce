@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@repo/database';
+import type { SellerPaymentFilterStatus } from '@repo/shared-types';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
 
 const ADMIN_WALLET_SELECT = {
@@ -46,8 +47,50 @@ const ADMIN_LEDGER_MIN_SELECT = {
   createdAt: true,
 } satisfies Prisma.AdminWalletLedgerSelect;
 
+const SELLER_PAYMENT_ORDER_SELECT = {
+  id: true,
+  orderNumber: true,
+  totalAmount: true,
+  status: true,
+  settlementStatus: true,
+  settledAt: true,
+  createdAt: true,
+  updatedAt: true,
+  sellerSettlement: {
+    select: {
+      id: true,
+      grossAmount: true,
+      commissionAmount: true,
+      netAmount: true,
+      status: true,
+      settledAt: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  },
+} satisfies Prisma.OrderSelect;
+
+const SELLER_SETTLEMENT_CASHFLOW_SELECT = {
+  grossAmount: true,
+  commissionAmount: true,
+  netAmount: true,
+  settledAt: true,
+} satisfies Prisma.SellerSettlementSelect;
+
+const SHOP_ID_SELECT = {
+  id: true,
+} satisfies Prisma.ShopSelect;
+
 export type DeliveredSettledOrderRecord = Prisma.OrderGetPayload<{
   select: typeof DELIVERED_SETTLED_ORDER_SELECT;
+}>;
+
+export type SellerPaymentOrderRecord = Prisma.OrderGetPayload<{
+  select: typeof SELLER_PAYMENT_ORDER_SELECT;
+}>;
+
+export type SellerSettlementCashflowRecord = Prisma.SellerSettlementGetPayload<{
+  select: typeof SELLER_SETTLEMENT_CASHFLOW_SELECT;
 }>;
 
 @Injectable()
@@ -226,5 +269,143 @@ export class FinanceRepository {
       data,
       select: SELLER_SETTLEMENT_MIN_SELECT,
     });
+  }
+
+  findSellerShopIdByUserId(userId: string, tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.shop.findFirst({
+      where: {
+        userId,
+      },
+      select: SHOP_ID_SELECT,
+    });
+  }
+
+  findSellerWalletByUserId(userId: string, tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.sellerWallet.findFirst({
+      where: {
+        shop: {
+          userId,
+        },
+      },
+      select: SELLER_WALLET_SELECT,
+    });
+  }
+
+  findSellerPaymentOrdersByUserId(
+    sellerUserId: string,
+    input: {
+      page: number;
+      limit: number;
+      status?: SellerPaymentFilterStatus;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.findMany({
+      where: {
+        shop: {
+          userId: sellerUserId,
+        },
+        status: {
+          in: ['SHIPPED', 'DELIVERED', 'CANCELLED'],
+        },
+        ...this.toSellerPaymentStatusWhere(input.status),
+      },
+      skip: (input.page - 1) * input.limit,
+      take: input.limit,
+      orderBy: [{ settledAt: 'desc' }, { updatedAt: 'desc' }],
+      select: SELLER_PAYMENT_ORDER_SELECT,
+    });
+  }
+
+  countSellerPaymentOrdersByUserId(
+    sellerUserId: string,
+    status?: SellerPaymentFilterStatus,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.count({
+      where: {
+        shop: {
+          userId: sellerUserId,
+        },
+        status: {
+          in: ['SHIPPED', 'DELIVERED', 'CANCELLED'],
+        },
+        ...this.toSellerPaymentStatusWhere(status),
+      },
+    });
+  }
+
+  findSellerSettlementsForCashflow(
+    sellerUserId: string,
+    settledAfterOrAt: Date,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.sellerSettlement.findMany({
+      where: {
+        shop: {
+          userId: sellerUserId,
+        },
+        status: 'COMPLETED',
+        settledAt: {
+          gte: settledAfterOrAt,
+        },
+      },
+      orderBy: {
+        settledAt: 'asc',
+      },
+      select: SELLER_SETTLEMENT_CASHFLOW_SELECT,
+    });
+  }
+
+  aggregateSellerSettlementSummary(
+    sellerUserId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.sellerSettlement.aggregate({
+      where: {
+        shop: {
+          userId: sellerUserId,
+        },
+        status: 'COMPLETED',
+      },
+      _sum: {
+        grossAmount: true,
+        commissionAmount: true,
+        netAmount: true,
+      },
+      _count: {
+        _all: true,
+      },
+    });
+  }
+
+  private toSellerPaymentStatusWhere(status?: SellerPaymentFilterStatus): {
+    settlementStatus?: 'PENDING' | 'SETTLED';
+  } {
+    if (status === 'settled') {
+      return {
+        settlementStatus: 'SETTLED',
+      };
+    }
+
+    if (status === 'pending') {
+      return {
+        settlementStatus: 'PENDING',
+      };
+    }
+
+    return {};
   }
 }

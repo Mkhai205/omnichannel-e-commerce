@@ -1,4 +1,4 @@
-import type { UUID } from "./common.js";
+import type { PaginatedResponse, UUID } from "./common.js";
 import type { OrderStatus, SettlementStatus } from "./orders.js";
 
 export type PaymentProvider = "VNPAY";
@@ -61,4 +61,55 @@ export interface VnpayReturnResponse {
 export interface VnpayIpnResponse {
     RspCode: string;
     Message: string;
+}
+
+export type SellerPaymentTransactionStatus = "PENDING" | "SETTLED";
+
+export type SellerPaymentFilterStatus = "all" | "settled" | "pending" | "mismatch";
+
+export interface SellerPaymentsFilterRequest {
+    page?: number;
+    limit?: number;
+    status?: SellerPaymentFilterStatus;
+}
+
+export interface SellerWalletSummaryResponse {
+    id: UUID;
+    shopId: UUID;
+    availableBalance: string;
+    pendingBalance: string;
+    totalCredited: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface SellerPaymentTransactionItem {
+    id: UUID;
+    orderId: UUID;
+    orderNumber: string;
+    transactionType: string;
+    amount: string;
+    platformFee?: string | null;
+    status: SellerPaymentTransactionStatus;
+    warningLabel?: string | null;
+    occurredAt: string;
+}
+
+export type SellerPaymentsTransactionsResponse = PaginatedResponse<SellerPaymentTransactionItem>;
+
+export interface SellerPaymentCashflowPoint {
+    label: string;
+    revenue: number;
+    platformFee: number;
+    profit: number;
+    emphasize?: boolean;
+}
+
+export interface SellerPaymentsOverviewResponse {
+    totalRevenue: string;
+    trendPercent: number;
+    trendLabel: string;
+    discrepancyAmount: string;
+    discrepancyCount: number;
+    cashflow: SellerPaymentCashflowPoint[];
 }
