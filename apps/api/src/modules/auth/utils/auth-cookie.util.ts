@@ -91,3 +91,25 @@ export function clearOAuthStateCookie(
 ): void {
   response.clearCookie(cookieName, { path: '/' });
 }
+
+export function setOAuthSourceCookie(
+  response: Response,
+  cookieName: string,
+  source: string,
+  secure: boolean,
+): void {
+  response.cookie(cookieName, source, {
+    httpOnly: true,
+    sameSite: AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_SAME_SITE,
+    secure,
+    maxAge: AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_STATE_MAX_AGE_SECONDS * 1000,
+    path: '/',
+  });
+}
+
+export function clearOAuthSourceCookie(
+  response: Response,
+  cookieName: string,
+): void {
+  response.clearCookie(cookieName, { path: '/' });
+}

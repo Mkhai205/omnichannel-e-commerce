@@ -16,6 +16,7 @@ export const AUTH_COOKIE_CONFIG_KEY = {
   AUTH_COOKIE_ACCESS_NAME: 'ecommerce_access_token',
   AUTH_COOKIE_REFRESH_NAME: 'ecommerce_refresh_token',
   AUTH_COOKIE_OAUTH_STATE_NAME: 'ecommerce_oauth_state',
+  AUTH_COOKIE_OAUTH_SOURCE_NAME: 'ecommerce_oauth_source',
   AUTH_COOKIE_STATE_MAX_AGE_SECONDS: 300,
   AUTH_COOKIE_SAME_SITE: 'lax',
 } as const;
@@ -24,6 +25,10 @@ export const FRONTEND_REDIRECT_URI_CONFIG_KEY = {
   FRONTEND_LOGIN_SUCCESS_REDIRECT:
     'http://localhost:3000/auth/callback/success',
   FRONTEND_LOGIN_FAILURE_REDIRECT: 'http://localhost:3000/auth/callback/error',
+  FRONTEND_SELLER_LOGIN_SUCCESS_REDIRECT:
+    'http://localhost:3002/auth/callback/success',
+  FRONTEND_SELLER_LOGIN_FAILURE_REDIRECT:
+    'http://localhost:3002/auth/callback/error',
   FRONTEND_RESET_PASSWORD_REDIRECT: 'http://localhost:3000/auth/reset-password',
   FRONTEND_VERIFY_EMAIL_REDIRECT: 'http://localhost:3000/auth/verify-email',
 } as const;
