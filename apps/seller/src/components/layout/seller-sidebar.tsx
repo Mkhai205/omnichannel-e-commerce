@@ -9,6 +9,7 @@ import {
     ClipboardCheck,
     CreditCard,
     Headset,
+    HouseIcon,
     LifeBuoy,
     Megaphone,
     ShoppingCart,
@@ -28,6 +29,7 @@ const mainNav = [
     { label: "Tiếp thị", icon: Megaphone, href: "/marketing" },
     { label: "Thanh toán", icon: CreditCard, href: "/payments" },
     { label: "Khách hàng", icon: Headset, href: "/customer-service" },
+    { label: "Cửa hàng", icon: HouseIcon, href: "/profile" },
     { label: "Thống kê", icon: BarChart3, href: "/analytics" },
 ];
 
