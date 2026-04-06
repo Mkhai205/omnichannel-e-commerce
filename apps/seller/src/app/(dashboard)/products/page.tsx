@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ProductItem, ProductStatus } from "@repo/shared-types";
-import { Button } from "@repo/ui";
+import { Button } from "@/components/ui";
 import { getSellerProducts } from "@/services/catalog-service";
 import { isApiRequestError } from "@/services/http-client";
 import { ProductsTable } from "./_components/products-table";

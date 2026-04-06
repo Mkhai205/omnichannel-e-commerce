@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui";
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
 import type { CustomerComplaintRecord } from "../data/customer-service-local-database";
 import type { CustomerProfile } from "../data/customer-service-mock-data";
 

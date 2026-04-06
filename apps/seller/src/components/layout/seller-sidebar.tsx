@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@repo/ui";
+import { cn } from "@/components/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {

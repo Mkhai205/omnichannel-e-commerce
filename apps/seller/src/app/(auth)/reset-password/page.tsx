@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Input } from "@repo/ui";
+import { Button, Input } from "@/components/ui";
 import { resetPassword } from "@/services/auth-service";
 import { isApiRequestError } from "@/services/http-client";
 

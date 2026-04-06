@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Input } from "@repo/ui";
+import { Button, Input } from "@/components/ui";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { buildSellerGoogleLoginUrl, loginSeller } from "@/services/auth-service";
 import { isApiRequestError } from "@/services/http-client";

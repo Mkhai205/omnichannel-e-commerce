@@ -1,4 +1,4 @@
-import { Button, Card, CardContent } from "@repo/ui";
+import { Button, Card, CardContent } from "@/components/ui";
 import { Download, Share2 } from "lucide-react";
 
 type SummaryMetric = {

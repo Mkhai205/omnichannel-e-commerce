@@ -30,7 +30,7 @@ import {
     TableHeader,
     TableRow,
     Textarea,
-} from "@repo/ui";
+} from "@/components/ui";
 
 export default function Home() {
     return (
@@ -39,7 +39,7 @@ export default function Home() {
                 <CardHeader>
                     <CardTitle>Shared UI - Web App</CardTitle>
                     <CardDescription>
-                        This page validates shadcn components from @repo/ui with app-level token
+                        This page validates web-local shadcn components with app-level token
                         overrides.
                     </CardDescription>
                 </CardHeader>
@@ -75,7 +75,7 @@ export default function Home() {
                                 <DialogHeader>
                                     <DialogTitle>Publish update?</DialogTitle>
                                     <DialogDescription>
-                                        This modal is rendered from shared UI package.
+                                        This modal is rendered from the web app local component set.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <DialogFooter>

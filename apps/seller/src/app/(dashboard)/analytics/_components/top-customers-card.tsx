@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardHeader, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import { Button, Card, CardContent, CardHeader, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui";
 import type { TopCustomer } from "../data/analytics-mock-data";
 
 type TopCustomersCardProps = {

@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui";
+import { Button } from "@/components/ui";
 import type { HanhDongChanTrang } from "../types";
 
 type ProfileActionBarProps = {

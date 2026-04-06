@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
-import { cn } from "@repo/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import { cn } from "@/components/ui";
 import type { CashflowLegendItem, CashflowPoint } from "../types";
 
 type PaymentsCashflowPanelProps = {

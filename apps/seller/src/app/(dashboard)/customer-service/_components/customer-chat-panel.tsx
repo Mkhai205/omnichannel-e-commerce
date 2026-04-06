@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input } from "@repo/ui";
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input } from "@/components/ui";
 import { Clock3, EllipsisVertical, Phone, SendHorizontal, Smile } from "lucide-react";
 import type { ComplaintChatMessage } from "../data/customer-service-local-database";
 

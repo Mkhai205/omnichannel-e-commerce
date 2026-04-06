@@ -1,7 +1,7 @@
 "use client";
 
 import type { ProductItem } from "@repo/shared-types";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui";
 
 type ProductsTableProps = {
     products: ProductItem[];

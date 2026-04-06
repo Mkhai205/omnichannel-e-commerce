@@ -7,7 +7,7 @@ import {
     TableHeader,
     TableRow,
     cn,
-} from "@repo/ui";
+} from "@/components/ui";
 import { ChevronLeft, ChevronRight, Filter, ListFilter, MoreHorizontal, Truck } from "lucide-react";
 import type { ShippingRow, ShippingStatusTab, ShippingTabFilter } from "../types";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@repo/ui";
+import { Button } from "@/components/ui";
 import { History, Plus } from "lucide-react";
 
 type CustomerServiceHeaderProps = {

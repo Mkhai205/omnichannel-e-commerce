@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui";
+import { Button } from "@/components/ui";
 import { Headset } from "lucide-react";
 
 export function LoginSupportButton() {

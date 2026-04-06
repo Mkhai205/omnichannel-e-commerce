@@ -1,4 +1,4 @@
-import { Button, Card, CardContent } from "@repo/ui";
+import { Button, Card, CardContent } from "@/components/ui";
 import { ArrowRight, BarChart3, Plus } from "lucide-react";
 import type { PaymentMonthlyReport, PaymentSmartTip } from "../types";
 

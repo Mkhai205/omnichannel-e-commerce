@@ -12,7 +12,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
     Input,
-} from "@repo/ui";
+} from "@/components/ui";
 import { Bell, HelpCircle, Menu, Search, Settings } from "lucide-react";
 import { logoutSeller } from "@/services/auth-service";
 

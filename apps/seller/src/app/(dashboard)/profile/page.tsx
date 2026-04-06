@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ShopDetail } from "@repo/shared-types";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@repo/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/components/ui";
 import { isApiRequestError } from "@/services/http-client";
 import {
     getMySellerShop,

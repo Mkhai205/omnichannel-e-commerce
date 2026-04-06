@@ -13,7 +13,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@repo/ui";
+} from "@/components/ui";
 import { ArrowLeft, PackageCheck, Truck } from "lucide-react";
 import type { OrderStatus, SellerOrderDetailResponse, SettlementStatus } from "@repo/shared-types";
 import { isApiRequestError } from "@/services/http-client";

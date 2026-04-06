@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import type { NhanDienThuongHieu } from "../types";
 
 type BrandIdentityCardProps = {

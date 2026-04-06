@@ -1,4 +1,4 @@
-import { Card, CardContent, cn } from "@repo/ui";
+import { Card, CardContent, cn } from "@/components/ui";
 import { CircleCheck, PackageCheck, Truck, Undo2 } from "lucide-react";
 import type { ShippingOverviewStat } from "../types";
 

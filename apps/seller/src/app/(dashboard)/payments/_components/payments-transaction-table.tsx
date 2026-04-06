@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui";
 import { Check, ChevronDown, ChevronLeft, ChevronRight, CircleAlert, Filter } from "lucide-react";
-import { cn } from "@repo/ui";
+import { cn } from "@/components/ui";
 import type {
     PaymentStatusFilterOption,
     PaymentStatusFilterValue,

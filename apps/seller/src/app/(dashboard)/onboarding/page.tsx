@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Input } from "@repo/ui";
+import { Button, Input } from "@/components/ui";
 import { isApiRequestError } from "@/services/http-client";
 import { createOnboardingShop, getMySellerShop } from "@/services/seller-shop-service";
 

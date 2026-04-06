@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardHeader } from "@repo/ui";
+import { Button, Card, CardContent, CardHeader } from "@/components/ui";
 import { ListFilter } from "lucide-react";
 import type { TopProduct } from "../data/analytics-mock-data";
 

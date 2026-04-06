@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Button, Card, CardContent } from "@repo/ui";
+import { Button, Card, CardContent } from "@/components/ui";
 import type { HoSoCuaHangHero } from "../types";
 
 type ProfileHeroCardProps = {

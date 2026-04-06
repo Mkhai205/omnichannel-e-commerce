@@ -1,4 +1,4 @@
-import { Button, Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@repo/ui";
+import { Button, Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui";
 import { Sparkles } from "lucide-react";
 
 export function MarketingAiInsight() {

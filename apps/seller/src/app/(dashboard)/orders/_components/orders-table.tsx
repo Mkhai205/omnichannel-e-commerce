@@ -1,4 +1,4 @@
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { OrderStatus, SellerOrderItem, SettlementStatus } from "@repo/shared-types";

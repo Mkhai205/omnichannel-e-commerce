@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui";
+import { Button } from "@/components/ui";
 import { Download, FileText } from "lucide-react";
 import type { PaymentHeaderAction } from "../types";
 

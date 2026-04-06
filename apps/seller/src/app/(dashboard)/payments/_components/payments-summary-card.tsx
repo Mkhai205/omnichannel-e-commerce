@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@repo/ui";
+import { Card, CardContent } from "@/components/ui";
 import { TrendingUp } from "lucide-react";
 import type { PaymentSummaryMetric } from "../types";
 

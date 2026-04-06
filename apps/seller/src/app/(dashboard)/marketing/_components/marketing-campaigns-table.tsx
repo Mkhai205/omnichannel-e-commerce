@@ -1,4 +1,4 @@
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, cn } from "@repo/ui";
+import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, cn } from "@/components/ui";
 import { Ban, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import type {
   CampaignFilterOption,

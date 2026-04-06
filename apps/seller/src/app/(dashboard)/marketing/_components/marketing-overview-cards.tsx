@@ -1,4 +1,4 @@
-import { Card, CardContent, cn } from "@repo/ui";
+import { Card, CardContent, cn } from "@/components/ui";
 import { Circle } from "lucide-react";
 import type { MarketingOverviewStat } from "../types";
 

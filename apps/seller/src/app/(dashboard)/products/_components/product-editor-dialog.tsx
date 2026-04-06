@@ -16,7 +16,7 @@ import {
     SelectTrigger,
     SelectValue,
     Textarea,
-} from "@repo/ui";
+} from "@/components/ui";
 import type { ProductStatus } from "@repo/shared-types";
 import type { ProductDraft, VariantDraft } from "../types";
 

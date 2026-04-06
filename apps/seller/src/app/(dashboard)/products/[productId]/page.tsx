@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import type { ProductItem, VariantAttributes } from "@repo/shared-types";
-import { Button } from "@repo/ui";
+import { Button } from "@/components/ui";
 import {
     createSellerProduct,
     createSellerProductVariant,

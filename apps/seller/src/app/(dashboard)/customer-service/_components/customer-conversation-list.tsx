@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Button, Card, CardContent, CardHeader } from "@repo/ui";
+import { Button, Card, CardContent, CardHeader } from "@/components/ui";
 import type { CustomerComplaintRecord } from "../data/customer-service-local-database";
 
 type CustomerConversationListProps = {

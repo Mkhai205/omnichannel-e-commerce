@@ -1,9 +1,6 @@
-export { cn } from "./lib/utils";
+export { cn } from "@/lib/utils";
 
-export {
-    Button,
-    buttonVariants,
-} from "./components/ui/button";
+export { Button, buttonVariants } from "./button";
 
 export {
     Card,
@@ -13,7 +10,7 @@ export {
     CardAction,
     CardDescription,
     CardContent,
-} from "./components/ui/card";
+} from "./card";
 
 export {
     Dialog,
@@ -26,7 +23,7 @@ export {
     DialogPortal,
     DialogTitle,
     DialogTrigger,
-} from "./components/ui/dialog";
+} from "./dialog";
 
 export {
     DropdownMenu,
@@ -44,15 +41,11 @@ export {
     DropdownMenuSub,
     DropdownMenuSubTrigger,
     DropdownMenuSubContent,
-} from "./components/ui/dropdown-menu";
+} from "./dropdown-menu";
 
-export {
-    Input,
-} from "./components/ui/input";
+export { Input } from "./input";
 
-export {
-    Label,
-} from "./components/ui/label";
+export { Label } from "./label";
 
 export {
     Select,
@@ -65,7 +58,7 @@ export {
     SelectSeparator,
     SelectTrigger,
     SelectValue,
-} from "./components/ui/select";
+} from "./select";
 
 export {
     Table,
@@ -76,8 +69,6 @@ export {
     TableRow,
     TableCell,
     TableCaption,
-} from "./components/ui/table";
+} from "./table";
 
-export {
-    Textarea,
-} from "./components/ui/textarea";
+export { Textarea } from "./textarea";

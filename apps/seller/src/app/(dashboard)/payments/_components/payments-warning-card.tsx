@@ -1,4 +1,4 @@
-import { Button, Card, CardContent } from "@repo/ui";
+import { Button, Card, CardContent } from "@/components/ui";
 import { AlertTriangle } from "lucide-react";
 import type { PaymentDiscrepancyWarning } from "../types";
 

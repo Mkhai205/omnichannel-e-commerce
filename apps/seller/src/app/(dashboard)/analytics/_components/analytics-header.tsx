@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui";
+import { Button } from "@/components/ui";
 import { CalendarDays } from "lucide-react";
 import type { TimeFilterOption } from "../data/analytics-mock-data";
 

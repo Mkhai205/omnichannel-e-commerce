@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui";
+import { Button } from "@/components/ui";
 import { BadgePlus, Zap } from "lucide-react";
 import type { MarketingActionButton } from "../types";
 

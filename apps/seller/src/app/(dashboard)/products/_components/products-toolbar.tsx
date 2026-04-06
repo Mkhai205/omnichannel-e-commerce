@@ -8,7 +8,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@repo/ui";
+} from "@/components/ui";
 import type { ProductStatus } from "@repo/shared-types";
 
 type ProductsToolbarProps = {

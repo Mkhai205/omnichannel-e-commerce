@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import type { ThanhVienNhom } from "../types";
 
 type TeamAccessCardProps = {

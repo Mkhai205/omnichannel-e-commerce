@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardHeader } from "@repo/ui";
+import { Button, Card, CardContent, CardHeader } from "@/components/ui";
 import { Download, Ellipsis } from "lucide-react";
 import type { RevenuePoint } from "../data/analytics-mock-data";
 

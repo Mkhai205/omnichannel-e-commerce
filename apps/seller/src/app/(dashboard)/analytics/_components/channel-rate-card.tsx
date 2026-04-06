@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@repo/ui";
+import { Card, CardContent, CardHeader } from "@/components/ui";
 import type { ChannelShare } from "../data/analytics-mock-data";
 
 type ChannelRateCardProps = {
