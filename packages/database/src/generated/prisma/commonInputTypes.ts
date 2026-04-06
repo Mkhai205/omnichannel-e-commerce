@@ -337,41 +337,16 @@ export type IntWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedIntFilter<$PrismaModel>
 }
 
-export type EnumInventoryLogTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.InventoryLogType | Prisma.EnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.InventoryLogType[] | Prisma.ListEnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.InventoryLogType[] | Prisma.ListEnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumInventoryLogTypeFilter<$PrismaModel> | $Enums.InventoryLogType
-}
-
-export type EnumInventoryLogTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.InventoryLogType | Prisma.EnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.InventoryLogType[] | Prisma.ListEnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.InventoryLogType[] | Prisma.ListEnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumInventoryLogTypeWithAggregatesFilter<$PrismaModel> | $Enums.InventoryLogType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumInventoryLogTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumInventoryLogTypeFilter<$PrismaModel>
-}
-
-export type BoolFilter<$PrismaModel = never> = {
-  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
-}
-
-export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedBoolFilter<$PrismaModel>
-  _max?: Prisma.NestedBoolFilter<$PrismaModel>
-}
-
 export type EnumAddressTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.AddressType | Prisma.EnumAddressTypeFieldRefInput<$PrismaModel>
   in?: $Enums.AddressType[] | Prisma.ListEnumAddressTypeFieldRefInput<$PrismaModel>
   notIn?: $Enums.AddressType[] | Prisma.ListEnumAddressTypeFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumAddressTypeFilter<$PrismaModel> | $Enums.AddressType
+}
+
+export type BoolFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
 }
 
 export type EnumAddressTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -382,6 +357,14 @@ export type EnumAddressTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAddressTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAddressTypeFilter<$PrismaModel>
+}
+
+export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBoolFilter<$PrismaModel>
+  _max?: Prisma.NestedBoolFilter<$PrismaModel>
 }
 
 export type EnumAuthProviderFilter<$PrismaModel = never> = {
@@ -833,41 +816,16 @@ export type NestedFloatFilter<$PrismaModel = never> = {
   not?: Prisma.NestedFloatFilter<$PrismaModel> | number
 }
 
-export type NestedEnumInventoryLogTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.InventoryLogType | Prisma.EnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.InventoryLogType[] | Prisma.ListEnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.InventoryLogType[] | Prisma.ListEnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumInventoryLogTypeFilter<$PrismaModel> | $Enums.InventoryLogType
-}
-
-export type NestedEnumInventoryLogTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.InventoryLogType | Prisma.EnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.InventoryLogType[] | Prisma.ListEnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.InventoryLogType[] | Prisma.ListEnumInventoryLogTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumInventoryLogTypeWithAggregatesFilter<$PrismaModel> | $Enums.InventoryLogType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumInventoryLogTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumInventoryLogTypeFilter<$PrismaModel>
-}
-
-export type NestedBoolFilter<$PrismaModel = never> = {
-  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
-}
-
-export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedBoolFilter<$PrismaModel>
-  _max?: Prisma.NestedBoolFilter<$PrismaModel>
-}
-
 export type NestedEnumAddressTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.AddressType | Prisma.EnumAddressTypeFieldRefInput<$PrismaModel>
   in?: $Enums.AddressType[] | Prisma.ListEnumAddressTypeFieldRefInput<$PrismaModel>
   notIn?: $Enums.AddressType[] | Prisma.ListEnumAddressTypeFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumAddressTypeFilter<$PrismaModel> | $Enums.AddressType
+}
+
+export type NestedBoolFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
 }
 
 export type NestedEnumAddressTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -878,6 +836,14 @@ export type NestedEnumAddressTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAddressTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAddressTypeFilter<$PrismaModel>
+}
+
+export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBoolFilter<$PrismaModel>
+  _max?: Prisma.NestedBoolFilter<$PrismaModel>
 }
 
 export type NestedEnumAuthProviderFilter<$PrismaModel = never> = {

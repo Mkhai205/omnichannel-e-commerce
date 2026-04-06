@@ -250,6 +250,18 @@ export class CatalogRepository {
     });
   }
 
+  deleteProductById(productId: string) {
+    return this.prisma.product.delete({
+      where: { id: productId },
+    });
+  }
+
+  deleteVariantById(variantId: string) {
+    return this.prisma.productVariant.delete({
+      where: { id: variantId },
+    });
+  }
+
   findAdminProducts(input: ProductsQueryInput) {
     return this.prisma.product.findMany({
       where: this.buildProductsWhere(input),

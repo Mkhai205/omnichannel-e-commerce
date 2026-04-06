@@ -16,10 +16,6 @@ import type {
 } from '@repo/shared-types';
 import { resolveCatalogImageUrl } from '../../core/http/catalog-image-url.helper';
 import { StorageService } from '../../infrastructure/storage/storage.service';
-import {
-  SellerInventoryService,
-  type CheckoutInventoryDeductionItem,
-} from '../inventory/seller-inventory.service';
 import { PaymentsService } from '../payments/payments.service';
 import {
   type CheckoutCartItemRecord,
@@ -39,7 +35,6 @@ interface CheckoutOrderGroup {
 export class OrdersService {
   constructor(
     private readonly ordersRepository: OrdersRepository,
-    private readonly sellerInventoryService: SellerInventoryService,
     private readonly paymentsService: PaymentsService,
     private readonly storageService: StorageService,
   ) {}
@@ -79,13 +74,20 @@ export class OrdersService {
       }
 
       const groupedOrders = this.groupItemsByShop(checkoutItems);
-      const inventoryDeductionItems =
-        this.toInventoryDeductionItems(checkoutItems);
+      for (const item of checkoutItems) {
+        const deductionResult =
+          await this.ordersRepository.deductVariantStockIfAvailable(
+            item.variantId,
+            item.quantity,
+            tx,
+          );
 
-      await this.sellerInventoryService.deductStockForCheckout(
-        inventoryDeductionItems,
-        tx,
-      );
+        if (deductionResult.count !== 1) {
+          throw new BadRequestException(
+            `Requested quantity exceeds stock for variant ${item.variantId}`,
+          );
+        }
+      }
 
       const checkoutOrders: CheckoutOrder[] = [];
       let totalCheckoutCents = 0n;
@@ -247,15 +249,6 @@ export class OrdersService {
     }
 
     return this.toSellerOrderDetailResponse(order);
-  }
-
-  private toInventoryDeductionItems(
-    items: CheckoutCartItemRecord[],
-  ): CheckoutInventoryDeductionItem[] {
-    return items.map((item) => ({
-      variantId: item.variantId,
-      quantity: item.quantity,
-    }));
   }
 
   private groupItemsByShop(

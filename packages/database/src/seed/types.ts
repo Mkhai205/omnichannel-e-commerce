@@ -6,7 +6,6 @@ export type SeedSummary = {
     categories: number;
     products: number;
     productVariants: number;
-    inventoryLogs: number;
     addresses: number;
     carts: number;
     cartItems: number;
@@ -27,6 +26,5 @@ export type VariantSeedInput = {
 export type CatalogSeedResult = {
     products: number;
     productVariants: number;
-    inventoryLogs: number;
     variants: VariantSeedInput[];
 };

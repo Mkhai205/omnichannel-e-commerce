@@ -1,52 +1,19 @@
-export type ProductActionId = "add-csv-file" | "sync-all";
+import type { ProductStatus } from "@repo/shared-types";
 
-export type ProductActionStyle = "outline" | "primary";
+export type ProductEditorMode = "create" | "edit";
 
-export type ProductStatus = "ĐANG BÁN" | "NGỪNG BÁN" | "BẢN NHÁP";
-
-export type ProductChannel = "Shopee" | "TikTok" | "Lazada" | "Khác";
-
-export type ProductChannelFilter = "all" | "tiktok" | "lazada" | "shopee" | "other";
-
-export type ProductSyncFilter = "all" | "synced" | "not-synced";
-
-export type ProductSyncStatus = "ĐÃ ĐỒNG BỘ" | "CHƯA ĐỒNG BỘ";
-
-export interface ProductActionButton {
-    id: ProductActionId;
-    label: string;
-    style: ProductActionStyle;
-    isDisabled?: boolean;
-    tooltip?: string;
-}
-
-export interface ProductOverviewStats {
-    totalGoodsCount: number;
-    sellingGoodsCount: number;
-    unsyncedGoodsCount: number;
-    channelCount: number;
-}
-
-export interface ProductFilterOption<TValue extends string> {
-    value: TValue;
-    label: string;
-}
-
-export interface ProductFilterValues {
-    syncStatus: ProductSyncFilter;
-    channel: ProductChannelFilter;
-    keyword: string;
-}
-
-export interface ProductRow {
-    id: string;
-    productId: string;
+export type VariantDraft = {
+    id?: string;
     sku: string;
-    productName: string;
-    categoryLabel: string;
-    channel: ProductChannel;
-    listedPrice: number;
-    promotionalPrice: number;
+    price: string;
+    stockQuantity: number;
+    attributesText: string;
+};
+
+export type ProductDraft = {
+    name: string;
+    categoryId: string;
+    description: string;
     status: ProductStatus;
-    syncStatus: ProductSyncStatus;
-}
+    variants: VariantDraft[];
+};

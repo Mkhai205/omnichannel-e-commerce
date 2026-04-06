@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
     BarChart3,
-    Boxes,
     ClipboardCheck,
     CreditCard,
     Headset,
@@ -23,7 +22,6 @@ type SellerSidebarProps = {
 
 const mainNav = [
     { label: "Đơn hàng", icon: ShoppingCart, href: "/orders" },
-    { label: "Kho hàng", icon: Boxes, href: "/inventory" },
     { label: "Sản phẩm", icon: ClipboardCheck, href: "/products" },
     { label: "Giao hàng", icon: Truck, href: "/shipping" },
     { label: "Tiếp thị", icon: Megaphone, href: "/marketing" },

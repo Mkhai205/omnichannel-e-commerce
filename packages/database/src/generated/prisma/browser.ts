@@ -53,21 +53,6 @@ export type Cart = Prisma.CartModel
  */
 export type CartItem = Prisma.CartItemModel
 /**
- * Model InventoryLog
- * 
- */
-export type InventoryLog = Prisma.InventoryLogModel
-/**
- * Model Warehouse
- * 
- */
-export type Warehouse = Prisma.WarehouseModel
-/**
- * Model VariantWarehouseInventory
- * 
- */
-export type VariantWarehouseInventory = Prisma.VariantWarehouseInventoryModel
-/**
  * Model Address
  * 
  */

@@ -58,9 +58,6 @@ export const ModelName = {
   ProductVariant: 'ProductVariant',
   Cart: 'Cart',
   CartItem: 'CartItem',
-  InventoryLog: 'InventoryLog',
-  Warehouse: 'Warehouse',
-  VariantWarehouseInventory: 'VariantWarehouseInventory',
   Address: 'Address',
   OauthAccount: 'OauthAccount',
   RefreshToken: 'RefreshToken',
@@ -188,44 +185,6 @@ export const CartItemScalarFieldEnum = {
 } as const
 
 export type CartItemScalarFieldEnum = (typeof CartItemScalarFieldEnum)[keyof typeof CartItemScalarFieldEnum]
-
-
-export const InventoryLogScalarFieldEnum = {
-  id: 'id',
-  variantId: 'variantId',
-  warehouseId: 'warehouseId',
-  type: 'type',
-  quantityChanged: 'quantityChanged',
-  note: 'note',
-  createdAt: 'createdAt'
-} as const
-
-export type InventoryLogScalarFieldEnum = (typeof InventoryLogScalarFieldEnum)[keyof typeof InventoryLogScalarFieldEnum]
-
-
-export const WarehouseScalarFieldEnum = {
-  id: 'id',
-  shopId: 'shopId',
-  name: 'name',
-  code: 'code',
-  isDefault: 'isDefault',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type WarehouseScalarFieldEnum = (typeof WarehouseScalarFieldEnum)[keyof typeof WarehouseScalarFieldEnum]
-
-
-export const VariantWarehouseInventoryScalarFieldEnum = {
-  id: 'id',
-  variantId: 'variantId',
-  warehouseId: 'warehouseId',
-  stockQuantity: 'stockQuantity',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type VariantWarehouseInventoryScalarFieldEnum = (typeof VariantWarehouseInventoryScalarFieldEnum)[keyof typeof VariantWarehouseInventoryScalarFieldEnum]
 
 
 export const AddressScalarFieldEnum = {

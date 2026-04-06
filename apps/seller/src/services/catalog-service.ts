@@ -157,6 +157,17 @@ export async function hideSellerProduct(productId: string): Promise<ProductItem>
     return updateSellerProduct(productId, { status: "HIDDEN" });
 }
 
+export async function deleteSellerProduct(productId: string): Promise<{ success: boolean }> {
+    const response = await requestApi<{ success: boolean }>(
+        `/seller/catalog/products/${productId}`,
+        {
+            method: "DELETE",
+        },
+    );
+
+    return requireData(response);
+}
+
 export async function createSellerProductVariant(
     productId: string,
     payload: CreateProductVariantRequest,
@@ -180,6 +191,17 @@ export async function updateSellerProductVariant(
         method: "PATCH",
         body: JSON.stringify(payload),
     });
+
+    return requireData(response);
+}
+
+export async function deleteSellerProductVariant(variantId: string): Promise<{ success: boolean }> {
+    const response = await requestApi<{ success: boolean }>(
+        `/seller/catalog/variants/${variantId}`,
+        {
+            method: "DELETE",
+        },
+    );
 
     return requireData(response);
 }

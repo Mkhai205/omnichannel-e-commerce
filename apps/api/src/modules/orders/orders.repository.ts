@@ -298,4 +298,26 @@ export class OrdersRepository {
   ): Promise<T> {
     return this.prisma.$transaction((tx) => operation(tx));
   }
+
+  deductVariantStockIfAvailable(
+    variantId: string,
+    quantity: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.productVariant.updateMany({
+      where: {
+        id: variantId,
+        stockQuantity: {
+          gte: quantity,
+        },
+      },
+      data: {
+        stockQuantity: {
+          decrement: quantity,
+        },
+      },
+    });
+  }
 }

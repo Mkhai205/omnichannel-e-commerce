@@ -215,6 +215,36 @@ export class SellerCatalogService {
     return this.toVariantItem(updated);
   }
 
+  async deleteMyProduct(
+    sellerUserId: string,
+    productId: string,
+  ): Promise<{ success: boolean }> {
+    const product = await this.catalogRepository.findProductByIdForSeller(
+      sellerUserId,
+      productId,
+    );
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    await this.catalogRepository.deleteProductById(productId);
+    return { success: true };
+  }
+
+  async deleteMyVariant(
+    sellerUserId: string,
+    variantId: string,
+  ): Promise<{ success: boolean }> {
+    const variant = await this.catalogRepository.findVariantByIdForSeller(
+      sellerUserId,
+      variantId,
+    );
+    if (!variant) {
+      throw new NotFoundException('Variant not found');
+    }
+    await this.catalogRepository.deleteVariantById(variantId);
+    return { success: true };
+  }
+
   async uploadCatalogImage(
     userId: string,
     payload: UploadCatalogImageRequest,

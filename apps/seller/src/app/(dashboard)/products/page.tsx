@@ -1,251 +1,392 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import type { ProductItem } from "@repo/shared-types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ProductItem, ProductStatus, VariantAttributes } from "@repo/shared-types";
+import { Button } from "@repo/ui";
 import {
-    getCatalogCategoryMap,
+    createSellerProduct,
+    createSellerProductVariant,
+    deleteSellerProduct,
+    deleteSellerProductVariant,
+    getCatalogCategories,
     getSellerProducts,
-    getSellerProductsCountByStatus,
-    hideSellerProduct,
+    updateSellerProduct,
+    updateSellerProductVariant,
 } from "@/services/catalog-service";
 import { isApiRequestError } from "@/services/http-client";
-import { toProductRow, toProductsOverviewStats } from "./_adapters/products-adapter";
-import { ProductsFilters } from "./_components/products-filters";
-import { ProductsHeader } from "./_components/products-header";
-import { ProductsOverviewCards } from "./_components/products-overview-cards";
+import { ProductEditorDialog } from "./_components/product-editor-dialog";
 import { ProductsTable } from "./_components/products-table";
-import type {
-    ProductActionButton,
-    ProductChannelFilter,
-    ProductFilterOption,
-    ProductFilterValues,
-    ProductSyncFilter,
-} from "./types";
+import { ProductsToolbar } from "./_components/products-toolbar";
+import type { ProductDraft, VariantDraft } from "./types";
 
-const pageSize = 10;
+const PAGE_SIZE = 20;
 
-const productsActionButtons: ProductActionButton[] = [
-    {
-        id: "add-csv-file",
-        label: "Thêm file CSV",
-        style: "outline",
-    },
-    {
-        id: "sync-all",
-        label: "Đồng bộ tất cả",
-        style: "primary",
-        isDisabled: true,
-        tooltip: "Coming soon",
-    },
-];
-
-const syncStatusOptions: ProductFilterOption<ProductSyncFilter>[] = [
-    { value: "all", label: "Tất cả trạng thái" },
-    { value: "synced", label: "Đồng bộ" },
-    { value: "not-synced", label: "Chưa đồng bộ" },
-];
-
-const channelOptions: ProductFilterOption<ProductChannelFilter>[] = [
-    { value: "all", label: "Tất cả các kênh" },
-    { value: "tiktok", label: "TikTok" },
-    { value: "lazada", label: "Lazada" },
-    { value: "shopee", label: "Shopee" },
-    { value: "other", label: "Khác" },
-];
-
-const syncStatusLabelByFilter: Record<
-    Exclude<ProductSyncFilter, "all">,
-    "ĐÃ ĐỒNG BỘ" | "CHƯA ĐỒNG BỘ"
-> = {
-    synced: "ĐÃ ĐỒNG BỘ",
-    "not-synced": "CHƯA ĐỒNG BỘ",
+type CategoryOption = {
+    id: string;
+    name: string;
 };
 
-const channelLabelByFilter: Record<
-    Exclude<ProductChannelFilter, "all">,
-    "Shopee" | "TikTok" | "Lazada" | "Khác"
-> = {
-    tiktok: "TikTok",
-    lazada: "Lazada",
-    shopee: "Shopee",
-    other: "Khác",
+type NormalizedVariantDraft = {
+    id?: string;
+    sku: string;
+    price: string;
+    stockQuantity: number;
+    attributes: VariantAttributes;
 };
 
-const initialFilterValues: ProductFilterValues = {
-    syncStatus: "all",
-    channel: "all",
-    keyword: "",
-};
+function buildDefaultDraft(): ProductDraft {
+    return {
+        name: "",
+        categoryId: "",
+        description: "",
+        status: "DRAFT",
+        variants: [
+            {
+                sku: "",
+                price: "0",
+                stockQuantity: 0,
+                attributesText: "{}",
+            },
+        ],
+    };
+}
 
-export default function ProductsPage() {
-    const [filterValues, setFilterValues] = useState<ProductFilterValues>(initialFilterValues);
-    const [products, setProducts] = useState<ProductItem[]>([]);
-    const [categoryMap, setCategoryMap] = useState<Record<string, string>>({});
-    const [totalProductsCount, setTotalProductsCount] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
-    const [sellingGoodsCount, setSellingGoodsCount] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isMutating, setIsMutating] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [reloadSeed, setReloadSeed] = useState(0);
+function mapProductToDraft(product: ProductItem): ProductDraft {
+    return {
+        name: product.name,
+        categoryId: product.categoryId,
+        description: product.description ?? "",
+        status: product.status,
+        variants: product.variants.map((variant) => ({
+            id: variant.id,
+            sku: variant.sku,
+            price: variant.price,
+            stockQuantity: variant.stockQuantity,
+            attributesText: JSON.stringify(variant.attributes, null, 2),
+        })),
+    };
+}
 
-    useEffect(() => {
-        let isMounted = true;
+function parseAttributesText(attributesText: string): VariantAttributes {
+    const normalizedText = attributesText.trim().length > 0 ? attributesText : "{}";
+    const parsed = JSON.parse(normalizedText) as unknown;
 
-        const fetchCategories = async () => {
-            try {
-                const nextCategoryMap = await getCatalogCategoryMap();
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+        throw new Error("Attributes phải là JSON object");
+    }
 
-                if (!isMounted) {
-                    return;
-                }
+    const output: VariantAttributes = {};
 
-                setCategoryMap(nextCategoryMap);
-            } catch (error) {
-                if (!isMounted) {
-                    return;
-                }
-
-                if (isApiRequestError(error)) {
-                    setErrorMessage(error.message);
-                } else {
-                    setErrorMessage("Không thể tải danh mục sản phẩm. Vui lòng thử lại.");
-                }
-            }
-        };
-
-        void fetchCategories();
-
-        return () => {
-            isMounted = false;
-        };
-    }, []);
-
-    useEffect(() => {
-        let isMounted = true;
-
-        const fetchProducts = async () => {
-            setIsLoading(true);
-
-            try {
-                const keyword = filterValues.keyword.trim();
-
-                const [response, activeProductsCount] = await Promise.all([
-                    getSellerProducts({
-                        page: currentPage,
-                        limit: pageSize,
-                        search: keyword.length > 0 ? keyword : undefined,
-                    }),
-                    getSellerProductsCountByStatus("ACTIVE"),
-                ]);
-
-                if (!isMounted) {
-                    return;
-                }
-
-                setProducts(response.data);
-                setTotalProductsCount(response.meta.totalItems);
-                setTotalPages(Math.max(1, response.meta.totalPages));
-                setSellingGoodsCount(activeProductsCount);
-                setErrorMessage(null);
-            } catch (error) {
-                if (!isMounted) {
-                    return;
-                }
-
-                if (isApiRequestError(error)) {
-                    setErrorMessage(error.message);
-                } else {
-                    setErrorMessage("Không thể tải dữ liệu sản phẩm. Vui lòng thử lại.");
-                }
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            }
-        };
-
-        void fetchProducts();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [currentPage, filterValues.keyword, reloadSeed]);
-
-    const rows = useMemo(() => {
-        return products.map((product) => toProductRow(product, categoryMap));
-    }, [categoryMap, products]);
-
-    const filteredRows = useMemo(() => {
-        return rows.filter((row) => {
-            const isStatusMatched =
-                filterValues.syncStatus === "all"
-                    ? true
-                    : row.syncStatus === syncStatusLabelByFilter[filterValues.syncStatus];
-
-            const isChannelMatched =
-                filterValues.channel === "all"
-                    ? true
-                    : row.channel === channelLabelByFilter[filterValues.channel];
-
-            return isStatusMatched && isChannelMatched;
-        });
-    }, [filterValues.channel, filterValues.syncStatus, rows]);
-
-    const isClientFiltered = filterValues.syncStatus !== "all" || filterValues.channel !== "all";
-    const effectiveTotalPages = isClientFiltered ? 1 : Math.max(1, totalPages);
-    const effectiveTotalCount = isClientFiltered ? filteredRows.length : totalProductsCount;
-
-    const productsOverviewStats = useMemo(() => {
-        return toProductsOverviewStats({
-            totalGoodsCount: totalProductsCount,
-            sellingGoodsCount,
-            rows,
-        });
-    }, [rows, sellingGoodsCount, totalProductsCount]);
-
-    useEffect(() => {
-        setCurrentPage((previousPage) => Math.min(previousPage, effectiveTotalPages));
-    }, [effectiveTotalPages]);
-
-    const handleHideProduct = async (productId: string) => {
-        const isConfirmed = window.confirm("Bạn có chắc chắn muốn ẩn sản phẩm này?");
-
-        if (!isConfirmed) {
-            return;
+    for (const [key, value] of Object.entries(parsed)) {
+        if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+            output[key] = String(value);
+            continue;
         }
 
-        setIsMutating(true);
+        throw new Error(`Giá trị của thuộc tính '${key}' phải là string/number/boolean`);
+    }
+
+    return output;
+}
+
+function normalizeVariants(variants: VariantDraft[]): NormalizedVariantDraft[] {
+    return variants.map((variant) => {
+        const sku = variant.sku.trim();
+        const price = variant.price.trim();
+        const stockQuantity = Number(variant.stockQuantity);
+
+        if (!variant.id && sku.length === 0) {
+            throw new Error("SKU không được để trống cho biến thể mới");
+        }
+
+        if (price.length === 0 || Number.isNaN(Number(price)) || Number(price) < 0) {
+            throw new Error("Giá biến thể không hợp lệ");
+        }
+
+        if (Number.isNaN(stockQuantity) || stockQuantity < 0) {
+            throw new Error("Số lượng tồn kho phải lớn hơn hoặc bằng 0");
+        }
+
+        return {
+            id: variant.id,
+            sku,
+            price,
+            stockQuantity,
+            attributes: parseAttributesText(variant.attributesText),
+        };
+    });
+}
+
+export default function ProductsPage() {
+    const [products, setProducts] = useState<ProductItem[]>([]);
+    const [categories, setCategories] = useState<CategoryOption[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    const [keyword, setKeyword] = useState("");
+    const [statusFilter, setStatusFilter] = useState<ProductStatus | "ALL">("ALL");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const [refreshSeed, setRefreshSeed] = useState(0);
+
+    const [editorOpen, setEditorOpen] = useState(false);
+    const [editorMode, setEditorMode] = useState<"create" | "edit">("create");
+    const [editingProductId, setEditingProductId] = useState<string | null>(null);
+    const [originalVariantIds, setOriginalVariantIds] = useState<string[]>([]);
+    const [draft, setDraft] = useState<ProductDraft>(buildDefaultDraft());
+
+    const fetchCategories = useCallback(async () => {
+        const loaded: CategoryOption[] = [];
+        let page = 1;
+
+        while (true) {
+            const response = await getCatalogCategories({ page, limit: 100 });
+            loaded.push(
+                ...response.data.map((item) => ({
+                    id: item.id,
+                    name: item.name,
+                })),
+            );
+
+            if (page >= response.meta.totalPages || response.meta.totalPages === 0) {
+                break;
+            }
+
+            page += 1;
+        }
+
+        setCategories(loaded);
+    }, []);
+
+    const fetchProducts = useCallback(async () => {
+        setIsLoading(true);
 
         try {
-            await hideSellerProduct(productId);
-            setReloadSeed((previous) => previous + 1);
+            const response = await getSellerProducts({
+                page: currentPage,
+                limit: PAGE_SIZE,
+                search: keyword.trim() || undefined,
+                status: statusFilter === "ALL" ? undefined : statusFilter,
+            });
+
+            setProducts(response.data);
+            setTotalItems(response.meta.totalItems);
+            setTotalPages(Math.max(1, response.meta.totalPages));
+            setErrorMessage(null);
         } catch (error) {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Không thể ẩn sản phẩm. Vui lòng thử lại.");
+                setErrorMessage("Không thể tải danh sách sản phẩm.");
             }
         } finally {
-            setIsMutating(false);
+            setIsLoading(false);
+        }
+    }, [currentPage, keyword, statusFilter]);
+
+    useEffect(() => {
+        void fetchCategories();
+    }, [fetchCategories]);
+
+    useEffect(() => {
+        void fetchProducts();
+    }, [fetchProducts, refreshSeed]);
+
+    const totalVariantCount = useMemo(
+        () => products.reduce((sum, product) => sum + product.variants.length, 0),
+        [products],
+    );
+
+    const totalStockCount = useMemo(
+        () =>
+            products.reduce(
+                (sum, product) =>
+                    sum +
+                    product.variants.reduce(
+                        (variantSum, variant) => variantSum + variant.stockQuantity,
+                        0,
+                    ),
+                0,
+            ),
+        [products],
+    );
+
+    const openCreateDialog = () => {
+        setEditorMode("create");
+        setEditingProductId(null);
+        setOriginalVariantIds([]);
+        setDraft(buildDefaultDraft());
+        setEditorOpen(true);
+        setErrorMessage(null);
+    };
+
+    const openEditDialog = (product: ProductItem) => {
+        setEditorMode("edit");
+        setEditingProductId(product.id);
+        setOriginalVariantIds(product.variants.map((variant) => variant.id));
+        setDraft(mapProductToDraft(product));
+        setEditorOpen(true);
+        setErrorMessage(null);
+    };
+
+    const handleDeleteProduct = async (product: ProductItem) => {
+        if (!window.confirm(`Xóa sản phẩm '${product.name}'?`)) {
+            return;
+        }
+
+        try {
+            await deleteSellerProduct(product.id);
+            setRefreshSeed((previous) => previous + 1);
+        } catch (error) {
+            if (isApiRequestError(error)) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage("Không thể xóa sản phẩm.");
+            }
+        }
+    };
+
+    const handleSubmitEditor = async () => {
+        if (draft.name.trim().length === 0) {
+            setErrorMessage("Tên sản phẩm không được để trống");
+            return;
+        }
+
+        if (draft.categoryId.trim().length === 0) {
+            setErrorMessage("Vui lòng chọn danh mục sản phẩm");
+            return;
+        }
+
+        if (draft.variants.length === 0) {
+            setErrorMessage("Sản phẩm cần ít nhất một biến thể");
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const normalizedVariants = normalizeVariants(draft.variants);
+
+            if (editorMode === "create") {
+                const createdProduct = await createSellerProduct({
+                    name: draft.name.trim(),
+                    categoryId: draft.categoryId,
+                    description: draft.description.trim() || undefined,
+                    status: draft.status,
+                });
+
+                for (const variant of normalizedVariants) {
+                    await createSellerProductVariant(createdProduct.id, {
+                        sku: variant.sku,
+                        price: variant.price,
+                        stockQuantity: variant.stockQuantity,
+                        attributes: variant.attributes,
+                    });
+                }
+            } else if (editingProductId) {
+                await updateSellerProduct(editingProductId, {
+                    name: draft.name.trim(),
+                    categoryId: draft.categoryId,
+                    description: draft.description.trim() || undefined,
+                    status: draft.status,
+                });
+
+                const nextVariantIdSet = new Set(
+                    normalizedVariants
+                        .filter((variant) => Boolean(variant.id))
+                        .map((variant) => variant.id as string),
+                );
+
+                for (const originalVariantId of originalVariantIds) {
+                    if (!nextVariantIdSet.has(originalVariantId)) {
+                        await deleteSellerProductVariant(originalVariantId);
+                    }
+                }
+
+                for (const variant of normalizedVariants) {
+                    if (variant.id) {
+                        await updateSellerProductVariant(variant.id, {
+                            price: variant.price,
+                            stockQuantity: variant.stockQuantity,
+                            attributes: variant.attributes,
+                        });
+                    } else {
+                        await createSellerProductVariant(editingProductId, {
+                            sku: variant.sku,
+                            price: variant.price,
+                            stockQuantity: variant.stockQuantity,
+                            attributes: variant.attributes,
+                        });
+                    }
+                }
+            }
+
+            setEditorOpen(false);
+            setRefreshSeed((previous) => previous + 1);
+            setErrorMessage(null);
+        } catch (error) {
+            if (error instanceof Error) {
+                setErrorMessage(error.message);
+            } else if (isApiRequestError(error)) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage("Không thể lưu sản phẩm. Vui lòng thử lại.");
+            }
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <section className="mx-auto grid w-full max-w-7xl gap-6 pb-10">
-            <ProductsHeader
-                actions={productsActionButtons}
-                onActionClick={(actionId) => {
-                    if (actionId === "add-csv-file") {
-                        setErrorMessage(
-                            "Tính năng nhập CSV sẽ được triển khai trong bước tiếp theo.",
-                        );
-                    }
-                }}
-            />
+        <section className="mx-auto grid w-full max-w-7xl gap-4 pb-10">
+            <section className="grid gap-2 rounded-lg border border-slate-200 bg-white p-5">
+                <h1 className="text-2xl font-semibold text-slate-900">
+                    Quản lý sản phẩm & tồn kho
+                </h1>
+                <p className="text-sm text-slate-600">
+                    Thêm, chỉnh sửa, xóa sản phẩm và cập nhật số lượng tồn kho biến thể trực tiếp
+                    trên cùng một màn hình.
+                </p>
+            </section>
 
-            <ProductsOverviewCards stats={productsOverviewStats} />
+            <section className="grid gap-3 md:grid-cols-3">
+                <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Tổng sản phẩm
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-slate-900">{totalItems}</p>
+                </div>
+                <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Tổng biến thể
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-slate-900">
+                        {totalVariantCount}
+                    </p>
+                </div>
+                <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Tổng tồn kho
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-slate-900">{totalStockCount}</p>
+                </div>
+            </section>
+
+            <ProductsToolbar
+                keyword={keyword}
+                status={statusFilter}
+                onKeywordChange={(value) => {
+                    setKeyword(value);
+                    setCurrentPage(1);
+                }}
+                onStatusChange={(value) => {
+                    setStatusFilter(value);
+                    setCurrentPage(1);
+                }}
+                onCreateClick={openCreateDialog}
+            />
 
             {errorMessage ? (
                 <section className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
@@ -253,35 +394,44 @@ export default function ProductsPage() {
                 </section>
             ) : null}
 
-            <ProductsFilters
-                values={filterValues}
-                statusOptions={syncStatusOptions}
-                channelOptions={channelOptions}
-                onKeywordChange={(value) => {
-                    setFilterValues((previous) => ({ ...previous, keyword: value }));
-                    setCurrentPage(1);
-                }}
-                onStatusChange={(value) => {
-                    setFilterValues((previous) => ({ ...previous, syncStatus: value }));
-                    setCurrentPage(1);
-                }}
-                onChannelChange={(value) => {
-                    setFilterValues((previous) => ({ ...previous, channel: value }));
-                    setCurrentPage(1);
-                }}
+            <ProductsTable
+                products={products}
+                isLoading={isLoading}
+                onEdit={openEditDialog}
+                onDelete={handleDeleteProduct}
             />
 
-            <ProductsTable
-                rows={filteredRows}
-                currentPage={currentPage}
-                totalPages={effectiveTotalPages}
-                pageSize={pageSize}
-                totalProductsCount={effectiveTotalCount}
-                filteredRowCount={filteredRows.length}
-                isLoading={isLoading}
-                isMutating={isMutating}
-                onPageChange={setCurrentPage}
-                onHideProduct={handleHideProduct}
+            <section className="flex items-center justify-end gap-2">
+                <Button
+                    type="button"
+                    variant="outline"
+                    disabled={currentPage <= 1 || isLoading}
+                    onClick={() => setCurrentPage((previous) => Math.max(1, previous - 1))}
+                >
+                    Trước
+                </Button>
+                <span className="text-sm text-slate-600">
+                    Trang {currentPage}/{totalPages}
+                </span>
+                <Button
+                    type="button"
+                    variant="outline"
+                    disabled={currentPage >= totalPages || isLoading}
+                    onClick={() => setCurrentPage((previous) => Math.min(totalPages, previous + 1))}
+                >
+                    Sau
+                </Button>
+            </section>
+
+            <ProductEditorDialog
+                open={editorOpen}
+                mode={editorMode}
+                categories={categories}
+                draft={draft}
+                submitting={isSubmitting}
+                onOpenChange={setEditorOpen}
+                onDraftChange={setDraft}
+                onSubmit={handleSubmitEditor}
             />
         </section>
     );

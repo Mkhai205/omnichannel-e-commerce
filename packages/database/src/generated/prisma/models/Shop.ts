@@ -240,7 +240,6 @@ export type ShopWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   products?: Prisma.ProductListRelationFilter
-  warehouses?: Prisma.WarehouseListRelationFilter
   orders?: Prisma.OrderListRelationFilter
   sellerWallet?: Prisma.XOR<Prisma.SellerWalletNullableScalarRelationFilter, Prisma.SellerWalletWhereInput> | null
   settlements?: Prisma.SellerSettlementListRelationFilter
@@ -261,7 +260,6 @@ export type ShopOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   products?: Prisma.ProductOrderByRelationAggregateInput
-  warehouses?: Prisma.WarehouseOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
   sellerWallet?: Prisma.SellerWalletOrderByWithRelationInput
   settlements?: Prisma.SellerSettlementOrderByRelationAggregateInput
@@ -285,7 +283,6 @@ export type ShopWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   products?: Prisma.ProductListRelationFilter
-  warehouses?: Prisma.WarehouseListRelationFilter
   orders?: Prisma.OrderListRelationFilter
   sellerWallet?: Prisma.XOR<Prisma.SellerWalletNullableScalarRelationFilter, Prisma.SellerWalletWhereInput> | null
   settlements?: Prisma.SellerSettlementListRelationFilter
@@ -341,7 +338,6 @@ export type ShopCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutShopInput
   products?: Prisma.ProductCreateNestedManyWithoutShopInput
-  warehouses?: Prisma.WarehouseCreateNestedManyWithoutShopInput
   orders?: Prisma.OrderCreateNestedManyWithoutShopInput
   sellerWallet?: Prisma.SellerWalletCreateNestedOneWithoutShopInput
   settlements?: Prisma.SellerSettlementCreateNestedManyWithoutShopInput
@@ -361,7 +357,6 @@ export type ShopUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutShopInput
-  warehouses?: Prisma.WarehouseUncheckedCreateNestedManyWithoutShopInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutShopInput
   sellerWallet?: Prisma.SellerWalletUncheckedCreateNestedOneWithoutShopInput
   settlements?: Prisma.SellerSettlementUncheckedCreateNestedManyWithoutShopInput
@@ -381,7 +376,6 @@ export type ShopUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutShopNestedInput
   products?: Prisma.ProductUpdateManyWithoutShopNestedInput
-  warehouses?: Prisma.WarehouseUpdateManyWithoutShopNestedInput
   orders?: Prisma.OrderUpdateManyWithoutShopNestedInput
   sellerWallet?: Prisma.SellerWalletUpdateOneWithoutShopNestedInput
   settlements?: Prisma.SellerSettlementUpdateManyWithoutShopNestedInput
@@ -401,7 +395,6 @@ export type ShopUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutShopNestedInput
-  warehouses?: Prisma.WarehouseUncheckedUpdateManyWithoutShopNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutShopNestedInput
   sellerWallet?: Prisma.SellerWalletUncheckedUpdateOneWithoutShopNestedInput
   settlements?: Prisma.SellerSettlementUncheckedUpdateManyWithoutShopNestedInput
@@ -556,20 +549,6 @@ export type ShopUpdateOneRequiredWithoutProductsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ShopUpdateToOneWithWhereWithoutProductsInput, Prisma.ShopUpdateWithoutProductsInput>, Prisma.ShopUncheckedUpdateWithoutProductsInput>
 }
 
-export type ShopCreateNestedOneWithoutWarehousesInput = {
-  create?: Prisma.XOR<Prisma.ShopCreateWithoutWarehousesInput, Prisma.ShopUncheckedCreateWithoutWarehousesInput>
-  connectOrCreate?: Prisma.ShopCreateOrConnectWithoutWarehousesInput
-  connect?: Prisma.ShopWhereUniqueInput
-}
-
-export type ShopUpdateOneRequiredWithoutWarehousesNestedInput = {
-  create?: Prisma.XOR<Prisma.ShopCreateWithoutWarehousesInput, Prisma.ShopUncheckedCreateWithoutWarehousesInput>
-  connectOrCreate?: Prisma.ShopCreateOrConnectWithoutWarehousesInput
-  upsert?: Prisma.ShopUpsertWithoutWarehousesInput
-  connect?: Prisma.ShopWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ShopUpdateToOneWithWhereWithoutWarehousesInput, Prisma.ShopUpdateWithoutWarehousesInput>, Prisma.ShopUncheckedUpdateWithoutWarehousesInput>
-}
-
 export type ShopCreateNestedOneWithoutOrdersInput = {
   create?: Prisma.XOR<Prisma.ShopCreateWithoutOrdersInput, Prisma.ShopUncheckedCreateWithoutOrdersInput>
   connectOrCreate?: Prisma.ShopCreateOrConnectWithoutOrdersInput
@@ -625,7 +604,6 @@ export type ShopCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   products?: Prisma.ProductCreateNestedManyWithoutShopInput
-  warehouses?: Prisma.WarehouseCreateNestedManyWithoutShopInput
   orders?: Prisma.OrderCreateNestedManyWithoutShopInput
   sellerWallet?: Prisma.SellerWalletCreateNestedOneWithoutShopInput
   settlements?: Prisma.SellerSettlementCreateNestedManyWithoutShopInput
@@ -644,7 +622,6 @@ export type ShopUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutShopInput
-  warehouses?: Prisma.WarehouseUncheckedCreateNestedManyWithoutShopInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutShopInput
   sellerWallet?: Prisma.SellerWalletUncheckedCreateNestedOneWithoutShopInput
   settlements?: Prisma.SellerSettlementUncheckedCreateNestedManyWithoutShopInput
@@ -679,7 +656,6 @@ export type ShopUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUpdateManyWithoutShopNestedInput
-  warehouses?: Prisma.WarehouseUpdateManyWithoutShopNestedInput
   orders?: Prisma.OrderUpdateManyWithoutShopNestedInput
   sellerWallet?: Prisma.SellerWalletUpdateOneWithoutShopNestedInput
   settlements?: Prisma.SellerSettlementUpdateManyWithoutShopNestedInput
@@ -698,7 +674,6 @@ export type ShopUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutShopNestedInput
-  warehouses?: Prisma.WarehouseUncheckedUpdateManyWithoutShopNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutShopNestedInput
   sellerWallet?: Prisma.SellerWalletUncheckedUpdateOneWithoutShopNestedInput
   settlements?: Prisma.SellerSettlementUncheckedUpdateManyWithoutShopNestedInput
@@ -717,7 +692,6 @@ export type ShopCreateWithoutProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutShopInput
-  warehouses?: Prisma.WarehouseCreateNestedManyWithoutShopInput
   orders?: Prisma.OrderCreateNestedManyWithoutShopInput
   sellerWallet?: Prisma.SellerWalletCreateNestedOneWithoutShopInput
   settlements?: Prisma.SellerSettlementCreateNestedManyWithoutShopInput
@@ -736,7 +710,6 @@ export type ShopUncheckedCreateWithoutProductsInput = {
   rejectionReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  warehouses?: Prisma.WarehouseUncheckedCreateNestedManyWithoutShopInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutShopInput
   sellerWallet?: Prisma.SellerWalletUncheckedCreateNestedOneWithoutShopInput
   settlements?: Prisma.SellerSettlementUncheckedCreateNestedManyWithoutShopInput
@@ -771,7 +744,6 @@ export type ShopUpdateWithoutProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutShopNestedInput
-  warehouses?: Prisma.WarehouseUpdateManyWithoutShopNestedInput
   orders?: Prisma.OrderUpdateManyWithoutShopNestedInput
   sellerWallet?: Prisma.SellerWalletUpdateOneWithoutShopNestedInput
   settlements?: Prisma.SellerSettlementUpdateManyWithoutShopNestedInput
@@ -790,99 +762,6 @@ export type ShopUncheckedUpdateWithoutProductsInput = {
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  warehouses?: Prisma.WarehouseUncheckedUpdateManyWithoutShopNestedInput
-  orders?: Prisma.OrderUncheckedUpdateManyWithoutShopNestedInput
-  sellerWallet?: Prisma.SellerWalletUncheckedUpdateOneWithoutShopNestedInput
-  settlements?: Prisma.SellerSettlementUncheckedUpdateManyWithoutShopNestedInput
-}
-
-export type ShopCreateWithoutWarehousesInput = {
-  id?: string
-  shopName: string
-  slug: string
-  description?: string | null
-  avatarKey?: string | null
-  coverKey?: string | null
-  businessLicense?: string | null
-  status?: $Enums.ShopStatus
-  rejectionReason?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutShopInput
-  products?: Prisma.ProductCreateNestedManyWithoutShopInput
-  orders?: Prisma.OrderCreateNestedManyWithoutShopInput
-  sellerWallet?: Prisma.SellerWalletCreateNestedOneWithoutShopInput
-  settlements?: Prisma.SellerSettlementCreateNestedManyWithoutShopInput
-}
-
-export type ShopUncheckedCreateWithoutWarehousesInput = {
-  id?: string
-  userId: string
-  shopName: string
-  slug: string
-  description?: string | null
-  avatarKey?: string | null
-  coverKey?: string | null
-  businessLicense?: string | null
-  status?: $Enums.ShopStatus
-  rejectionReason?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  products?: Prisma.ProductUncheckedCreateNestedManyWithoutShopInput
-  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutShopInput
-  sellerWallet?: Prisma.SellerWalletUncheckedCreateNestedOneWithoutShopInput
-  settlements?: Prisma.SellerSettlementUncheckedCreateNestedManyWithoutShopInput
-}
-
-export type ShopCreateOrConnectWithoutWarehousesInput = {
-  where: Prisma.ShopWhereUniqueInput
-  create: Prisma.XOR<Prisma.ShopCreateWithoutWarehousesInput, Prisma.ShopUncheckedCreateWithoutWarehousesInput>
-}
-
-export type ShopUpsertWithoutWarehousesInput = {
-  update: Prisma.XOR<Prisma.ShopUpdateWithoutWarehousesInput, Prisma.ShopUncheckedUpdateWithoutWarehousesInput>
-  create: Prisma.XOR<Prisma.ShopCreateWithoutWarehousesInput, Prisma.ShopUncheckedCreateWithoutWarehousesInput>
-  where?: Prisma.ShopWhereInput
-}
-
-export type ShopUpdateToOneWithWhereWithoutWarehousesInput = {
-  where?: Prisma.ShopWhereInput
-  data: Prisma.XOR<Prisma.ShopUpdateWithoutWarehousesInput, Prisma.ShopUncheckedUpdateWithoutWarehousesInput>
-}
-
-export type ShopUpdateWithoutWarehousesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  shopName?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
-  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutShopNestedInput
-  products?: Prisma.ProductUpdateManyWithoutShopNestedInput
-  orders?: Prisma.OrderUpdateManyWithoutShopNestedInput
-  sellerWallet?: Prisma.SellerWalletUpdateOneWithoutShopNestedInput
-  settlements?: Prisma.SellerSettlementUpdateManyWithoutShopNestedInput
-}
-
-export type ShopUncheckedUpdateWithoutWarehousesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  shopName?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  coverKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  businessLicense?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumShopStatusFieldUpdateOperationsInput | $Enums.ShopStatus
-  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  products?: Prisma.ProductUncheckedUpdateManyWithoutShopNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutShopNestedInput
   sellerWallet?: Prisma.SellerWalletUncheckedUpdateOneWithoutShopNestedInput
   settlements?: Prisma.SellerSettlementUncheckedUpdateManyWithoutShopNestedInput
@@ -902,7 +781,6 @@ export type ShopCreateWithoutOrdersInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutShopInput
   products?: Prisma.ProductCreateNestedManyWithoutShopInput
-  warehouses?: Prisma.WarehouseCreateNestedManyWithoutShopInput
   sellerWallet?: Prisma.SellerWalletCreateNestedOneWithoutShopInput
   settlements?: Prisma.SellerSettlementCreateNestedManyWithoutShopInput
 }
@@ -921,7 +799,6 @@ export type ShopUncheckedCreateWithoutOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutShopInput
-  warehouses?: Prisma.WarehouseUncheckedCreateNestedManyWithoutShopInput
   sellerWallet?: Prisma.SellerWalletUncheckedCreateNestedOneWithoutShopInput
   settlements?: Prisma.SellerSettlementUncheckedCreateNestedManyWithoutShopInput
 }
@@ -956,7 +833,6 @@ export type ShopUpdateWithoutOrdersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutShopNestedInput
   products?: Prisma.ProductUpdateManyWithoutShopNestedInput
-  warehouses?: Prisma.WarehouseUpdateManyWithoutShopNestedInput
   sellerWallet?: Prisma.SellerWalletUpdateOneWithoutShopNestedInput
   settlements?: Prisma.SellerSettlementUpdateManyWithoutShopNestedInput
 }
@@ -975,7 +851,6 @@ export type ShopUncheckedUpdateWithoutOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutShopNestedInput
-  warehouses?: Prisma.WarehouseUncheckedUpdateManyWithoutShopNestedInput
   sellerWallet?: Prisma.SellerWalletUncheckedUpdateOneWithoutShopNestedInput
   settlements?: Prisma.SellerSettlementUncheckedUpdateManyWithoutShopNestedInput
 }
@@ -994,7 +869,6 @@ export type ShopCreateWithoutSellerWalletInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutShopInput
   products?: Prisma.ProductCreateNestedManyWithoutShopInput
-  warehouses?: Prisma.WarehouseCreateNestedManyWithoutShopInput
   orders?: Prisma.OrderCreateNestedManyWithoutShopInput
   settlements?: Prisma.SellerSettlementCreateNestedManyWithoutShopInput
 }
@@ -1013,7 +887,6 @@ export type ShopUncheckedCreateWithoutSellerWalletInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutShopInput
-  warehouses?: Prisma.WarehouseUncheckedCreateNestedManyWithoutShopInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutShopInput
   settlements?: Prisma.SellerSettlementUncheckedCreateNestedManyWithoutShopInput
 }
@@ -1048,7 +921,6 @@ export type ShopUpdateWithoutSellerWalletInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutShopNestedInput
   products?: Prisma.ProductUpdateManyWithoutShopNestedInput
-  warehouses?: Prisma.WarehouseUpdateManyWithoutShopNestedInput
   orders?: Prisma.OrderUpdateManyWithoutShopNestedInput
   settlements?: Prisma.SellerSettlementUpdateManyWithoutShopNestedInput
 }
@@ -1067,7 +939,6 @@ export type ShopUncheckedUpdateWithoutSellerWalletInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutShopNestedInput
-  warehouses?: Prisma.WarehouseUncheckedUpdateManyWithoutShopNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutShopNestedInput
   settlements?: Prisma.SellerSettlementUncheckedUpdateManyWithoutShopNestedInput
 }
@@ -1086,7 +957,6 @@ export type ShopCreateWithoutSettlementsInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutShopInput
   products?: Prisma.ProductCreateNestedManyWithoutShopInput
-  warehouses?: Prisma.WarehouseCreateNestedManyWithoutShopInput
   orders?: Prisma.OrderCreateNestedManyWithoutShopInput
   sellerWallet?: Prisma.SellerWalletCreateNestedOneWithoutShopInput
 }
@@ -1105,7 +975,6 @@ export type ShopUncheckedCreateWithoutSettlementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutShopInput
-  warehouses?: Prisma.WarehouseUncheckedCreateNestedManyWithoutShopInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutShopInput
   sellerWallet?: Prisma.SellerWalletUncheckedCreateNestedOneWithoutShopInput
 }
@@ -1140,7 +1009,6 @@ export type ShopUpdateWithoutSettlementsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutShopNestedInput
   products?: Prisma.ProductUpdateManyWithoutShopNestedInput
-  warehouses?: Prisma.WarehouseUpdateManyWithoutShopNestedInput
   orders?: Prisma.OrderUpdateManyWithoutShopNestedInput
   sellerWallet?: Prisma.SellerWalletUpdateOneWithoutShopNestedInput
 }
@@ -1159,7 +1027,6 @@ export type ShopUncheckedUpdateWithoutSettlementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutShopNestedInput
-  warehouses?: Prisma.WarehouseUncheckedUpdateManyWithoutShopNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutShopNestedInput
   sellerWallet?: Prisma.SellerWalletUncheckedUpdateOneWithoutShopNestedInput
 }
@@ -1171,14 +1038,12 @@ export type ShopUncheckedUpdateWithoutSettlementsInput = {
 
 export type ShopCountOutputType = {
   products: number
-  warehouses: number
   orders: number
   settlements: number
 }
 
 export type ShopCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   products?: boolean | ShopCountOutputTypeCountProductsArgs
-  warehouses?: boolean | ShopCountOutputTypeCountWarehousesArgs
   orders?: boolean | ShopCountOutputTypeCountOrdersArgs
   settlements?: boolean | ShopCountOutputTypeCountSettlementsArgs
 }
@@ -1198,13 +1063,6 @@ export type ShopCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
  */
 export type ShopCountOutputTypeCountProductsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ProductWhereInput
-}
-
-/**
- * ShopCountOutputType without action
- */
-export type ShopCountOutputTypeCountWarehousesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.WarehouseWhereInput
 }
 
 /**
@@ -1237,7 +1095,6 @@ export type ShopSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   products?: boolean | Prisma.Shop$productsArgs<ExtArgs>
-  warehouses?: boolean | Prisma.Shop$warehousesArgs<ExtArgs>
   orders?: boolean | Prisma.Shop$ordersArgs<ExtArgs>
   sellerWallet?: boolean | Prisma.Shop$sellerWalletArgs<ExtArgs>
   settlements?: boolean | Prisma.Shop$settlementsArgs<ExtArgs>
@@ -1295,7 +1152,6 @@ export type ShopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type ShopInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   products?: boolean | Prisma.Shop$productsArgs<ExtArgs>
-  warehouses?: boolean | Prisma.Shop$warehousesArgs<ExtArgs>
   orders?: boolean | Prisma.Shop$ordersArgs<ExtArgs>
   sellerWallet?: boolean | Prisma.Shop$sellerWalletArgs<ExtArgs>
   settlements?: boolean | Prisma.Shop$settlementsArgs<ExtArgs>
@@ -1313,7 +1169,6 @@ export type $ShopPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     products: Prisma.$ProductPayload<ExtArgs>[]
-    warehouses: Prisma.$WarehousePayload<ExtArgs>[]
     orders: Prisma.$OrderPayload<ExtArgs>[]
     sellerWallet: Prisma.$SellerWalletPayload<ExtArgs> | null
     settlements: Prisma.$SellerSettlementPayload<ExtArgs>[]
@@ -1727,7 +1582,6 @@ export interface Prisma__ShopClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   products<T extends Prisma.Shop$productsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Shop$productsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  warehouses<T extends Prisma.Shop$warehousesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Shop$warehousesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orders<T extends Prisma.Shop$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Shop$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sellerWallet<T extends Prisma.Shop$sellerWalletArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Shop$sellerWalletArgs<ExtArgs>>): Prisma.Prisma__SellerWalletClient<runtime.Types.Result.GetResult<Prisma.$SellerWalletPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   settlements<T extends Prisma.Shop$settlementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Shop$settlementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SellerSettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2194,30 +2048,6 @@ export type Shop$productsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.ProductScalarFieldEnum | Prisma.ProductScalarFieldEnum[]
-}
-
-/**
- * Shop.warehouses
- */
-export type Shop$warehousesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Warehouse
-   */
-  select?: Prisma.WarehouseSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Warehouse
-   */
-  omit?: Prisma.WarehouseOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.WarehouseInclude<ExtArgs> | null
-  where?: Prisma.WarehouseWhereInput
-  orderBy?: Prisma.WarehouseOrderByWithRelationInput | Prisma.WarehouseOrderByWithRelationInput[]
-  cursor?: Prisma.WarehouseWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.WarehouseScalarFieldEnum | Prisma.WarehouseScalarFieldEnum[]
 }
 
 /**
