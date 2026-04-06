@@ -90,6 +90,11 @@ export async function getSellerProducts(
     return requireData(response);
 }
 
+export async function getSellerProductById(productId: string): Promise<ProductItem> {
+    const response = await requestApi<ProductItem>(`/seller/catalog/products/${productId}`);
+    return requireData(response);
+}
+
 export async function getSellerProductsCountByStatus(status: ProductStatus): Promise<number> {
     const response = await getSellerProducts({ page: 1, limit: 1, status });
     return response.meta.totalItems;

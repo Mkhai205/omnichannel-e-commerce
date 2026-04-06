@@ -1,13 +1,12 @@
 "use client";
 
 import type { ProductItem } from "@repo/shared-types";
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
 
 type ProductsTableProps = {
     products: ProductItem[];
     isLoading: boolean;
-    onEdit: (product: ProductItem) => void;
-    onDelete: (product: ProductItem) => void;
+    onRowClick: (productId: string) => void;
 };
 
 function toStatusLabel(status: ProductItem["status"]): string {
@@ -36,7 +35,32 @@ function sumVariantStock(product: ProductItem): number {
     return product.variants.reduce((sum, variant) => sum + variant.stockQuantity, 0);
 }
 
-export function ProductsTable({ products, isLoading, onEdit, onDelete }: ProductsTableProps) {
+function summarizeOtherSpecs(product: ProductItem): string {
+    const attributeKeys = new Set<string>();
+
+    for (const variant of product.variants) {
+        for (const key of Object.keys(variant.attributes)) {
+            if (key.trim().length > 0) {
+                attributeKeys.add(key);
+            }
+        }
+    }
+
+    if (attributeKeys.size === 0) {
+        return "Không có";
+    }
+
+    const labels = Array.from(attributeKeys);
+    const head = labels.slice(0, 2).join(", ");
+
+    if (labels.length <= 2) {
+        return head;
+    }
+
+    return `${head} (+${labels.length - 2})`;
+}
+
+export function ProductsTable({ products, isLoading, onRowClick }: ProductsTableProps) {
     return (
         <section className="overflow-hidden rounded-lg border border-slate-200 bg-white">
             <Table>
@@ -45,8 +69,8 @@ export function ProductsTable({ products, isLoading, onEdit, onDelete }: Product
                         <TableHead className="w-[32%]">Sản phẩm</TableHead>
                         <TableHead>Trạng thái</TableHead>
                         <TableHead>Biến thể</TableHead>
+                        <TableHead>Thông số khác</TableHead>
                         <TableHead>Tổng tồn</TableHead>
-                        <TableHead className="w-[220px]">Thao tác</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -74,7 +98,19 @@ export function ProductsTable({ products, isLoading, onEdit, onDelete }: Product
 
                     {!isLoading
                         ? products.map((product) => (
-                              <TableRow key={product.id}>
+                              <TableRow
+                                  key={product.id}
+                                  className="cursor-pointer transition-colors hover:bg-slate-50"
+                                  role="button"
+                                  tabIndex={0}
+                                  onClick={() => onRowClick(product.id)}
+                                  onKeyDown={(event) => {
+                                      if (event.key === "Enter" || event.key === " ") {
+                                          event.preventDefault();
+                                          onRowClick(product.id);
+                                      }
+                                  }}
+                              >
                                   <TableCell>
                                       <div className="grid gap-1">
                                           <p className="text-sm font-semibold text-slate-900">
@@ -93,26 +129,10 @@ export function ProductsTable({ products, isLoading, onEdit, onDelete }: Product
                                       </span>
                                   </TableCell>
                                   <TableCell>{product.variants.length}</TableCell>
-                                  <TableCell>{sumVariantStock(product)}</TableCell>
-                                  <TableCell>
-                                      <div className="flex items-center gap-2">
-                                          <Button
-                                              variant="outline"
-                                              size="sm"
-                                              onClick={() => onEdit(product)}
-                                          >
-                                              Sửa
-                                          </Button>
-                                          <Button
-                                              variant="outline"
-                                              size="sm"
-                                              className="border-rose-200 text-rose-600 hover:bg-rose-50"
-                                              onClick={() => onDelete(product)}
-                                          >
-                                              Xóa
-                                          </Button>
-                                      </div>
+                                  <TableCell className="text-sm text-slate-600">
+                                      {summarizeOtherSpecs(product)}
                                   </TableCell>
+                                  <TableCell>{sumVariantStock(product)}</TableCell>
                               </TableRow>
                           ))
                         : null}

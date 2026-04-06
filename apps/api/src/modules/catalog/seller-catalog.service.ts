@@ -83,6 +83,24 @@ export class SellerCatalogService {
     };
   }
 
+  async getMyProductById(
+    userId: string,
+    productId: string,
+  ): Promise<ProductItem> {
+    await this.ensureSellerShopExists(userId);
+
+    const product = await this.catalogRepository.findProductByIdForSeller(
+      userId,
+      productId,
+    );
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return this.toProductItem(product);
+  }
+
   async createMyProduct(
     userId: string,
     payload: CreateProductRequest,

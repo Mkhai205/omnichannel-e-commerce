@@ -92,6 +92,33 @@ export class SellerCatalogController {
     });
   }
 
+  @Get('products/:id')
+  @ApiOperation({ summary: 'Get one seller product by id' })
+  @ApiAuthSchemes()
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOkEnvelopeResponse(
+    ProductSwaggerDto,
+    'Seller product retrieved successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid product id',
+    unauthorized: 'Authentication required',
+    notFound: 'Product not found',
+  })
+  async getMyProductById(
+    @CurrentUser() currentUser: JwtPayload,
+    @Param('id', new ParseUUIDPipe()) productId: string,
+  ): Promise<ApiResponse<ProductItem>> {
+    const product = await this.sellerCatalogService.getMyProductById(
+      currentUser.sub,
+      productId,
+    );
+
+    return createSuccessResponse(product, {
+      message: 'Seller product retrieved successfully',
+    });
+  }
+
   @Post('products')
   @ApiOperation({ summary: 'Create a product for current seller' })
   @ApiAuthSchemes()
@@ -205,15 +232,11 @@ export class SellerCatalogController {
     });
   }
 
-
-    @Delete('products/:id')
+  @Delete('products/:id')
   @ApiOperation({ summary: 'Delete a product' })
   @ApiAuthSchemes()
   @ApiParam({ name: 'id', format: 'uuid' })
-  @ApiOkEnvelopeResponse(
-    ProductSwaggerDto,
-    'Product deleted successfully',
-  )
+  @ApiOkEnvelopeResponse(ProductSwaggerDto, 'Product deleted successfully')
   async deleteMyProduct(
     @CurrentUser() currentUser: JwtPayload,
     @Param('id', new ParseUUIDPipe()) productId: string,
