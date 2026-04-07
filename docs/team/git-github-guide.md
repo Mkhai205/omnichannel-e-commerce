@@ -66,15 +66,15 @@ git push origin admin/header-ui
 
 1. Lên trang GitHub của dự án.
 2. Bạn sẽ thấy nút xanh lá cây **"Compare & pull request"** hiện lên -> Bấm vào đó.
-3. Ở ô nội dung, ghi rõ: _"Em đã làm xong giao diện Header, có dùng component Button từ thư viện chung."_
+3. Ở ô nội dung, ghi rõ: _"Em đã làm xong giao diện Header, dùng component local từ `@/components/ui`."_
 4. Gắn thẻ (Assign) Tech Lead vào để review.
 5. Chuyển sang làm task khác (quay lại Bước 1) trong lúc chờ duyệt.
 
 ---
 
-## ⚠️ 3. LUẬT "VÙNG CẤM" (Khu vực packages/)
+## ⚠️ 3. LUẬT "VÙNG CẤM" (Không sửa ngoài app đang làm)
 
-Cấu trúc dự án của chúng ta có thư mục `packages/ui` và `packages/shared-types` dùng chung cho cả 3 app.
+Cấu trúc dự án hiện tại dùng `packages/shared-types` là dùng chung, còn UI thuộc quyền sở hữu của từng frontend app.
 
-- Nếu bạn đang code `apps/web` mà phát hiện ra cần một mã màu mới, hoặc cần cài thêm một Component DatePicker vào `packages/ui`: **KHÔNG ĐƯỢC TỰ LÀM.**
-- **Cách xử lý:** Nhắn tin vào group chat: _"Anh Khai ơi, cấu hình giúp em cái màu X vào file tailwind chung nhé"_. Tech Lead sẽ làm việc đó, sau đó bạn chỉ việc `git pull main` về là có để xài. Việc này đảm bảo thư viện dùng chung không bị nát.
+- Nếu bạn đang code `apps/web`, chỉ sửa UI trong phạm vi `apps/web/src/components/ui` và import bằng `@/components/ui`.
+- Nếu thiếu component (ví dụ `DatePicker`), hãy thêm bằng shadcn CLI trong chính app đó, không chỉnh UI của app khác.

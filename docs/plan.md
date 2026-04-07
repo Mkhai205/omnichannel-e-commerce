@@ -4,14 +4,14 @@
 
 Mục tiêu: Đảm bảo toàn bộ team có môi trường code chuẩn nhất, chạy được `turbo run dev` trơn tru.
 
-| Mã         | Hạng mục công việc (Task)               | Phân hệ  | Đầu ra kỳ vọng (DoD)                                              |
-| :--------- | :-------------------------------------- | :------- | :---------------------------------------------------------------- |
-| **INF-01** | Khởi tạo Monorepo & Pnpm Workspaces     | Root     | Thư mục `apps` và `packages` được link với nhau.                  |
-| **INF-02** | Viết file cấu hình `turbo.json`         | Root     | Định nghĩa luồng build, lint, test theo dependency graph.         |
-| **INF-03** | Thiết lập `docker-compose.yml`          | Infra    | Chạy 1 lệnh lên được PostgreSQL, Redis và MinIO cục bộ.           |
-| **PKG-01** | Setup `packages/database` (Prisma)      | Packages | Schema Prisma hoàn chỉnh, chạy được lệnh generate & push.         |
-| **PKG-02** | Setup `packages/shared-types`           | Packages | Định nghĩa xong các DTO cơ bản (User, Shop, Product).             |
-| **PKG-03** | Setup `packages/ui` (Shared Components) | Packages | Tích hợp TailwindCSS, tạo sẵn component Button, Input dùng chung. |
+| Mã         | Hạng mục công việc (Task)                     | Phân hệ  | Đầu ra kỳ vọng (DoD)                                                                                      |
+| :--------- | :-------------------------------------------- | :------- | :-------------------------------------------------------------------------------------------------------- |
+| **INF-01** | Khởi tạo Monorepo & Pnpm Workspaces           | Root     | Thư mục `apps` và `packages` được link với nhau.                                                          |
+| **INF-02** | Viết file cấu hình `turbo.json`               | Root     | Định nghĩa luồng build, lint, test theo dependency graph.                                                 |
+| **INF-03** | Thiết lập `docker-compose.yml`                | Infra    | Chạy 1 lệnh lên được PostgreSQL, Redis và MinIO cục bộ.                                                   |
+| **PKG-01** | Setup `packages/database` (Prisma)            | Packages | Schema Prisma hoàn chỉnh, chạy được lệnh generate & push.                                                 |
+| **PKG-02** | Setup `packages/shared-types`                 | Packages | Định nghĩa xong các DTO cơ bản (User, Shop, Product).                                                     |
+| **PKG-03** | Thiết lập shadcn local theo từng frontend app | Frontend | Mỗi app (`web`, `admin`, `seller`) có `components.json`, `src/components/ui`, và token UI riêng theo app. |
 
 #### Phase 2: Phát triển Backend API Core (Sprint 2 & 3)
 
