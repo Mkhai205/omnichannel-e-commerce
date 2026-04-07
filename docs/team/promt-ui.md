@@ -37,8 +37,8 @@ Nếu bạn dùng ChatGPT Plus, Claude 3.5 Sonnet, hoặc Cursor IDE, hãy tận
 >
 > **Ràng buộc Thư viện UI (BẮT BUỘC):**
 >
-> - Chúng ta đang dùng `shadcn/ui` tại thư mục `@repo/ui`.
-> - Nếu trong ảnh có Nút bấm, Ô input, hay Thẻ (Card), hãy import chúng từ thư viện chung. (Ví dụ: `import { Card, CardContent } from '@repo/ui'`). Không tự code thẻ `<button>` hay `<div>` bo góc thô."
+> - Mỗi app (`apps/web`, `apps/admin`, `apps/seller`) dùng bộ `shadcn/ui` riêng trong chính app đó.
+> - Nếu trong ảnh có Nút bấm, Ô input, hay Thẻ (Card), hãy import từ local component của app hiện tại (Ví dụ: `import { Card, CardContent } from '@/components/ui'`). Không tự code thẻ `<button>` hay `<div>` bo góc thô."
 
 ---
 
@@ -62,7 +62,7 @@ Khi bạn cần dựng một trang lớn như Bảng danh sách đơn hàng ho�
 > - Dưới cùng là một Table hiển thị 5 đơn hàng mới nhất.
 >
 > **Hành động:**
-> Viết code cho trang này. Nhớ sử dụng các component của `shadcn/ui` (Input, Table, Avatar) import từ `@repo/ui`."
+> Viết code cho trang này. Nhớ sử dụng các component của `shadcn/ui` (Input, Table, Avatar) import từ local app path `@/components/ui`."
 
 ---
 
@@ -72,7 +72,7 @@ AI rất hay code lệch thiết kế (chữ to quá, màu sai, căn lề méo).
 
 1. **Nếu code chạy lên bị lỗi báo đỏ ở Terminal:** Copy toàn bộ dòng báo lỗi đó dán lại cho AI và bảo: _"Code bị lỗi này, giải thích tại sao và đưa ra code đã sửa."_
 2. **Nếu code chạy được nhưng nhìn xấu/không giống thiết kế:** Chụp ảnh màn hình cái giao diện bị lỗi đó, gửi lại cho AI và bảo: _"Phần tiêu đề đang bị dính sát vào cái ảnh quá, hãy thêm khoảng trống (padding/margin). Và đổi nút bấm thành màu đỏ chủ đạo (`bg-primary`)."_
-3. **Nếu AI "bịa" ra component không tồn tại:** Nhắc nhở nó: _"Trong `@repo/ui` của tôi không có component `DatePicker`, hãy dùng thẻ `<input type="date">` của Tailwind thay thế, hoặc hướng dẫn tôi bảo Tech Lead cài thêm."_
+3. **Nếu AI "bịa" ra component không tồn tại:** Nhắc nhở nó: _"Trong local `@/components/ui` của app này không có component `DatePicker`, hãy dùng thẻ `<input type="date">` của Tailwind thay thế, hoặc hướng dẫn tôi cài thêm bằng shadcn CLI cho chính app này."_
 
 ---
 

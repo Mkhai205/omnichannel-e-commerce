@@ -233,7 +233,7 @@ export class AuthService {
         role: user.role,
       });
 
-      const resetUrl = this.buildResetPasswordUrl(resetToken);
+      const resetUrl = this.buildResetPasswordUrl(resetToken, user.role);
       const template =
         await this.mailTemplateService.buildResetPasswordEmailTemplate(
           user.fullName,
@@ -407,7 +407,7 @@ export class AuthService {
         email,
         role,
       });
-      const verifyUrl = this.buildVerifyEmailUrl(verifyToken);
+      const verifyUrl = this.buildVerifyEmailUrl(verifyToken, role);
       const template = await this.mailTemplateService.buildVerifyEmailTemplate(
         fullName,
         verifyUrl,
@@ -427,20 +427,32 @@ export class AuthService {
     }
   }
 
-  private buildResetPasswordUrl(token: string): string {
-    const baseUrl = this.configService.get<string>(
-      'FRONTEND_RESET_PASSWORD_REDIRECT',
-      FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_RESET_PASSWORD_REDIRECT,
-    );
+  private buildResetPasswordUrl(token: string, role: UserRole): string {
+    const configKey =
+      role === 'SELLER'
+        ? 'FRONTEND_SELLER_RESET_PASSWORD_REDIRECT'
+        : 'FRONTEND_RESET_PASSWORD_REDIRECT';
+    const fallbackUrl =
+      role === 'SELLER'
+        ? FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_SELLER_RESET_PASSWORD_REDIRECT
+        : FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_RESET_PASSWORD_REDIRECT;
+
+    const baseUrl = this.configService.get<string>(configKey, fallbackUrl);
 
     return `${baseUrl}?token=${encodeURIComponent(token)}`;
   }
 
-  private buildVerifyEmailUrl(token: string): string {
-    const baseUrl = this.configService.get<string>(
-      'FRONTEND_VERIFY_EMAIL_REDIRECT',
-      FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_VERIFY_EMAIL_REDIRECT,
-    );
+  private buildVerifyEmailUrl(token: string, role: UserRole): string {
+    const configKey =
+      role === 'SELLER'
+        ? 'FRONTEND_SELLER_VERIFY_EMAIL_REDIRECT'
+        : 'FRONTEND_VERIFY_EMAIL_REDIRECT';
+    const fallbackUrl =
+      role === 'SELLER'
+        ? FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_SELLER_VERIFY_EMAIL_REDIRECT
+        : FRONTEND_REDIRECT_URI_CONFIG_KEY.FRONTEND_VERIFY_EMAIL_REDIRECT;
+
+    const baseUrl = this.configService.get<string>(configKey, fallbackUrl);
 
     return `${baseUrl}?token=${encodeURIComponent(token)}`;
   }

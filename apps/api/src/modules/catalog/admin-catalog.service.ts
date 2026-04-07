@@ -105,12 +105,7 @@ export class AdminCatalogService {
       name: product.name,
       description: product.description,
       imageKey: product.imageKey,
-      imageUrl: resolveCatalogImageUrl(
-        this.storageService,
-        'PRODUCT',
-        product.imageKey,
-      ),
-      omnichannelSyncStatus: this.toStringRecord(product.omnichannelSyncStatus),
+      imageUrl: resolveCatalogImageUrl(this.storageService, product.imageKey),
       status: product.status,
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
@@ -123,7 +118,6 @@ export class AdminCatalogService {
         imageKey: variant.imageKey,
         imageUrl: resolveCatalogImageUrl(
           this.storageService,
-          'PRODUCT_VARIANT',
           variant.imageKey,
           product.imageKey,
         ),

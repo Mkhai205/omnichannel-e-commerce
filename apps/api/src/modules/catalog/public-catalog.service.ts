@@ -125,11 +125,7 @@ export class PublicCatalogService {
       name: category.name,
       slug: category.slug,
       imageKey: category.imageKey,
-      imageUrl: resolveCatalogImageUrl(
-        this.storageService,
-        'CATEGORY',
-        category.imageKey,
-      ),
+      imageUrl: resolveCatalogImageUrl(this.storageService, category.imageKey),
       createdAt: category.createdAt.toISOString(),
       updatedAt: category.updatedAt.toISOString(),
     };
@@ -143,12 +139,7 @@ export class PublicCatalogService {
       name: product.name,
       description: product.description,
       imageKey: product.imageKey,
-      imageUrl: resolveCatalogImageUrl(
-        this.storageService,
-        'PRODUCT',
-        product.imageKey,
-      ),
-      omnichannelSyncStatus: this.toStringRecord(product.omnichannelSyncStatus),
+      imageUrl: resolveCatalogImageUrl(this.storageService, product.imageKey),
       status: product.status,
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
@@ -171,7 +162,6 @@ export class PublicCatalogService {
       imageKey: variant.imageKey,
       imageUrl: resolveCatalogImageUrl(
         this.storageService,
-        'PRODUCT_VARIANT',
         variant.imageKey,
         fallbackProductImageKey,
       ),

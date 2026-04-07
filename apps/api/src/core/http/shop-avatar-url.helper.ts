@@ -6,8 +6,28 @@ export function resolveShopAvatarUrl(
   storageService: StorageService,
   avatarKey?: string | null,
 ): string | null {
-  const resolvedObjectKey =
-    normalizeObjectKey(avatarKey) ?? 'placeholders/shop-avatar-default.png';
+  const resolvedObjectKey = normalizeObjectKey(avatarKey);
+
+  if (!resolvedObjectKey) {
+    return null;
+  }
+
+  try {
+    return storageService.getPublicUrl(SHOP_MEDIA_BUCKET, resolvedObjectKey);
+  } catch {
+    return null;
+  }
+}
+
+export function resolveShopCoverUrl(
+  storageService: StorageService,
+  coverKey?: string | null,
+): string | null {
+  const resolvedObjectKey = normalizeObjectKey(coverKey);
+
+  if (!resolvedObjectKey) {
+    return null;
+  }
 
   try {
     return storageService.getPublicUrl(SHOP_MEDIA_BUCKET, resolvedObjectKey);

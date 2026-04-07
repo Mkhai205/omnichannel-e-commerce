@@ -10,7 +10,10 @@ import type {
   AdminUpdateShopStatusRequest,
   ShopDetail,
 } from '@repo/shared-types';
-import { resolveShopAvatarUrl } from '../../core/http/shop-avatar-url.helper';
+import {
+  resolveShopAvatarUrl,
+  resolveShopCoverUrl,
+} from '../../core/http/shop-avatar-url.helper';
 import { StorageService } from '../../infrastructure/storage/storage.service';
 import type { AdminShopRecord, ShopDetailRecord } from './shops.repository';
 import { ShopsRepository } from './shops.repository';
@@ -119,6 +122,8 @@ export class AdminShopsService {
       description: shop.description,
       avatarKey: shop.avatarKey,
       avatarUrl: resolveShopAvatarUrl(this.storageService, shop.avatarKey),
+      coverKey: shop.coverKey,
+      coverUrl: resolveShopCoverUrl(this.storageService, shop.coverKey),
       businessLicense: shop.businessLicense,
       status: shop.status,
       rejectionReason: shop.rejectionReason,
@@ -138,6 +143,8 @@ export class AdminShopsService {
       description: shop.description,
       avatarKey: shop.avatarKey,
       avatarUrl: resolveShopAvatarUrl(this.storageService, shop.avatarKey),
+      coverKey: shop.coverKey,
+      coverUrl: resolveShopCoverUrl(this.storageService, shop.coverKey),
       businessLicense: shop.businessLicense,
       status: shop.status,
       rejectionReason: shop.rejectionReason,

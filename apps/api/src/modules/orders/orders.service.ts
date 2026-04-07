@@ -8,21 +8,20 @@ import type {
   CheckoutOrderItem,
   CheckoutOrdersRequest,
   CheckoutOrdersResponse,
+  SellerOrderDetailItem,
+  SellerOrderDetailResponse,
   SellerOrderItem,
   SellerOrdersFilterRequest,
   SellerOrdersListResponse,
 } from '@repo/shared-types';
 import { resolveCatalogImageUrl } from '../../core/http/catalog-image-url.helper';
 import { StorageService } from '../../infrastructure/storage/storage.service';
-import {
-  SellerInventoryService,
-  type CheckoutInventoryDeductionItem,
-} from '../inventory/seller-inventory.service';
 import { PaymentsService } from '../payments/payments.service';
 import {
   type CheckoutCartItemRecord,
   type OrderItemRecord,
   type OrderRecord,
+  type SellerOrderDetailRecord,
   type SellerOrderRecord,
   OrdersRepository,
 } from './orders.repository';
@@ -36,7 +35,6 @@ interface CheckoutOrderGroup {
 export class OrdersService {
   constructor(
     private readonly ordersRepository: OrdersRepository,
-    private readonly sellerInventoryService: SellerInventoryService,
     private readonly paymentsService: PaymentsService,
     private readonly storageService: StorageService,
   ) {}
@@ -76,13 +74,20 @@ export class OrdersService {
       }
 
       const groupedOrders = this.groupItemsByShop(checkoutItems);
-      const inventoryDeductionItems =
-        this.toInventoryDeductionItems(checkoutItems);
+      for (const item of checkoutItems) {
+        const deductionResult =
+          await this.ordersRepository.deductVariantStockIfAvailable(
+            item.variantId,
+            item.quantity,
+            tx,
+          );
 
-      await this.sellerInventoryService.deductStockForCheckout(
-        inventoryDeductionItems,
-        tx,
-      );
+        if (deductionResult.count !== 1) {
+          throw new BadRequestException(
+            `Requested quantity exceeds stock for variant ${item.variantId}`,
+          );
+        }
+      }
 
       const checkoutOrders: CheckoutOrder[] = [];
       let totalCheckoutCents = 0n;
@@ -160,17 +165,29 @@ export class OrdersService {
   ): Promise<SellerOrdersListResponse> {
     const page = this.resolvePage(filters.page);
     const limit = this.resolveLimit(filters.limit);
+    const search = this.normalizeSearch(filters.search);
+    const placedFrom = this.resolveStartOfDate(filters.placedFrom);
+    const placedToExclusive = this.resolveEndExclusiveOfDate(filters.placedTo);
+
+    if (placedFrom && placedToExclusive && placedFrom >= placedToExclusive) {
+      throw new BadRequestException('placedFrom must not be after placedTo');
+    }
 
     const [orders, totalItems] = await Promise.all([
       this.ordersRepository.findSellerOrdersByUserId(sellerUserId, {
         page,
         limit,
         status: filters.status,
+        search,
+        placedFrom,
+        placedToExclusive,
       }),
-      this.ordersRepository.countSellerOrdersByUserId(
-        sellerUserId,
-        filters.status,
-      ),
+      this.ordersRepository.countSellerOrdersByUserId(sellerUserId, {
+        status: filters.status,
+        search,
+        placedFrom,
+        placedToExclusive,
+      }),
     ]);
 
     return {
@@ -214,13 +231,20 @@ export class OrdersService {
     );
   }
 
-  private toInventoryDeductionItems(
-    items: CheckoutCartItemRecord[],
-  ): CheckoutInventoryDeductionItem[] {
-    return items.map((item) => ({
-      variantId: item.variantId,
-      quantity: item.quantity,
-    }));
+  async getMyOrderDetail(
+    sellerUserId: string,
+    orderId: string,
+  ): Promise<SellerOrderDetailResponse> {
+    const order = await this.ordersRepository.findSellerOrderDetailByIdForUser(
+      sellerUserId,
+      orderId,
+    );
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return this.toSellerOrderDetailResponse(order);
   }
 
   private groupItemsByShop(
@@ -288,7 +312,33 @@ export class OrdersService {
         null,
       imageUrl: resolveCatalogImageUrl(
         this.storageService,
-        'PRODUCT_VARIANT',
+        orderItem.variant.imageKey,
+        orderItem.variant.product.imageKey,
+      ),
+      quantity: orderItem.quantity,
+      unitPrice: this.normalizeMoney(orderItem.unitPrice.toString()),
+      lineTotal: this.normalizeMoney(orderItem.lineTotal.toString()),
+      createdAt: orderItem.createdAt.toISOString(),
+      updatedAt: orderItem.updatedAt.toISOString(),
+    };
+  }
+
+  private toSellerOrderDetailItem(
+    orderItem: OrderItemRecord,
+  ): SellerOrderDetailItem {
+    return {
+      id: orderItem.id,
+      orderId: orderItem.orderId,
+      variantId: orderItem.variantId,
+      productId: orderItem.variant.productId,
+      productName: orderItem.variant.product.name,
+      variantSku: orderItem.variant.sku,
+      imageKey:
+        orderItem.variant.imageKey ??
+        orderItem.variant.product.imageKey ??
+        null,
+      imageUrl: resolveCatalogImageUrl(
+        this.storageService,
         orderItem.variant.imageKey,
         orderItem.variant.product.imageKey,
       ),
@@ -304,6 +354,7 @@ export class OrdersService {
     return {
       id: order.id,
       orderNumber: order.orderNumber,
+      customerName: order.user.fullName,
       userId: order.userId,
       shopId: order.shopId,
       shippingAddressId: order.shippingAddressId,
@@ -317,6 +368,31 @@ export class OrdersService {
       settledAt: order.settledAt?.toISOString() ?? null,
       createdAt: order.createdAt.toISOString(),
       updatedAt: order.updatedAt.toISOString(),
+    };
+  }
+
+  private toSellerOrderDetailResponse(
+    order: SellerOrderDetailRecord,
+  ): SellerOrderDetailResponse {
+    return {
+      ...this.toSellerOrderItem(order),
+      customer: {
+        name: order.user.fullName,
+        phone: order.user.phone,
+        email: order.user.email,
+      },
+      shippingAddress: {
+        id: order.shippingAddress.id,
+        recipientName: order.shippingAddress.recipientName,
+        recipientPhone: order.shippingAddress.recipientPhone,
+        streetAddress: order.shippingAddress.streetAddress,
+        wardDistrict: order.shippingAddress.wardDistrict,
+        city: order.shippingAddress.city,
+        state: order.shippingAddress.state,
+        postalCode: order.shippingAddress.postalCode,
+        country: order.shippingAddress.country,
+      },
+      items: order.items.map((item) => this.toSellerOrderDetailItem(item)),
     };
   }
 
@@ -378,6 +454,45 @@ export class OrdersService {
     }
 
     return limit;
+  }
+
+  private normalizeSearch(search?: string): string | undefined {
+    const normalized = search?.trim();
+
+    if (!normalized || normalized.length === 0) {
+      return undefined;
+    }
+
+    return normalized;
+  }
+
+  private resolveStartOfDate(value?: string): Date | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+
+    if (Number.isNaN(parsed.getTime())) {
+      throw new BadRequestException('Invalid placedFrom value');
+    }
+
+    return parsed;
+  }
+
+  private resolveEndExclusiveOfDate(value?: string): Date | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+
+    if (Number.isNaN(parsed.getTime())) {
+      throw new BadRequestException('Invalid placedTo value');
+    }
+
+    parsed.setUTCDate(parsed.getUTCDate() + 1);
+    return parsed;
   }
 
   private normalizeMoney(value: string): string {

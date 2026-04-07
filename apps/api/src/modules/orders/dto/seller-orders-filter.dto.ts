@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import type { SellerOrdersFilterRequest } from '@repo/shared-types';
 import { Type } from 'class-transformer';
-import { IsIn, IsOptional, Max, Min } from 'class-validator';
+import { IsIn, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
 
 const ORDER_STATUS_OPTIONS = [
   'PENDING_PAYMENT',
@@ -30,4 +30,19 @@ export class SellerOrdersFilterDto implements SellerOrdersFilterRequest {
   @IsOptional()
   @IsIn(ORDER_STATUS_OPTIONS)
   status?: (typeof ORDER_STATUS_OPTIONS)[number];
+
+  @ApiPropertyOptional({ example: 'ORD-2026' })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({ example: '2026-04-01', description: 'YYYY-MM-DD' })
+  @IsOptional()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  placedFrom?: string;
+
+  @ApiPropertyOptional({ example: '2026-04-30', description: 'YYYY-MM-DD' })
+  @IsOptional()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  placedTo?: string;
 }

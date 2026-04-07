@@ -9,6 +9,7 @@ const PUBLIC_SHOP_SELECT = {
   slug: true,
   description: true,
   avatarKey: true,
+  coverKey: true,
 } satisfies Prisma.ShopSelect;
 
 const SHOP_DETAIL_SELECT = {
@@ -18,6 +19,7 @@ const SHOP_DETAIL_SELECT = {
   slug: true,
   description: true,
   avatarKey: true,
+  coverKey: true,
   businessLicense: true,
   status: true,
   rejectionReason: true,
@@ -32,6 +34,7 @@ const ADMIN_SHOP_SELECT = {
   slug: true,
   description: true,
   avatarKey: true,
+  coverKey: true,
   businessLicense: true,
   status: true,
   rejectionReason: true,
@@ -124,6 +127,13 @@ export class ShopsRepository {
   updateShopById(id: string, data: Prisma.ShopUpdateInput) {
     return this.prisma.shop.update({
       where: { id },
+      data,
+      select: SHOP_DETAIL_SELECT,
+    });
+  }
+
+  createShop(data: Prisma.ShopUncheckedCreateInput) {
+    return this.prisma.shop.create({
       data,
       select: SHOP_DETAIL_SELECT,
     });

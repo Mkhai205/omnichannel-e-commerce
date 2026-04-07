@@ -19,7 +19,7 @@ Monorepo for a multi-vendor omnichannel e-commerce platform using Turborepo and 
 - `apps/seller`: Seller center
 - `packages/database`: Prisma schema/client
 - `packages/shared-types`: Shared contracts/types
-- `packages/ui`: Shared UI components
+- `apps/*/src/components/ui`: App-local shadcn components per frontend app
 
 ## Prerequisites
 

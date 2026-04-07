@@ -106,13 +106,6 @@ export class ProductSwaggerDto {
   })
   imageUrl?: string | null;
 
-  @ApiProperty({
-    type: 'object',
-    additionalProperties: { type: 'string' },
-    example: { tiktok: 'success' },
-  })
-  omnichannelSyncStatus!: Record<string, string>;
-
   @ApiProperty({ enum: ['DRAFT', 'ACTIVE', 'HIDDEN'] })
   status!: 'DRAFT' | 'ACTIVE' | 'HIDDEN';
 

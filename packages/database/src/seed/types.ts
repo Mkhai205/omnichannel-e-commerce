@@ -6,7 +6,6 @@ export type SeedSummary = {
     categories: number;
     products: number;
     productVariants: number;
-    inventoryLogs: number;
     addresses: number;
     carts: number;
     cartItems: number;
@@ -20,13 +19,11 @@ export type VariantSeedInput = {
     sku: string;
     attributes: Prisma.InputJsonValue;
     price: string;
-    imageKey: string;
     stockQuantity: number;
 };
 
 export type CatalogSeedResult = {
     products: number;
     productVariants: number;
-    inventoryLogs: number;
     variants: VariantSeedInput[];
 };

@@ -32,7 +32,6 @@ const PRODUCT_SELECT = {
   name: true,
   description: true,
   imageKey: true,
-  omnichannelSyncStatus: true,
   status: true,
   createdAt: true,
   updatedAt: true,
@@ -247,6 +246,18 @@ export class CatalogRepository {
       where: { id: variantId },
       data,
       select: PRODUCT_VARIANT_SELECT,
+    });
+  }
+
+  deleteProductById(productId: string) {
+    return this.prisma.product.delete({
+      where: { id: productId },
+    });
+  }
+
+  deleteVariantById(variantId: string) {
+    return this.prisma.productVariant.delete({
+      where: { id: variantId },
     });
   }
 

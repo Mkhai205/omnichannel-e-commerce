@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { RunAutoDeliveryResponse } from '@repo/shared-types';
+import type {
+  RunAutoDeliveryResponse,
+  SellerShippingMetricsResponse,
+} from '@repo/shared-types';
 import { FinanceService } from '../finance/finance.service';
 import { ShippingRepository } from './shipping.repository';
 
@@ -95,5 +98,42 @@ export class ShippingService {
     );
 
     return result;
+  }
+
+  async getSellerShippingMetrics(
+    sellerUserId: string,
+  ): Promise<SellerShippingMetricsResponse> {
+    const [pickupCount, inTransitCount, deliveredCount, returnPendingCount] =
+      await Promise.all([
+        this.shippingRepository.countSellerOrdersByStatuses(sellerUserId, [
+          'PROCESSING',
+        ]),
+        this.shippingRepository.countSellerOrdersByStatuses(sellerUserId, [
+          'SHIPPED',
+        ]),
+        this.shippingRepository.countSellerOrdersByStatuses(sellerUserId, [
+          'DELIVERED',
+        ]),
+        this.shippingRepository.countSellerOrdersByStatuses(sellerUserId, [
+          'CANCELLED',
+        ]),
+      ]);
+
+    const deliveryRateBase =
+      inTransitCount + deliveredCount + returnPendingCount;
+    const deliveryRatePercent =
+      deliveryRateBase === 0
+        ? 0
+        : Number(((deliveredCount / deliveryRateBase) * 100).toFixed(1));
+
+    return {
+      pickupCount,
+      inTransitCount,
+      deliveredCount,
+      returnPendingCount,
+      pickupGrowthPercent: 0,
+      inTransitGrowthPercent: 0,
+      deliveryRatePercent,
+    };
   }
 }

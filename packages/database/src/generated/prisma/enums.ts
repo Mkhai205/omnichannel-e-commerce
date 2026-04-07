@@ -61,16 +61,6 @@ export const ProductStatus = {
 export type ProductStatus = (typeof ProductStatus)[keyof typeof ProductStatus]
 
 
-export const InventoryLogType = {
-  IMPORT: 'IMPORT',
-  EXPORT: 'EXPORT',
-  RETURN: 'RETURN',
-  ORDER_DEDUCT: 'ORDER_DEDUCT'
-} as const
-
-export type InventoryLogType = (typeof InventoryLogType)[keyof typeof InventoryLogType]
-
-
 export const OrderStatus = {
   PENDING_PAYMENT: 'PENDING_PAYMENT',
   PAID: 'PAID',

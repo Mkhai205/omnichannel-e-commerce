@@ -6,7 +6,6 @@ export async function cleanDatabase(prisma: PrismaClient): Promise<void> {
         prisma.paymentOrder.deleteMany(),
         prisma.orderItem.deleteMany(),
         prisma.cartItem.deleteMany(),
-        prisma.inventoryLog.deleteMany(),
         prisma.payment.deleteMany(),
         prisma.order.deleteMany(),
         prisma.cart.deleteMany(),

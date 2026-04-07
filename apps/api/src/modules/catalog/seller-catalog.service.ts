@@ -83,6 +83,24 @@ export class SellerCatalogService {
     };
   }
 
+  async getMyProductById(
+    userId: string,
+    productId: string,
+  ): Promise<ProductItem> {
+    await this.ensureSellerShopExists(userId);
+
+    const product = await this.catalogRepository.findProductByIdForSeller(
+      userId,
+      productId,
+    );
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return this.toProductItem(product);
+  }
+
   async createMyProduct(
     userId: string,
     payload: CreateProductRequest,
@@ -97,7 +115,6 @@ export class SellerCatalogService {
       description: payload.description?.trim() || null,
       imageKey: this.normalizeImageKey(payload.imageKey),
       status: payload.status ?? 'DRAFT',
-      omnichannelSyncStatus: payload.omnichannelSyncStatus ?? {},
     });
 
     return this.toProductItem(product);
@@ -126,8 +143,7 @@ export class SellerCatalogService {
       payload.name !== undefined ||
       payload.description !== undefined ||
       payload.imageKey !== undefined ||
-      payload.status !== undefined ||
-      payload.omnichannelSyncStatus !== undefined;
+      payload.status !== undefined;
 
     if (!hasPayload) {
       throw new BadRequestException('At least one field must be provided');
@@ -143,9 +159,6 @@ export class SellerCatalogService {
         ? { imageKey: this.normalizeImageKey(payload.imageKey) }
         : {}),
       ...(payload.status ? { status: payload.status } : {}),
-      ...(payload.omnichannelSyncStatus
-        ? { omnichannelSyncStatus: payload.omnichannelSyncStatus }
-        : {}),
     });
 
     return this.toProductItem(updated);
@@ -215,6 +228,36 @@ export class SellerCatalogService {
     return this.toVariantItem(updated);
   }
 
+  async deleteMyProduct(
+    sellerUserId: string,
+    productId: string,
+  ): Promise<{ success: boolean }> {
+    const product = await this.catalogRepository.findProductByIdForSeller(
+      sellerUserId,
+      productId,
+    );
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    await this.catalogRepository.deleteProductById(productId);
+    return { success: true };
+  }
+
+  async deleteMyVariant(
+    sellerUserId: string,
+    variantId: string,
+  ): Promise<{ success: boolean }> {
+    const variant = await this.catalogRepository.findVariantByIdForSeller(
+      sellerUserId,
+      variantId,
+    );
+    if (!variant) {
+      throw new NotFoundException('Variant not found');
+    }
+    await this.catalogRepository.deleteVariantById(variantId);
+    return { success: true };
+  }
+
   async uploadCatalogImage(
     userId: string,
     payload: UploadCatalogImageRequest,
@@ -250,7 +293,6 @@ export class SellerCatalogService {
       objectKey: uploaded.objectName,
       imageUrl: resolveCatalogImageUrl(
         this.storageService,
-        payload.entityType,
         uploaded.objectName,
       ),
     };
@@ -302,12 +344,7 @@ export class SellerCatalogService {
       name: product.name,
       description: product.description,
       imageKey: product.imageKey,
-      imageUrl: resolveCatalogImageUrl(
-        this.storageService,
-        'PRODUCT',
-        product.imageKey,
-      ),
-      omnichannelSyncStatus: this.toStringRecord(product.omnichannelSyncStatus),
+      imageUrl: resolveCatalogImageUrl(this.storageService, product.imageKey),
       status: product.status,
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
@@ -330,7 +367,6 @@ export class SellerCatalogService {
       imageKey: variant.imageKey,
       imageUrl: resolveCatalogImageUrl(
         this.storageService,
-        'PRODUCT_VARIANT',
         variant.imageKey,
         fallbackProductImageKey,
       ),

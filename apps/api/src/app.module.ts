@@ -12,7 +12,6 @@ import { StorageModule } from './infrastructure/storage/storage.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CartModule } from './modules/cart/cart.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
-import { InventoryModule } from './modules/inventory/inventory.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ShippingModule } from './modules/shipping/shipping.module';
@@ -34,7 +33,6 @@ import { UsersModule } from './modules/users/users.module';
     AuthModule,
     CartModule,
     CatalogModule,
-    InventoryModule,
     OrdersModule,
     PaymentsModule,
     ShippingModule,

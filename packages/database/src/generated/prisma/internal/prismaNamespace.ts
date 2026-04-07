@@ -391,7 +391,6 @@ export const ModelName = {
   ProductVariant: 'ProductVariant',
   Cart: 'Cart',
   CartItem: 'CartItem',
-  InventoryLog: 'InventoryLog',
   Address: 'Address',
   OauthAccount: 'OauthAccount',
   RefreshToken: 'RefreshToken',
@@ -419,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "shop" | "category" | "product" | "productVariant" | "cart" | "cartItem" | "inventoryLog" | "address" | "oauthAccount" | "refreshToken" | "order" | "orderItem" | "payment" | "paymentOrder" | "paymentWebhookLog" | "adminWallet" | "adminWalletLedger" | "sellerWallet" | "sellerSettlement"
+    modelProps: "user" | "shop" | "category" | "product" | "productVariant" | "cart" | "cartItem" | "address" | "oauthAccount" | "refreshToken" | "order" | "orderItem" | "payment" | "paymentOrder" | "paymentWebhookLog" | "adminWallet" | "adminWalletLedger" | "sellerWallet" | "sellerSettlement"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -938,80 +937,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CartItemCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CartItemCountAggregateOutputType> | number
-        }
-      }
-    }
-    InventoryLog: {
-      payload: Prisma.$InventoryLogPayload<ExtArgs>
-      fields: Prisma.InventoryLogFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.InventoryLogFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryLogPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.InventoryLogFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryLogPayload>
-        }
-        findFirst: {
-          args: Prisma.InventoryLogFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryLogPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.InventoryLogFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryLogPayload>
-        }
-        findMany: {
-          args: Prisma.InventoryLogFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryLogPayload>[]
-        }
-        create: {
-          args: Prisma.InventoryLogCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryLogPayload>
-        }
-        createMany: {
-          args: Prisma.InventoryLogCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.InventoryLogCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryLogPayload>[]
-        }
-        delete: {
-          args: Prisma.InventoryLogDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryLogPayload>
-        }
-        update: {
-          args: Prisma.InventoryLogUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryLogPayload>
-        }
-        deleteMany: {
-          args: Prisma.InventoryLogDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.InventoryLogUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.InventoryLogUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryLogPayload>[]
-        }
-        upsert: {
-          args: Prisma.InventoryLogUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryLogPayload>
-        }
-        aggregate: {
-          args: Prisma.InventoryLogAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateInventoryLog>
-        }
-        groupBy: {
-          args: Prisma.InventoryLogGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.InventoryLogGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.InventoryLogCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.InventoryLogCountAggregateOutputType> | number
         }
       }
     }
@@ -1964,6 +1889,7 @@ export const ShopScalarFieldEnum = {
   slug: 'slug',
   description: 'description',
   avatarKey: 'avatarKey',
+  coverKey: 'coverKey',
   businessLicense: 'businessLicense',
   status: 'status',
   rejectionReason: 'rejectionReason',
@@ -1994,7 +1920,6 @@ export const ProductScalarFieldEnum = {
   name: 'name',
   description: 'description',
   imageKey: 'imageKey',
-  omnichannelSyncStatus: 'omnichannelSyncStatus',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -2038,18 +1963,6 @@ export const CartItemScalarFieldEnum = {
 } as const
 
 export type CartItemScalarFieldEnum = (typeof CartItemScalarFieldEnum)[keyof typeof CartItemScalarFieldEnum]
-
-
-export const InventoryLogScalarFieldEnum = {
-  id: 'id',
-  variantId: 'variantId',
-  type: 'type',
-  quantityChanged: 'quantityChanged',
-  note: 'note',
-  createdAt: 'createdAt'
-} as const
-
-export type InventoryLogScalarFieldEnum = (typeof InventoryLogScalarFieldEnum)[keyof typeof InventoryLogScalarFieldEnum]
 
 
 export const AddressScalarFieldEnum = {
@@ -2365,20 +2278,6 @@ export type ListEnumShopStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$P
 
 
 /**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-/**
  * Reference to a field of type 'ProductStatus'
  */
 export type EnumProductStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductStatus'>
@@ -2389,6 +2288,20 @@ export type EnumProductStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'ProductStatus[]'
  */
 export type ListEnumProductStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -2417,20 +2330,6 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-/**
- * Reference to a field of type 'InventoryLogType'
- */
-export type EnumInventoryLogTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InventoryLogType'>
-    
-
-
-/**
- * Reference to a field of type 'InventoryLogType[]'
- */
-export type ListEnumInventoryLogTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InventoryLogType[]'>
     
 
 
@@ -2668,7 +2567,6 @@ export type GlobalOmitConfig = {
   productVariant?: Prisma.ProductVariantOmit
   cart?: Prisma.CartOmit
   cartItem?: Prisma.CartItemOmit
-  inventoryLog?: Prisma.InventoryLogOmit
   address?: Prisma.AddressOmit
   oauthAccount?: Prisma.OauthAccountOmit
   refreshToken?: Prisma.RefreshTokenOmit

@@ -2,7 +2,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsIn,
   IsNotEmpty,
-  IsObject,
   IsOptional,
   IsString,
   IsUUID,
@@ -43,13 +42,4 @@ export class CreateProductDto implements CreateProductRequest {
   @IsOptional()
   @IsIn(['DRAFT', 'ACTIVE', 'HIDDEN'])
   status?: 'DRAFT' | 'ACTIVE' | 'HIDDEN';
-
-  @ApiPropertyOptional({
-    type: 'object',
-    additionalProperties: { type: 'string' },
-    example: { tiktok: 'pending', lazada: 'success' },
-  })
-  @IsOptional()
-  @IsObject()
-  omnichannelSyncStatus?: Record<string, string>;
 }

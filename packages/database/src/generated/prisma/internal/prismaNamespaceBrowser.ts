@@ -58,7 +58,6 @@ export const ModelName = {
   ProductVariant: 'ProductVariant',
   Cart: 'Cart',
   CartItem: 'CartItem',
-  InventoryLog: 'InventoryLog',
   Address: 'Address',
   OauthAccount: 'OauthAccount',
   RefreshToken: 'RefreshToken',
@@ -111,6 +110,7 @@ export const ShopScalarFieldEnum = {
   slug: 'slug',
   description: 'description',
   avatarKey: 'avatarKey',
+  coverKey: 'coverKey',
   businessLicense: 'businessLicense',
   status: 'status',
   rejectionReason: 'rejectionReason',
@@ -141,7 +141,6 @@ export const ProductScalarFieldEnum = {
   name: 'name',
   description: 'description',
   imageKey: 'imageKey',
-  omnichannelSyncStatus: 'omnichannelSyncStatus',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -185,18 +184,6 @@ export const CartItemScalarFieldEnum = {
 } as const
 
 export type CartItemScalarFieldEnum = (typeof CartItemScalarFieldEnum)[keyof typeof CartItemScalarFieldEnum]
-
-
-export const InventoryLogScalarFieldEnum = {
-  id: 'id',
-  variantId: 'variantId',
-  type: 'type',
-  quantityChanged: 'quantityChanged',
-  note: 'note',
-  createdAt: 'createdAt'
-} as const
-
-export type InventoryLogScalarFieldEnum = (typeof InventoryLogScalarFieldEnum)[keyof typeof InventoryLogScalarFieldEnum]
 
 
 export const AddressScalarFieldEnum = {

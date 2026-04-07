@@ -11,8 +11,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
   ApiResponse,
+  SellerCreateShopOnboardingRequest,
   ShopDetail,
   UploadShopAvatarResult,
+  UploadShopCoverResult,
 } from '@repo/shared-types';
 import { CurrentUser, Roles } from '../../core/decorators';
 import { createSuccessResponse } from '../../core/http/api-response.util';
@@ -23,10 +25,12 @@ import {
   ApiOkEnvelopeResponse,
 } from '../../core/http/swagger-response.decorator';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
+import { SellerCreateShopDto } from './dto/seller-create-shop.dto';
 import { SellerUpdateShopDto } from './dto/seller-update-shop.dto';
 import {
   ShopDetailSwaggerDto,
   UploadShopAvatarResultSwaggerDto,
+  UploadShopCoverResultSwaggerDto,
 } from './dto/shops-swagger.dto';
 import {
   SellerShopsService,
@@ -38,6 +42,36 @@ import {
 @Controller('seller/shops')
 export class SellerShopsController {
   constructor(private readonly sellerShopsService: SellerShopsService) {}
+
+  @Post('onboarding')
+  @ApiOperation({
+    summary: 'Create initial seller shop during onboarding (idempotent)',
+  })
+  @ApiAuthSchemes()
+  @ApiBody({ type: SellerCreateShopDto })
+  @ApiCreatedEnvelopeResponse(
+    ShopDetailSwaggerDto,
+    'Seller onboarding shop created successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid onboarding payload',
+    unauthorized: 'Authentication required',
+    notFound: false,
+  })
+  async createOnboardingShop(
+    @CurrentUser() currentUser: JwtPayload,
+    @Body() payload: SellerCreateShopDto,
+  ): Promise<ApiResponse<ShopDetail>> {
+    const shop = await this.sellerShopsService.createOnboardingShop(
+      currentUser.sub,
+      payload as SellerCreateShopOnboardingRequest,
+    );
+
+    return createSuccessResponse(shop, {
+      statusCode: 201,
+      message: 'Seller onboarding shop created successfully',
+    });
+  }
 
   @Get('me')
   @ApiOperation({ summary: 'Get current seller shop details' })
@@ -132,6 +166,53 @@ export class SellerShopsController {
     return createSuccessResponse(result, {
       statusCode: 201,
       message: 'Shop avatar uploaded successfully',
+    });
+  }
+
+  @Post('cover/upload')
+  @ApiOperation({ summary: 'Upload seller shop cover to MinIO' })
+  @ApiAuthSchemes()
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: {
+        fileSize: 5 * 1024 * 1024,
+      },
+    }),
+  )
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiCreatedEnvelopeResponse(
+    UploadShopCoverResultSwaggerDto,
+    'Shop cover uploaded successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid upload payload or unsupported image file',
+    unauthorized: 'Authentication required',
+    notFound: 'Shop not found',
+  })
+  async uploadMyShopCover(
+    @CurrentUser() currentUser: JwtPayload,
+    @UploadedFile() file?: ShopAvatarUploadFile,
+  ): Promise<ApiResponse<UploadShopCoverResult>> {
+    const result = await this.sellerShopsService.uploadMyShopCover(
+      currentUser.sub,
+      file,
+    );
+
+    return createSuccessResponse(result, {
+      statusCode: 201,
+      message: 'Shop cover uploaded successfully',
     });
   }
 }

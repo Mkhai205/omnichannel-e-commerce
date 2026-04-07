@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Delete,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -88,6 +89,33 @@ export class SellerCatalogController {
 
     return createSuccessResponse(response, {
       message: 'Seller products list retrieved successfully',
+    });
+  }
+
+  @Get('products/:id')
+  @ApiOperation({ summary: 'Get one seller product by id' })
+  @ApiAuthSchemes()
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOkEnvelopeResponse(
+    ProductSwaggerDto,
+    'Seller product retrieved successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid product id',
+    unauthorized: 'Authentication required',
+    notFound: 'Product not found',
+  })
+  async getMyProductById(
+    @CurrentUser() currentUser: JwtPayload,
+    @Param('id', new ParseUUIDPipe()) productId: string,
+  ): Promise<ApiResponse<ProductItem>> {
+    const product = await this.sellerCatalogService.getMyProductById(
+      currentUser.sub,
+      productId,
+    );
+
+    return createSuccessResponse(product, {
+      message: 'Seller product retrieved successfully',
     });
   }
 
@@ -201,6 +229,47 @@ export class SellerCatalogController {
 
     return createSuccessResponse(variant, {
       message: 'Product variant updated successfully',
+    });
+  }
+
+  @Delete('products/:id')
+  @ApiOperation({ summary: 'Delete a product' })
+  @ApiAuthSchemes()
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOkEnvelopeResponse(ProductSwaggerDto, 'Product deleted successfully')
+  async deleteMyProduct(
+    @CurrentUser() currentUser: JwtPayload,
+    @Param('id', new ParseUUIDPipe()) productId: string,
+  ) {
+    const result = await this.sellerCatalogService.deleteMyProduct(
+      currentUser.sub,
+      productId,
+    );
+
+    return createSuccessResponse(result, {
+      message: 'Product deleted successfully',
+    });
+  }
+
+  @Delete('variants/:variantId')
+  @ApiOperation({ summary: 'Delete a variant' })
+  @ApiAuthSchemes()
+  @ApiParam({ name: 'variantId', format: 'uuid' })
+  @ApiOkEnvelopeResponse(
+    ProductVariantSwaggerDto,
+    'Variant deleted successfully',
+  )
+  async deleteMyVariant(
+    @CurrentUser() currentUser: JwtPayload,
+    @Param('variantId', new ParseUUIDPipe()) variantId: string,
+  ) {
+    const result = await this.sellerCatalogService.deleteMyVariant(
+      currentUser.sub,
+      variantId,
+    );
+
+    return createSuccessResponse(result, {
+      message: 'Variant deleted successfully',
     });
   }
 

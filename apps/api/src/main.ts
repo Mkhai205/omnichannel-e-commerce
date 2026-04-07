@@ -32,12 +32,38 @@ async function bootstrap() {
   app.use(cookieParser());
 
   const configService = app.get(ConfigService);
-  // const corsOrigin = configService.get<string>('CORS_ORIGIN');
+  const corsOriginRaw = configService.get<string>(
+    'CORS_ORIGIN',
+    APP_CONFIG_KEY.CORS_ORIGIN,
+  );
 
-  // app.enableCors({
-  //   credentials: true,
-  //   origin: corsOrigin ?? true,
-  // });
+  let corsOrigin: true | string[] = true;
+
+  if (corsOriginRaw && corsOriginRaw.trim()) {
+    const normalizedOrigin = corsOriginRaw.trim();
+
+    if (normalizedOrigin !== '*') {
+      try {
+        const parsedOrigins = JSON.parse(normalizedOrigin) as unknown;
+
+        if (Array.isArray(parsedOrigins)) {
+          corsOrigin = parsedOrigins
+            .map((item) => String(item).trim())
+            .filter((item) => item.length > 0);
+        }
+      } catch {
+        corsOrigin = normalizedOrigin
+          .split(',')
+          .map((item) => item.trim())
+          .filter((item) => item.length > 0);
+      }
+    }
+  }
+
+  app.enableCors({
+    credentials: true,
+    origin: corsOrigin,
+  });
 
   const appEnv = configService.get<string>('APP_ENV', APP_CONFIG_KEY.APP_ENV);
   const swaggerEnabled =

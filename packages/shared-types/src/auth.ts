@@ -10,6 +10,13 @@ export const AUTH_PROVIDER = {
 
 export type AuthProvider = (typeof AUTH_PROVIDER)[keyof typeof AUTH_PROVIDER];
 
+export interface SellerProfileSummary {
+    shopId: UUID;
+    shopName: string;
+    avatarKey?: string | null;
+    avatarUrl?: string | null;
+}
+
 export interface AuthUser {
     id: UUID;
     email: string;
@@ -17,6 +24,7 @@ export interface AuthUser {
     phone?: string | null;
     role: UserRole;
     status: UserStatus;
+    sellerProfile?: SellerProfileSummary;
     createdAt: string;
     updatedAt: string;
 }

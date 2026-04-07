@@ -10,6 +10,13 @@ const USER_SELECT = {
   phone: true,
   role: true,
   status: true,
+  shop: {
+    select: {
+      id: true,
+      shopName: true,
+      avatarKey: true,
+    },
+  },
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.UserSelect;

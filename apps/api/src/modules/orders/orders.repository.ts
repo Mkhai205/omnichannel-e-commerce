@@ -48,6 +48,11 @@ const ORDER_SELECT = {
 const SELLER_ORDER_SELECT = {
   id: true,
   orderNumber: true,
+  user: {
+    select: {
+      fullName: true,
+    },
+  },
   userId: true,
   shopId: true,
   shippingAddressId: true,
@@ -87,6 +92,33 @@ const ORDER_ITEM_SELECT = {
   },
 } satisfies Prisma.OrderItemSelect;
 
+const SELLER_ORDER_DETAIL_SELECT = {
+  ...SELLER_ORDER_SELECT,
+  user: {
+    select: {
+      fullName: true,
+      phone: true,
+      email: true,
+    },
+  },
+  shippingAddress: {
+    select: {
+      id: true,
+      recipientName: true,
+      recipientPhone: true,
+      streetAddress: true,
+      wardDistrict: true,
+      city: true,
+      state: true,
+      postalCode: true,
+      country: true,
+    },
+  },
+  items: {
+    select: ORDER_ITEM_SELECT,
+  },
+} satisfies Prisma.OrderSelect;
+
 export type CheckoutCartItemRecord = Prisma.CartItemGetPayload<{
   select: typeof CHECKOUT_CART_ITEM_SELECT;
 }>;
@@ -97,6 +129,10 @@ export type OrderRecord = Prisma.OrderGetPayload<{
 
 export type SellerOrderRecord = Prisma.OrderGetPayload<{
   select: typeof SELLER_ORDER_SELECT;
+}>;
+
+export type SellerOrderDetailRecord = Prisma.OrderGetPayload<{
+  select: typeof SELLER_ORDER_DETAIL_SELECT;
 }>;
 
 export type OrderItemRecord = Prisma.OrderItemGetPayload<{
@@ -113,18 +149,16 @@ export class OrdersRepository {
       page: number;
       limit: number;
       status?: OrderStatus;
+      search?: string;
+      placedFrom?: Date;
+      placedToExclusive?: Date;
     },
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 
     return client.order.findMany({
-      where: {
-        shop: {
-          userId: sellerUserId,
-        },
-        ...(input.status ? { status: input.status } : {}),
-      },
+      where: this.buildSellerOrdersWhere(sellerUserId, input),
       skip: (input.page - 1) * input.limit,
       take: input.limit,
       orderBy: {
@@ -136,18 +170,18 @@ export class OrdersRepository {
 
   countSellerOrdersByUserId(
     sellerUserId: string,
-    status?: OrderStatus,
+    input: {
+      status?: OrderStatus;
+      search?: string;
+      placedFrom?: Date;
+      placedToExclusive?: Date;
+    },
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 
     return client.order.count({
-      where: {
-        shop: {
-          userId: sellerUserId,
-        },
-        ...(status ? { status } : {}),
-      },
+      where: this.buildSellerOrdersWhere(sellerUserId, input),
     });
   }
 
@@ -166,6 +200,24 @@ export class OrdersRepository {
         },
       },
       select: SELLER_ORDER_SELECT,
+    });
+  }
+
+  findSellerOrderDetailByIdForUser(
+    sellerUserId: string,
+    orderId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.findFirst({
+      where: {
+        id: orderId,
+        shop: {
+          userId: sellerUserId,
+        },
+      },
+      select: SELLER_ORDER_DETAIL_SELECT,
     });
   }
 
@@ -268,5 +320,72 @@ export class OrdersRepository {
     operation: (tx: Prisma.TransactionClient) => Promise<T>,
   ): Promise<T> {
     return this.prisma.$transaction((tx) => operation(tx));
+  }
+
+  deductVariantStockIfAvailable(
+    variantId: string,
+    quantity: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.productVariant.updateMany({
+      where: {
+        id: variantId,
+        stockQuantity: {
+          gte: quantity,
+        },
+      },
+      data: {
+        stockQuantity: {
+          decrement: quantity,
+        },
+      },
+    });
+  }
+
+  private buildSellerOrdersWhere(
+    sellerUserId: string,
+    input: {
+      status?: OrderStatus;
+      search?: string;
+      placedFrom?: Date;
+      placedToExclusive?: Date;
+    },
+  ): Prisma.OrderWhereInput {
+    const where: Prisma.OrderWhereInput = {
+      shop: {
+        userId: sellerUserId,
+      },
+      ...(input.status ? { status: input.status } : {}),
+    };
+
+    if (input.search) {
+      where.OR = [
+        {
+          orderNumber: {
+            contains: input.search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          user: {
+            fullName: {
+              contains: input.search,
+              mode: 'insensitive',
+            },
+          },
+        },
+      ];
+    }
+
+    if (input.placedFrom || input.placedToExclusive) {
+      where.createdAt = {
+        ...(input.placedFrom ? { gte: input.placedFrom } : {}),
+        ...(input.placedToExclusive ? { lt: input.placedToExclusive } : {}),
+      };
+    }
+
+    return where;
   }
 }

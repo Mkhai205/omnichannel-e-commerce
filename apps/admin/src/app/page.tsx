@@ -30,7 +30,7 @@ import {
     TableHeader,
     TableRow,
     Textarea,
-} from "@repo/ui";
+} from "@/components/ui";
 
 export default function Home() {
     return (
@@ -39,7 +39,7 @@ export default function Home() {
                 <CardHeader>
                     <CardTitle>Shared UI - Admin App</CardTitle>
                     <CardDescription>
-                        Governance console using common shadcn components from @repo/ui.
+                        Governance console using admin-local shadcn components.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4">

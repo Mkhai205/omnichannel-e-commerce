@@ -22,3 +22,26 @@ export class RunAutoDeliveryResponseSwaggerDto {
   @ApiProperty({ type: [String], format: 'uuid' })
   processedOrderIds!: string[];
 }
+
+export class SellerShippingMetricsResponseSwaggerDto {
+  @ApiProperty({ example: 16 })
+  pickupCount!: number;
+
+  @ApiProperty({ example: 42 })
+  inTransitCount!: number;
+
+  @ApiProperty({ example: 380 })
+  deliveredCount!: number;
+
+  @ApiProperty({ example: 4 })
+  returnPendingCount!: number;
+
+  @ApiProperty({ example: 0 })
+  pickupGrowthPercent!: number;
+
+  @ApiProperty({ example: 0 })
+  inTransitGrowthPercent!: number;
+
+  @ApiProperty({ example: 89.6 })
+  deliveryRatePercent!: number;
+}

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@repo/database';
+import type { OrderStatus } from '@repo/shared-types';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
 
 const SHIPPING_ORDER_SELECT = {
@@ -125,5 +126,24 @@ export class ShippingRepository {
     operation: (tx: Prisma.TransactionClient) => Promise<T>,
   ): Promise<T> {
     return this.prisma.$transaction((tx) => operation(tx));
+  }
+
+  countSellerOrdersByStatuses(
+    sellerUserId: string,
+    statuses: OrderStatus[],
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.count({
+      where: {
+        shop: {
+          userId: sellerUserId,
+        },
+        status: {
+          in: statuses,
+        },
+      },
+    });
   }
 }

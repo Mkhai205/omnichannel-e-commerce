@@ -4,11 +4,9 @@ export type ProductStatus = "DRAFT" | "ACTIVE" | "HIDDEN";
 
 export type CatalogImageEntityType = "CATEGORY" | "PRODUCT" | "PRODUCT_VARIANT";
 
-export type InventoryLogType = "IMPORT" | "EXPORT" | "RETURN" | "ORDER_DEDUCT";
+export type InventoryStockStatus = "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
 
 export type VariantAttributes = Record<string, string>;
-
-export type OmnichannelSyncStatus = Record<string, string>;
 
 export interface CategoryItem {
     id: UUID;
@@ -42,20 +40,10 @@ export interface ProductItem {
     description?: string | null;
     imageKey?: string | null;
     imageUrl?: string | null;
-    omnichannelSyncStatus: OmnichannelSyncStatus;
     status: ProductStatus;
     createdAt: string;
     updatedAt: string;
     variants: ProductVariantItem[];
-}
-
-export interface InventoryLogItem {
-    id: UUID;
-    variantId: UUID;
-    type: InventoryLogType;
-    quantityChanged: number;
-    note?: string | null;
-    createdAt: string;
 }
 
 export interface PublicProductsFilterRequest {
@@ -96,7 +84,6 @@ export interface CreateProductRequest {
     description?: string;
     imageKey?: string | null;
     status?: ProductStatus;
-    omnichannelSyncStatus?: OmnichannelSyncStatus;
 }
 
 export interface UpdateProductRequest {
@@ -105,7 +92,6 @@ export interface UpdateProductRequest {
     description?: string;
     imageKey?: string | null;
     status?: ProductStatus;
-    omnichannelSyncStatus?: OmnichannelSyncStatus;
 }
 
 export interface UpdateProductStatusRequest {
@@ -127,12 +113,6 @@ export interface UpdateProductVariantRequest {
     stockQuantity?: number;
 }
 
-export interface CreateInventoryLogRequest {
-    type: InventoryLogType;
-    quantityChanged: number;
-    note?: string;
-}
-
 export interface UploadCatalogImageRequest {
     entityType: CatalogImageEntityType;
     entityId: UUID;
@@ -151,5 +131,3 @@ export type PublicProductsListResponse = PaginatedResponse<ProductItem>;
 export type SellerProductsListResponse = PaginatedResponse<ProductItem>;
 
 export type AdminProductsListResponse = PaginatedResponse<ProductItem>;
-
-export type InventoryLogsListResponse = PaginatedResponse<InventoryLogItem>;

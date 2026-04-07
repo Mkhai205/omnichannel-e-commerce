@@ -12,7 +12,7 @@ export async function seedCore(prisma: PrismaClient): Promise<SeedSummary> {
     const users = await seedUsers(prisma);
     const shops = await seedShops(prisma);
     const categories = await seedCategories(prisma);
-    const { products, productVariants, inventoryLogs, variants } = await seedCatalog(prisma);
+    const { products, productVariants, variants } = await seedCatalog(prisma);
     const addresses = await seedAddresses(prisma);
     const { carts, cartItems } = await seedCarts(prisma);
     const { orders, orderItems } = await seedOrders(prisma, variants);
@@ -23,7 +23,6 @@ export async function seedCore(prisma: PrismaClient): Promise<SeedSummary> {
         categories,
         products,
         productVariants,
-        inventoryLogs,
         addresses,
         carts,
         cartItems,
