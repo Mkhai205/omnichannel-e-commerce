@@ -41,7 +41,7 @@ export function LoginFormCard() {
             }
 
             const myShop = await getMySellerShop();
-            router.replace(myShop ? "/" : "/onboarding");
+            router.replace(myShop ? "/analytics" : "/onboarding");
         } catch (error) {
             const fallbackMessage = "Đăng nhập thất bại. Vui lòng thử lại.";
             if (isApiRequestError(error)) {

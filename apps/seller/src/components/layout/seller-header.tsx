@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import type { AuthUser } from "@repo/shared-types";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
     Button,
@@ -14,7 +15,8 @@ import {
     Input,
 } from "@/components/ui";
 import { Bell, HelpCircle, Menu, Search, Settings } from "lucide-react";
-import { logoutSeller } from "@/services/auth-service";
+import { getMyProfile, logoutSeller } from "@/services/auth-service";
+import Link from "next/link";
 
 type SellerHeaderProps = {
     onToggleSidebar: () => void;
@@ -22,7 +24,46 @@ type SellerHeaderProps = {
 
 export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
     const router = useRouter();
+    const [profile, setProfile] = useState<AuthUser | null>(null);
+    const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+    const [hasAvatarLoadError, setHasAvatarLoadError] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadProfile = async () => {
+            setIsLoadingProfile(true);
+
+            try {
+                const currentProfile = await getMyProfile();
+
+                if (!isMounted) {
+                    return;
+                }
+
+                setProfile(currentProfile);
+                setHasAvatarLoadError(false);
+            } catch (error) {
+                if (!isMounted) {
+                    return;
+                }
+
+                setProfile(null);
+                console.error("Cannot load seller profile", error);
+            } finally {
+                if (isMounted) {
+                    setIsLoadingProfile(false);
+                }
+            }
+        };
+
+        void loadProfile();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const handleLogout = async () => {
         if (isLoggingOut) {
@@ -38,6 +79,27 @@ export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
             router.replace("/login");
         }
     };
+
+    const displayShopCode = profile?.sellerProfile?.shopId ?? "--";
+    const displayShopName = profile?.sellerProfile?.shopName ?? profile?.fullName ?? "--";
+    const displayEmail = profile?.email ?? "--";
+    const avatarUrl = profile?.sellerProfile?.avatarUrl;
+
+    const getInitials = (value: string): string => {
+        const words = value.trim().split(/\s+/).filter(Boolean);
+
+        if (words.length === 0) {
+            return "S";
+        }
+
+        const first = words[0]?.[0] ?? "";
+        const second = words[1]?.[0] ?? "";
+        const initials = `${first}${second}`.toUpperCase();
+
+        return initials || "S";
+    };
+
+    const avatarInitials = getInitials(displayShopName);
 
     return (
         <header className="sticky top-0 z-40 h-16 border-b border-slate-200 bg-white">
@@ -90,10 +152,23 @@ export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
                                     type="button"
                                     variant="ghost"
                                     className="h-10 rounded-full px-1"
+                                    disabled={isLoadingProfile}
                                 >
-                                    <span className="inline-flex size-8 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
-                                        KT
-                                    </span>
+                                    {avatarUrl && !hasAvatarLoadError ? (
+                                        /* eslint-disable-next-line @next/next/no-img-element */
+                                        <img
+                                            src={avatarUrl}
+                                            alt={displayShopName}
+                                            className="size-8 rounded-full object-cover"
+                                            onError={() => {
+                                                setHasAvatarLoadError(true);
+                                            }}
+                                        />
+                                    ) : (
+                                        <span className="inline-flex size-8 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
+                                            {avatarInitials}
+                                        </span>
+                                    )}
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
@@ -109,16 +184,16 @@ export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
                                         <div className="rounded-lg border border-slate-700 bg-slate-800 p-3">
                                             <div className="grid grid-cols-[96px_1fr] gap-y-1 text-xs">
                                                 <span className="text-slate-400">Mã chủ shop</span>
-                                                <span className="font-medium text-slate-100">
-                                                    SEL-2001
+                                                <span className="truncate font-medium text-slate-100">
+                                                    {displayShopCode}
                                                 </span>
                                                 <span className="text-slate-400">Chủ shop</span>
-                                                <span className="font-medium text-slate-100">
-                                                    Khaidz Store
+                                                <span className="truncate font-medium text-slate-100">
+                                                    {displayShopName}
                                                 </span>
                                                 <span className="text-slate-400">Email</span>
                                                 <span className="truncate font-medium text-slate-100">
-                                                    khaidz.store@email.com
+                                                    {displayEmail}
                                                 </span>
                                             </div>
                                         </div>
@@ -127,11 +202,11 @@ export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
 
                                 <DropdownMenuSeparator className="bg-slate-700" />
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem className="text-slate-100 focus:bg-slate-800 focus:text-slate-100">
+                                    <DropdownMenuItem className="text-slate-100 focus:bg-slate-200 focus:text-slate-800">
                                         Thông tin tài khoản
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem className="text-slate-100 focus:bg-slate-800 focus:text-slate-100">
-                                        Thiết lập cửa hàng
+                                    <DropdownMenuItem className="text-slate-100 focus:bg-slate-200 focus:text-slate-800">
+                                        <Link href="/profile">Thiết lập cửa hàng</Link>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator className="bg-slate-700" />

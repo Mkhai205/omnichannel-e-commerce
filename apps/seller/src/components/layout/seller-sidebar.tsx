@@ -21,14 +21,14 @@ type SellerSidebarProps = {
 };
 
 const mainNav = [
-    { label: "Đơn hàng", icon: ShoppingCart, href: "/orders" },
+    { label: "Thống kê", icon: BarChart3, href: "/analytics" },
+    { label: "Cửa hàng", icon: HouseIcon, href: "/profile" },
     { label: "Sản phẩm", icon: ClipboardCheck, href: "/products" },
+    { label: "Đơn hàng", icon: ShoppingCart, href: "/orders" },
     { label: "Giao hàng", icon: Truck, href: "/shipping" },
     { label: "Tiếp thị", icon: Megaphone, href: "/marketing" },
     { label: "Thanh toán", icon: CreditCard, href: "/payments" },
     { label: "Khách hàng", icon: Headset, href: "/customer-service" },
-    { label: "Cửa hàng", icon: HouseIcon, href: "/profile" },
-    { label: "Thống kê", icon: BarChart3, href: "/analytics" },
 ];
 
 const supportNav = [{ label: "Hỗ trợ", icon: LifeBuoy, href: "/support" }];

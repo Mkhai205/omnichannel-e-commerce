@@ -12,12 +12,17 @@ import type {
   UserAddress,
   UserAddressListResponse,
 } from '@repo/shared-types';
+import { resolveShopAvatarUrl } from '../../core/http/shop-avatar-url.helper';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import type { SafeUserRecord, UserAddressRecord } from './users.repository';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UserProfileService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly storageService: StorageService,
+  ) {}
 
   async getMyProfile(userId: string): Promise<AuthUser> {
     const user = await this.usersRepository.findUserById(userId);
@@ -160,6 +165,18 @@ export class UserProfileService {
       phone: user.phone,
       role: user.role,
       status: user.status,
+      sellerProfile:
+        user.role === 'SELLER' && user.shop
+          ? {
+              shopId: user.shop.id,
+              shopName: user.shop.shopName,
+              avatarKey: user.shop.avatarKey,
+              avatarUrl: resolveShopAvatarUrl(
+                this.storageService,
+                user.shop.avatarKey,
+              ),
+            }
+          : undefined,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };
