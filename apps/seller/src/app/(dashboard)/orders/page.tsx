@@ -128,15 +128,6 @@ export default function OrdersPage() {
 
     return (
         <section className="mx-auto grid w-full max-w-7xl gap-6 pb-10">
-            <header>
-                <h1 className="text-4xl font-semibold tracking-tight text-slate-900">
-                    Quản lý Đơn hàng
-                </h1>
-                <p className="mt-2 max-w-md text-lg text-slate-600">
-                    Theo dõi và xử lý đơn hàng từ cửa hàng của bạn theo thời gian thực.
-                </p>
-            </header>
-
             <OrdersFilters
                 values={filterValues}
                 statusOptions={statusOptions}

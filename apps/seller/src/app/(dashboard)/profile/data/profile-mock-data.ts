@@ -4,8 +4,8 @@ export const duLieuTrangHoSo: DuLieuTrangHoSo = {
   hero: {
     tenCuaHang: "Nhà Aura Fashion",
     maDinhDanhNguoiBan: "MID-99120304",
-    anhDaiDienUrl: "/profile/store-avatar.svg",
-    anhBiaUrl: "/profile/store-cover.svg",
+    anhDaiDienUrl: "/products/avartar.png",
+    anhBiaUrl: "/products/background.png",
     nutChinhSuaBanner: "Chỉnh sửa",
   },
   nhanDienThuongHieu: {

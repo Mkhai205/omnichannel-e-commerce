@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ProductItem, ProductStatus } from "@repo/shared-types";
 import { Button } from "@/components/ui";
-import { getSellerProducts } from "@/services/catalog-service";
+import { getCatalogCategoryMap, getSellerProducts } from "@/services/catalog-service";
 import { isApiRequestError } from "@/services/http-client";
 import { ProductsTable } from "./_components/products-table";
 import { ProductsToolbar } from "./_components/products-toolbar";
@@ -14,6 +14,7 @@ const PAGE_SIZE = 20;
 export default function ProductsPage() {
     const router = useRouter();
     const [products, setProducts] = useState<ProductItem[]>([]);
+    const [categoryMap, setCategoryMap] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -49,9 +50,22 @@ export default function ProductsPage() {
         }
     }, [currentPage, keyword, statusFilter]);
 
+    const fetchCategoryMap = useCallback(async () => {
+        try {
+            const loadedMap = await getCatalogCategoryMap();
+            setCategoryMap(loadedMap);
+        } catch {
+            setCategoryMap({});
+        }
+    }, []);
+
     useEffect(() => {
         void fetchProducts();
     }, [fetchProducts]);
+
+    useEffect(() => {
+        void fetchCategoryMap();
+    }, [fetchCategoryMap]);
 
     const totalVariantCount = useMemo(
         () => products.reduce((sum, product) => sum + product.variants.length, 0),
@@ -82,15 +96,6 @@ export default function ProductsPage() {
 
     return (
         <section className="mx-auto grid w-full max-w-7xl gap-4 pb-10">
-            <section className="grid gap-2 rounded-lg border border-slate-200 bg-white p-5">
-                <h1 className="text-2xl font-semibold text-slate-900">
-                    Quản lý sản phẩm & tồn kho
-                </h1>
-                <p className="text-sm text-slate-600">
-                    Click vào từng dòng sản phẩm để xem chi tiết và chỉnh sửa trên trang riêng.
-                </p>
-            </section>
-
             <section className="grid gap-3 md:grid-cols-3">
                 <div className="rounded-lg border border-slate-200 bg-white p-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -134,7 +139,12 @@ export default function ProductsPage() {
                 </section>
             ) : null}
 
-            <ProductsTable products={products} isLoading={isLoading} onRowClick={openDetailPage} />
+            <ProductsTable
+                products={products}
+                categoryMap={categoryMap}
+                isLoading={isLoading}
+                onRowClick={openDetailPage}
+            />
 
             <section className="flex items-center justify-end gap-2">
                 <Button

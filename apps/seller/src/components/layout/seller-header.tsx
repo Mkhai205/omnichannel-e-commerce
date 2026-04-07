@@ -58,11 +58,11 @@ export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
                         <Menu aria-hidden="true" />
                     </Button>
 
-                    <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3">
-                        <Search aria-hidden="true" className="size-4 text-slate-400" />
+                    <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md border px-3">
+                        <Search className="size-4" />
                         <Input
                             placeholder="Tìm kiếm mã đơn, khách hàng..."
-                            className="h-10 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+                            className="h-10 bg-white! border-0 px-0 focus-visible:ring-0"
                         />
                     </div>
 

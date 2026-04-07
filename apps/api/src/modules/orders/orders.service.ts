@@ -316,7 +316,6 @@ export class OrdersService {
         null,
       imageUrl: resolveCatalogImageUrl(
         this.storageService,
-        'PRODUCT_VARIANT',
         orderItem.variant.imageKey,
         orderItem.variant.product.imageKey,
       ),
@@ -344,7 +343,6 @@ export class OrdersService {
         null,
       imageUrl: resolveCatalogImageUrl(
         this.storageService,
-        'PRODUCT_VARIANT',
         orderItem.variant.imageKey,
         orderItem.variant.product.imageKey,
       ),

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import type { ProductItem, VariantAttributes } from "@repo/shared-types";
 import { Button } from "@/components/ui";
@@ -335,18 +334,6 @@ export default function ProductDetailPage() {
 
     return (
         <section className="mx-auto grid w-full max-w-7xl gap-4 pb-10">
-            <section className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-5">
-                <div className="grid gap-1">
-                    <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
-                    <p className="text-sm text-slate-600">
-                        Chỉnh sửa thông tin sản phẩm trực tiếp trên trang, không dùng modal.
-                    </p>
-                </div>
-                <Button asChild type="button" variant="outline">
-                    <Link href="/products">Quay lại danh sách</Link>
-                </Button>
-            </section>
-
             {errorMessage ? (
                 <section className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                     {errorMessage}

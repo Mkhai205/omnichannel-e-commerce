@@ -30,7 +30,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.smartphones,
             name: randomVietnameseProductName("smartphones"),
             description: randomVietnameseProductDescription(),
-            imageKey: `products/${SEED_IDS.products.smartphoneA}/main.jpg`,
             omnichannelSyncStatus: { tiktok: "pending", lazada: "success" },
             status: "ACTIVE",
         },
@@ -40,7 +39,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.smartphones,
             name: randomVietnameseProductName("smartphones"),
             description: randomVietnameseProductDescription(),
-            imageKey: `products/${SEED_IDS.products.smartphoneB}/main.jpg`,
             omnichannelSyncStatus: { tiktok: "success", shopee: "pending" },
             status: "ACTIVE",
         },
@@ -50,7 +48,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.laptops,
             name: randomVietnameseProductName("laptops"),
             description: randomVietnameseProductDescription(),
-            imageKey: `products/${SEED_IDS.products.laptopA}/main.jpg`,
             omnichannelSyncStatus: { tiktok: "disabled" },
             status: "ACTIVE",
         },
@@ -60,7 +57,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.menFashion,
             name: randomVietnameseProductName("menFashion"),
             description: randomVietnameseProductDescription(),
-            imageKey: `products/${SEED_IDS.products.jacketA}/main.jpg`,
             omnichannelSyncStatus: {},
             status: "DRAFT",
         },
@@ -70,7 +66,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.kitchen,
             name: randomVietnameseProductName("kitchen"),
             description: randomVietnameseProductDescription(),
-            imageKey: `products/${SEED_IDS.products.blenderA}/main.jpg`,
             omnichannelSyncStatus: { lazada: "pending" },
             status: "ACTIVE",
         },
@@ -80,7 +75,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.electronics,
             name: randomVietnameseProductName("electronics"),
             description: randomVietnameseProductDescription(),
-            imageKey: `products/${SEED_IDS.products.speakerA}/main.jpg`,
             omnichannelSyncStatus: {},
             status: "HIDDEN",
         },
@@ -93,7 +87,6 @@ function buildFixedCatalog(): {
             sku: "SEED-SMARTA-128",
             attributes: { color: randomVietnameseColor(), storage: "128GB" },
             price: "999.00",
-            imageKey: `products/${SEED_IDS.products.smartphoneA}/variants/${SEED_IDS.variants.smartphoneA128}.jpg`,
             stockQuantity: 30,
         },
         {
@@ -102,7 +95,6 @@ function buildFixedCatalog(): {
             sku: "SEED-SMARTA-256",
             attributes: { color: randomVietnameseColor(), storage: "256GB" },
             price: "1199.00",
-            imageKey: `products/${SEED_IDS.products.smartphoneA}/variants/${SEED_IDS.variants.smartphoneA256}.jpg`,
             stockQuantity: 24,
         },
         {
@@ -111,7 +103,6 @@ function buildFixedCatalog(): {
             sku: "SEED-SMARTB-128",
             attributes: { color: randomVietnameseColor(), storage: "128GB" },
             price: "899.00",
-            imageKey: `products/${SEED_IDS.products.smartphoneB}/variants/${SEED_IDS.variants.smartphoneB128}.jpg`,
             stockQuantity: 28,
         },
         {
@@ -120,7 +111,6 @@ function buildFixedCatalog(): {
             sku: "SEED-SMARTB-256",
             attributes: { color: randomVietnameseColor(), storage: "256GB" },
             price: "1099.00",
-            imageKey: `products/${SEED_IDS.products.smartphoneB}/variants/${SEED_IDS.variants.smartphoneB256}.jpg`,
             stockQuantity: 20,
         },
         {
@@ -129,7 +119,6 @@ function buildFixedCatalog(): {
             sku: "SEED-LAPTOPA-16GB",
             attributes: { ram: "16GB", storage: "512GB SSD" },
             price: "1699.00",
-            imageKey: `products/${SEED_IDS.products.laptopA}/variants/${SEED_IDS.variants.laptopA16}.jpg`,
             stockQuantity: 15,
         },
         {
@@ -138,7 +127,6 @@ function buildFixedCatalog(): {
             sku: "SEED-LAPTOPA-32GB",
             attributes: { ram: "32GB", storage: "1TB SSD" },
             price: "1999.00",
-            imageKey: `products/${SEED_IDS.products.laptopA}/variants/${SEED_IDS.variants.laptopA32}.jpg`,
             stockQuantity: 9,
         },
         {
@@ -147,7 +135,6 @@ function buildFixedCatalog(): {
             sku: "SEED-JACKETA-M",
             attributes: { size: "M", color: randomVietnameseColor() },
             price: "129.00",
-            imageKey: `products/${SEED_IDS.products.jacketA}/variants/${SEED_IDS.variants.jacketAM}.jpg`,
             stockQuantity: 40,
         },
         {
@@ -156,7 +143,6 @@ function buildFixedCatalog(): {
             sku: "SEED-JACKETA-L",
             attributes: { size: "L", color: randomVietnameseColor() },
             price: "129.00",
-            imageKey: `products/${SEED_IDS.products.jacketA}/variants/${SEED_IDS.variants.jacketAL}.jpg`,
             stockQuantity: 35,
         },
         {
@@ -165,7 +151,6 @@ function buildFixedCatalog(): {
             sku: "SEED-BLENDERA-WHITE",
             attributes: { color: "Trắng", power: "600W" },
             price: "159.00",
-            imageKey: `products/${SEED_IDS.products.blenderA}/variants/${SEED_IDS.variants.blenderAWhite}.jpg`,
             stockQuantity: 21,
         },
         {
@@ -174,7 +159,6 @@ function buildFixedCatalog(): {
             sku: "SEED-BLENDERA-BLACK",
             attributes: { color: "Đen", power: "600W" },
             price: "159.00",
-            imageKey: `products/${SEED_IDS.products.blenderA}/variants/${SEED_IDS.variants.blenderABlack}.jpg`,
             stockQuantity: 19,
         },
         {
@@ -183,7 +167,6 @@ function buildFixedCatalog(): {
             sku: "SEED-SPEAKERA-BLACK",
             attributes: { color: "Đen", connectivity: "Bluetooth 5.3" },
             price: "89.00",
-            imageKey: `products/${SEED_IDS.products.speakerA}/variants/${SEED_IDS.variants.speakerABlack}.jpg`,
             stockQuantity: 50,
         },
         {
@@ -192,7 +175,6 @@ function buildFixedCatalog(): {
             sku: "SEED-SPEAKERA-BLUE",
             attributes: { color: "Xanh dương", connectivity: "Bluetooth 5.3" },
             price: "89.00",
-            imageKey: `products/${SEED_IDS.products.speakerA}/variants/${SEED_IDS.variants.speakerABlue}.jpg`,
             stockQuantity: 44,
         },
     ];
@@ -235,7 +217,6 @@ function buildExtraCatalog(): {
             categoryId,
             name: randomVietnameseProductName(categoryKey),
             description: randomVietnameseProductDescription(),
-            imageKey: `products/${productId}/main.jpg`,
             omnichannelSyncStatus: {
                 tiktok: faker.helpers.arrayElement(["pending", "success", "failed"]),
                 lazada: faker.helpers.arrayElement(["pending", "success", "disabled"]),
@@ -261,7 +242,6 @@ function buildExtraCatalog(): {
                     material: randomVietnameseMaterial(),
                 },
                 price: formatCents(BigInt(priceCents)),
-                imageKey: `products/${productId}/variants/${variantId}.jpg`,
                 stockQuantity,
             });
         }
@@ -289,7 +269,6 @@ export async function seedCatalog(prisma: PrismaClient): Promise<CatalogSeedResu
             sku: variant.sku,
             attributes: variant.attributes,
             price: variant.price,
-            imageKey: variant.imageKey,
             stockQuantity: variant.stockQuantity,
         })),
     });

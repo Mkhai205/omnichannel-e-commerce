@@ -228,7 +228,6 @@ export class CartService {
       imageKey,
       imageUrl: resolveCatalogImageUrl(
         this.storageService,
-        'PRODUCT_VARIANT',
         item.variant.imageKey,
         item.variant.product.imageKey,
       ),

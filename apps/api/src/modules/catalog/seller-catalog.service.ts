@@ -298,7 +298,6 @@ export class SellerCatalogService {
       objectKey: uploaded.objectName,
       imageUrl: resolveCatalogImageUrl(
         this.storageService,
-        payload.entityType,
         uploaded.objectName,
       ),
     };
@@ -350,11 +349,7 @@ export class SellerCatalogService {
       name: product.name,
       description: product.description,
       imageKey: product.imageKey,
-      imageUrl: resolveCatalogImageUrl(
-        this.storageService,
-        'PRODUCT',
-        product.imageKey,
-      ),
+      imageUrl: resolveCatalogImageUrl(this.storageService, product.imageKey),
       omnichannelSyncStatus: this.toStringRecord(product.omnichannelSyncStatus),
       status: product.status,
       createdAt: product.createdAt.toISOString(),
@@ -378,7 +373,6 @@ export class SellerCatalogService {
       imageKey: variant.imageKey,
       imageUrl: resolveCatalogImageUrl(
         this.storageService,
-        'PRODUCT_VARIANT',
         variant.imageKey,
         fallbackProductImageKey,
       ),
