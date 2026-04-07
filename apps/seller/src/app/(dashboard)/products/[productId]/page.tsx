@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import type { ProductItem, VariantAttributes } from "@repo/shared-types";
-import { Button } from "@/components/ui";
+import type { ProductItem } from "@repo/shared-types";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import {
     createSellerProduct,
     createSellerProductVariant,
@@ -11,24 +11,27 @@ import {
     deleteSellerProductVariant,
     getCatalogCategories,
     getSellerProductById,
+    uploadCatalogImage,
     updateSellerProduct,
     updateSellerProductVariant,
 } from "@/services/catalog-service";
 import { isApiRequestError } from "@/services/http-client";
 import { ProductEditorForm } from "../_components/product-editor-form";
-import type { ProductDraft, VariantDraft } from "../types";
+import { normalizeVariants, validateCatalogImageFile } from "../utils/product-draft";
+import type { ProductDraft } from "../types";
+import { ProductDetailHeader } from "./_components/product-detail-header";
+import { ProductFeedbackAlert } from "./_components/product-feedback-alert";
+import { ProductImagePanel } from "./_components/product-image-panel";
 
 type CategoryOption = {
     id: string;
     name: string;
 };
 
-type NormalizedVariantDraft = {
-    id?: string;
-    sku: string;
-    price: string;
-    stockQuantity: number;
-    attributes: VariantAttributes;
+const PRODUCT_STATUS_LABEL: Record<ProductDraft["status"], string> = {
+    DRAFT: "Nháp",
+    ACTIVE: "Đang bán",
+    HIDDEN: "Đã ẩn",
 };
 
 function buildDefaultDraft(): ProductDraft {
@@ -36,6 +39,8 @@ function buildDefaultDraft(): ProductDraft {
         name: "",
         categoryId: "",
         description: "",
+        imageKey: null,
+        imageUrl: null,
         status: "DRAFT",
         variants: [
             {
@@ -43,6 +48,8 @@ function buildDefaultDraft(): ProductDraft {
                 price: "0",
                 stockQuantity: 0,
                 attributesText: "{}",
+                imageKey: null,
+                imageUrl: null,
             },
         ],
     };
@@ -53,6 +60,8 @@ function mapProductToDraft(product: ProductItem): ProductDraft {
         name: product.name,
         categoryId: product.categoryId,
         description: product.description ?? "",
+        imageKey: product.imageKey ?? null,
+        imageUrl: product.imageUrl ?? null,
         status: product.status,
         variants: product.variants.map((variant) => ({
             id: variant.id,
@@ -60,58 +69,10 @@ function mapProductToDraft(product: ProductItem): ProductDraft {
             price: variant.price,
             stockQuantity: variant.stockQuantity,
             attributesText: JSON.stringify(variant.attributes, null, 2),
+            imageKey: variant.imageKey ?? null,
+            imageUrl: variant.imageUrl ?? null,
         })),
     };
-}
-
-function parseAttributesText(attributesText: string): VariantAttributes {
-    const normalizedText = attributesText.trim().length > 0 ? attributesText : "{}";
-    const parsed = JSON.parse(normalizedText) as unknown;
-
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-        throw new Error("Attributes phải là JSON object");
-    }
-
-    const output: VariantAttributes = {};
-
-    for (const [key, value] of Object.entries(parsed)) {
-        if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-            output[key] = String(value);
-            continue;
-        }
-
-        throw new Error(`Giá trị của thuộc tính '${key}' phải là string/number/boolean`);
-    }
-
-    return output;
-}
-
-function normalizeVariants(variants: VariantDraft[]): NormalizedVariantDraft[] {
-    return variants.map((variant) => {
-        const sku = variant.sku.trim();
-        const price = variant.price.trim();
-        const stockQuantity = Number(variant.stockQuantity);
-
-        if (!variant.id && sku.length === 0) {
-            throw new Error("SKU không được để trống cho biến thể mới");
-        }
-
-        if (price.length === 0 || Number.isNaN(Number(price)) || Number(price) < 0) {
-            throw new Error("Giá biến thể không hợp lệ");
-        }
-
-        if (Number.isNaN(stockQuantity) || stockQuantity < 0) {
-            throw new Error("Số lượng tồn kho phải lớn hơn hoặc bằng 0");
-        }
-
-        return {
-            id: variant.id,
-            sku,
-            price,
-            stockQuantity,
-            attributes: parseAttributesText(variant.attributesText),
-        };
-    });
 }
 
 export default function ProductDetailPage() {
@@ -136,10 +97,13 @@ export default function ProductDetailPage() {
 
     const [categories, setCategories] = useState<CategoryOption[]>([]);
     const [draft, setDraft] = useState<ProductDraft>(buildDefaultDraft());
+    const [resolvedProductId, setResolvedProductId] = useState<string | null>(null);
     const [originalVariantIds, setOriginalVariantIds] = useState<string[]>([]);
 
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const [uploadingVariantIds, setUploadingVariantIds] = useState<string[]>([]);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -169,6 +133,7 @@ export default function ProductDetailPage() {
     const fetchProduct = useCallback(async () => {
         if (isCreateMode) {
             setDraft(buildDefaultDraft());
+            setResolvedProductId(null);
             setOriginalVariantIds([]);
             return;
         }
@@ -179,6 +144,7 @@ export default function ProductDetailPage() {
 
         const product = await getSellerProductById(productId);
         setDraft(mapProductToDraft(product));
+        setResolvedProductId(product.id);
         setOriginalVariantIds(product.variants.map((variant) => variant.id));
     }, [isCreateMode, productId]);
 
@@ -204,6 +170,125 @@ export default function ProductDetailPage() {
     useEffect(() => {
         void loadInitialData();
     }, [loadInitialData]);
+
+    const handleBackToProducts = useCallback(() => {
+        router.push("/products");
+    }, [router]);
+
+    const handleUploadProductImage = useCallback(
+        async (file: File) => {
+            const normalizedProductId = resolvedProductId?.trim() ?? "";
+
+            if (isCreateMode || normalizedProductId.length === 0) {
+                setErrorMessage("ID sản phẩm chưa sẵn sàng. Hãy lưu sản phẩm trước khi tải ảnh.");
+                return;
+            }
+
+            try {
+                validateCatalogImageFile(file);
+            } catch (error) {
+                if (error instanceof Error) {
+                    setErrorMessage(error.message);
+                }
+
+                return;
+            }
+
+            setIsUploadingImage(true);
+
+            try {
+                const uploaded = await uploadCatalogImage("PRODUCT", normalizedProductId, file);
+                const updatedProduct = await updateSellerProduct(normalizedProductId, {
+                    imageKey: uploaded.objectKey,
+                });
+
+                setDraft((currentDraft) => ({
+                    ...currentDraft,
+                    imageKey: updatedProduct.imageKey ?? uploaded.objectKey,
+                    imageUrl:
+                        updatedProduct.imageUrl ??
+                        uploaded.imageUrl ??
+                        currentDraft.imageUrl ??
+                        null,
+                }));
+                setErrorMessage(null);
+                setSuccessMessage("Cập nhật ảnh sản phẩm thành công.");
+            } catch (error) {
+                if (error instanceof Error) {
+                    setErrorMessage(error.message);
+                } else if (isApiRequestError(error)) {
+                    setErrorMessage(error.message);
+                } else {
+                    setErrorMessage("Không thể tải ảnh sản phẩm. Vui lòng thử lại.");
+                }
+            } finally {
+                setIsUploadingImage(false);
+            }
+        },
+        [isCreateMode, resolvedProductId],
+    );
+
+    const handleUploadVariantImage = useCallback(async (variantId: string, file: File) => {
+        const normalizedVariantId = variantId.trim();
+
+        if (normalizedVariantId.length === 0) {
+            setErrorMessage("ID biến thể chưa sẵn sàng. Hãy lưu biến thể trước khi tải ảnh.");
+            return;
+        }
+
+        try {
+            validateCatalogImageFile(file);
+        } catch (error) {
+            if (error instanceof Error) {
+                setErrorMessage(error.message);
+            }
+
+            return;
+        }
+
+        setUploadingVariantIds((previousIds) =>
+            previousIds.includes(normalizedVariantId)
+                ? previousIds
+                : [...previousIds, normalizedVariantId],
+        );
+
+        try {
+            const uploaded = await uploadCatalogImage("PRODUCT_VARIANT", normalizedVariantId, file);
+            const updatedVariant = await updateSellerProductVariant(normalizedVariantId, {
+                imageKey: uploaded.objectKey,
+            });
+
+            setDraft((currentDraft) => ({
+                ...currentDraft,
+                variants: currentDraft.variants.map((variant) => {
+                    if (variant.id !== normalizedVariantId) {
+                        return variant;
+                    }
+
+                    return {
+                        ...variant,
+                        imageKey: updatedVariant.imageKey ?? uploaded.objectKey,
+                        imageUrl: updatedVariant.imageUrl ?? uploaded.imageUrl ?? variant.imageUrl,
+                    };
+                }),
+            }));
+
+            setErrorMessage(null);
+            setSuccessMessage("Cập nhật ảnh biến thể thành công.");
+        } catch (error) {
+            if (error instanceof Error) {
+                setErrorMessage(error.message);
+            } else if (isApiRequestError(error)) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage("Không thể tải ảnh biến thể. Vui lòng thử lại.");
+            }
+        } finally {
+            setUploadingVariantIds((previousIds) =>
+                previousIds.filter((currentId) => currentId !== normalizedVariantId),
+            );
+        }
+    }, []);
 
     const handleSubmit = async () => {
         if (draft.name.trim().length === 0) {
@@ -273,6 +358,9 @@ export default function ProductDetailPage() {
                         price: variant.price,
                         stockQuantity: variant.stockQuantity,
                         attributes: variant.attributes,
+                        imageKey:
+                            draft.variants.find((item) => item.id === variant.id)?.imageKey ??
+                            undefined,
                     });
                 } else {
                     await createSellerProductVariant(productId, {
@@ -332,16 +420,12 @@ export default function ProductDetailPage() {
 
     return (
         <section className="mx-auto grid w-full max-w-7xl gap-4 pb-10">
-            {errorMessage ? (
-                <section className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                    {errorMessage}
-                </section>
-            ) : null}
+            <ProductDetailHeader isCreateMode={isCreateMode} onBack={handleBackToProducts} />
+
+            {errorMessage ? <ProductFeedbackAlert tone="error" message={errorMessage} /> : null}
 
             {successMessage ? (
-                <section className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                    {successMessage}
-                </section>
+                <ProductFeedbackAlert tone="success" message={successMessage} />
             ) : null}
 
             {isLoading ? (
@@ -350,19 +434,45 @@ export default function ProductDetailPage() {
                 </section>
             ) : (
                 <>
-                    <ProductEditorForm
-                        categories={categories}
-                        draft={draft}
-                        disabled={isSubmitting}
-                        onDraftChange={setDraft}
-                    />
+                    <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
+                        <ProductEditorForm
+                            categories={categories}
+                            draft={draft}
+                            disabled={isSubmitting || isUploadingImage}
+                            uploadingVariantIds={uploadingVariantIds}
+                            onDraftChange={setDraft}
+                            onVariantImageUpload={handleUploadVariantImage}
+                        />
+
+                        <aside className="grid gap-4">
+                            <ProductImagePanel
+                                imageKey={draft.imageKey}
+                                imageUrl={draft.imageUrl}
+                                isCreateMode={isCreateMode}
+                                disabled={isSubmitting || !resolvedProductId}
+                                isUploading={isUploadingImage}
+                                onUpload={handleUploadProductImage}
+                            />
+
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-base">Tổng quan</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-2 text-sm text-slate-600">
+                                    <p>Trạng thái: {PRODUCT_STATUS_LABEL[draft.status]}</p>
+                                    <p>Số biến thể: {draft.variants.length}</p>
+                                    <p>{isCreateMode ? "Chế độ tạo mới" : "Chế độ cập nhật"}</p>
+                                </CardContent>
+                            </Card>
+                        </aside>
+                    </section>
 
                     <section className="flex flex-wrap items-center justify-end gap-2 rounded-lg border border-slate-200 bg-white p-4">
                         {!isCreateMode ? (
                             <Button
                                 type="button"
                                 variant="outline"
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || isUploadingImage}
                                 className="border-rose-200 text-rose-600 hover:bg-rose-50"
                                 onClick={handleDeleteProduct}
                             >
@@ -372,14 +482,18 @@ export default function ProductDetailPage() {
                         <Button
                             type="button"
                             variant="outline"
-                            disabled={isSubmitting}
-                            onClick={() => router.push("/products")}
+                            disabled={isSubmitting || isUploadingImage}
+                            onClick={handleBackToProducts}
                         >
                             Hủy
                         </Button>
-                        <Button type="button" disabled={isSubmitting} onClick={handleSubmit}>
-                            {isSubmitting
-                                ? "Đang lưu..."
+                        <Button
+                            type="button"
+                            disabled={isSubmitting || isUploadingImage}
+                            onClick={handleSubmit}
+                        >
+                            {isSubmitting || isUploadingImage
+                                ? "Đang xử lý..."
                                 : isCreateMode
                                   ? "Tạo sản phẩm"
                                   : "Lưu thay đổi"}

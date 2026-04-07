@@ -111,13 +111,15 @@ export function ProductsTable({
         <section className="overflow-hidden rounded-lg border border-slate-200 bg-white">
             <Table>
                 <TableHeader>
-                    <TableRow className="bg-slate-50/70">
-                        <TableHead className="w-[32%]">Sản phẩm</TableHead>
-                        <TableHead>Danh mục</TableHead>
-                        <TableHead>Trạng thái</TableHead>
-                        <TableHead>Biến thể</TableHead>
-                        <TableHead>Thông số khác</TableHead>
-                        <TableHead>Tổng tồn</TableHead>
+                    <TableRow className="bg-slate-100">
+                        <TableHead className="w-[32%] text-center font-extrabold">
+                            Sản phẩm
+                        </TableHead>
+                        <TableHead className="text-center font-extrabold">Danh mục</TableHead>
+                        <TableHead className="text-center font-extrabold">Trạng thái</TableHead>
+                        <TableHead className="text-center font-extrabold">Biến thể</TableHead>
+                        <TableHead className="text-center font-extrabold">Thông số khác</TableHead>
+                        <TableHead className="text-center font-extrabold">Tổng tồn</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -159,7 +161,7 @@ export function ProductsTable({
                                   }}
                               >
                                   <TableCell>
-                                      <div className="grid grid-cols-[56px_1fr] items-start gap-3">
+                                      <div className="grid grid-cols-[56px_1fr] items-start gap-4">
                                           <ProductThumbnail
                                               src={toProductImageSrc(product)}
                                               alt={product.name}
@@ -174,21 +176,25 @@ export function ProductsTable({
                                           </div>
                                       </div>
                                   </TableCell>
-                                  <TableCell className="text-sm text-slate-700">
+                                  <TableCell className="text-sm text-center text-slate-700">
                                       {categoryMap[product.categoryId] || "Không xác định"}
                                   </TableCell>
-                                  <TableCell>
+                                  <TableCell className="text-center">
                                       <span
                                           className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${toStatusClassName(product.status)}`}
                                       >
                                           {toStatusLabel(product.status)}
                                       </span>
                                   </TableCell>
-                                  <TableCell>{product.variants.length}</TableCell>
-                                  <TableCell className="text-sm text-slate-600">
+                                  <TableCell className="text-center">
+                                      {product.variants.length}
+                                  </TableCell>
+                                  <TableCell className="text-sm text-center text-slate-600">
                                       {summarizeOtherSpecs(product)}
                                   </TableCell>
-                                  <TableCell>{sumVariantStock(product)}</TableCell>
+                                  <TableCell className="text-center">
+                                      {sumVariantStock(product)}
+                                  </TableCell>
                               </TableRow>
                           ))
                         : null}
