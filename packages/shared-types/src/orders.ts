@@ -98,7 +98,27 @@ export interface SellerOrderDetailItem {
     updatedAt: string;
 }
 
+export interface SellerOrderCustomerInfo {
+    name: string;
+    phone: string | null;
+    email: string;
+}
+
+export interface SellerOrderShippingAddressInfo {
+    id: UUID;
+    recipientName: string;
+    recipientPhone: string;
+    streetAddress: string;
+    wardDistrict?: string | null;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+}
+
 export interface SellerOrderDetailResponse extends SellerOrderItem {
+    customer: SellerOrderCustomerInfo;
+    shippingAddress: SellerOrderShippingAddressInfo;
     items: SellerOrderDetailItem[];
 }
 

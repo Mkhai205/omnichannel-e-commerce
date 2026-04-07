@@ -240,7 +240,53 @@ export class SellerOrderDetailItemSwaggerDto {
   updatedAt!: string;
 }
 
+export class SellerOrderCustomerInfoSwaggerDto {
+  @ApiProperty({ example: 'Nguyen Van A' })
+  name!: string;
+
+  @ApiProperty({ nullable: true, example: '0909123456' })
+  phone!: string | null;
+
+  @ApiProperty({ example: 'customer@example.com' })
+  email!: string;
+}
+
+export class SellerOrderShippingAddressSwaggerDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ example: 'Nguyen Van A' })
+  recipientName!: string;
+
+  @ApiProperty({ example: '0909123456' })
+  recipientPhone!: string;
+
+  @ApiProperty({ example: '123 Le Loi' })
+  streetAddress!: string;
+
+  @ApiProperty({ nullable: true, example: 'Phuong Ben Thanh' })
+  wardDistrict!: string | null;
+
+  @ApiProperty({ example: 'Ho Chi Minh City' })
+  city!: string;
+
+  @ApiProperty({ example: 'Ho Chi Minh' })
+  state!: string;
+
+  @ApiProperty({ example: '700000' })
+  postalCode!: string;
+
+  @ApiProperty({ example: 'Vietnam' })
+  country!: string;
+}
+
 export class SellerOrderDetailSwaggerDto extends SellerOrderSwaggerDto {
+  @ApiProperty({ type: SellerOrderCustomerInfoSwaggerDto })
+  customer!: SellerOrderCustomerInfoSwaggerDto;
+
+  @ApiProperty({ type: SellerOrderShippingAddressSwaggerDto })
+  shippingAddress!: SellerOrderShippingAddressSwaggerDto;
+
   @ApiProperty({ type: [SellerOrderDetailItemSwaggerDto] })
   items!: SellerOrderDetailItemSwaggerDto[];
 }

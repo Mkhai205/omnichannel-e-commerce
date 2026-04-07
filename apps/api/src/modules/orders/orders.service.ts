@@ -231,22 +231,6 @@ export class OrdersService {
     );
   }
 
-  async markMyOrderAsDelivered(
-    sellerUserId: string,
-    orderId: string,
-  ): Promise<SellerOrderItem> {
-    return this.updateMyOrderStatus(
-      sellerUserId,
-      orderId,
-      'SHIPPED',
-      'DELIVERED',
-      'Order must be SHIPPED before moving to DELIVERED',
-      {
-        deliveredAt: new Date(),
-      },
-    );
-  }
-
   async getMyOrderDetail(
     sellerUserId: string,
     orderId: string,
@@ -392,6 +376,22 @@ export class OrdersService {
   ): SellerOrderDetailResponse {
     return {
       ...this.toSellerOrderItem(order),
+      customer: {
+        name: order.user.fullName,
+        phone: order.user.phone,
+        email: order.user.email,
+      },
+      shippingAddress: {
+        id: order.shippingAddress.id,
+        recipientName: order.shippingAddress.recipientName,
+        recipientPhone: order.shippingAddress.recipientPhone,
+        streetAddress: order.shippingAddress.streetAddress,
+        wardDistrict: order.shippingAddress.wardDistrict,
+        city: order.shippingAddress.city,
+        state: order.shippingAddress.state,
+        postalCode: order.shippingAddress.postalCode,
+        country: order.shippingAddress.country,
+      },
       items: order.items.map((item) => this.toSellerOrderDetailItem(item)),
     };
   }
@@ -399,12 +399,11 @@ export class OrdersService {
   private async updateMyOrderStatus(
     sellerUserId: string,
     orderId: string,
-    fromStatus: 'PAID' | 'PROCESSING' | 'SHIPPED',
-    toStatus: 'PROCESSING' | 'SHIPPED' | 'DELIVERED',
+    fromStatus: 'PAID' | 'PROCESSING',
+    toStatus: 'PROCESSING' | 'SHIPPED',
     invalidTransitionMessage: string,
     updateData: {
       shippedAt?: Date;
-      deliveredAt?: Date;
     },
   ): Promise<SellerOrderItem> {
     const updatedOrder = await this.ordersRepository.runInTransaction(

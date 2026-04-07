@@ -94,6 +94,26 @@ const ORDER_ITEM_SELECT = {
 
 const SELLER_ORDER_DETAIL_SELECT = {
   ...SELLER_ORDER_SELECT,
+  user: {
+    select: {
+      fullName: true,
+      phone: true,
+      email: true,
+    },
+  },
+  shippingAddress: {
+    select: {
+      id: true,
+      recipientName: true,
+      recipientPhone: true,
+      streetAddress: true,
+      wardDistrict: true,
+      city: true,
+      state: true,
+      postalCode: true,
+      country: true,
+    },
+  },
   items: {
     select: ORDER_ITEM_SELECT,
   },

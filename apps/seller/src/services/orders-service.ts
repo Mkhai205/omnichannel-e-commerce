@@ -81,12 +81,3 @@ export async function markSellerOrderAsShipped(orderId: string): Promise<SellerO
 
     return requireData(response);
 }
-
-export async function markSellerOrderAsDelivered(orderId: string): Promise<SellerOrderItem> {
-    const response = await requestApi<SellerOrderItem>(`/seller/orders/${orderId}/deliver`, {
-        method: "PATCH",
-        body: JSON.stringify({}),
-    });
-
-    return requireData(response);
-}
