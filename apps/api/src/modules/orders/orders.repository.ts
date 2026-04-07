@@ -48,6 +48,11 @@ const ORDER_SELECT = {
 const SELLER_ORDER_SELECT = {
   id: true,
   orderNumber: true,
+  user: {
+    select: {
+      fullName: true,
+    },
+  },
   userId: true,
   shopId: true,
   shippingAddressId: true,
@@ -124,18 +129,16 @@ export class OrdersRepository {
       page: number;
       limit: number;
       status?: OrderStatus;
+      search?: string;
+      placedFrom?: Date;
+      placedToExclusive?: Date;
     },
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 
     return client.order.findMany({
-      where: {
-        shop: {
-          userId: sellerUserId,
-        },
-        ...(input.status ? { status: input.status } : {}),
-      },
+      where: this.buildSellerOrdersWhere(sellerUserId, input),
       skip: (input.page - 1) * input.limit,
       take: input.limit,
       orderBy: {
@@ -147,18 +150,18 @@ export class OrdersRepository {
 
   countSellerOrdersByUserId(
     sellerUserId: string,
-    status?: OrderStatus,
+    input: {
+      status?: OrderStatus;
+      search?: string;
+      placedFrom?: Date;
+      placedToExclusive?: Date;
+    },
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? this.prisma;
 
     return client.order.count({
-      where: {
-        shop: {
-          userId: sellerUserId,
-        },
-        ...(status ? { status } : {}),
-      },
+      where: this.buildSellerOrdersWhere(sellerUserId, input),
     });
   }
 
@@ -319,5 +322,50 @@ export class OrdersRepository {
         },
       },
     });
+  }
+
+  private buildSellerOrdersWhere(
+    sellerUserId: string,
+    input: {
+      status?: OrderStatus;
+      search?: string;
+      placedFrom?: Date;
+      placedToExclusive?: Date;
+    },
+  ): Prisma.OrderWhereInput {
+    const where: Prisma.OrderWhereInput = {
+      shop: {
+        userId: sellerUserId,
+      },
+      ...(input.status ? { status: input.status } : {}),
+    };
+
+    if (input.search) {
+      where.OR = [
+        {
+          orderNumber: {
+            contains: input.search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          user: {
+            fullName: {
+              contains: input.search,
+              mode: 'insensitive',
+            },
+          },
+        },
+      ];
+    }
+
+    if (input.placedFrom || input.placedToExclusive) {
+      where.createdAt = {
+        ...(input.placedFrom ? { gte: input.placedFrom } : {}),
+        ...(input.placedToExclusive ? { lt: input.placedToExclusive } : {}),
+      };
+    }
+
+    return where;
   }
 }

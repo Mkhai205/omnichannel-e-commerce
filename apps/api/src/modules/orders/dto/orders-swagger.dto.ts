@@ -148,6 +148,9 @@ export class SellerOrderSwaggerDto {
   @ApiProperty({ example: 'ORD-20260330-52A9D13B' })
   orderNumber!: string;
 
+  @ApiProperty({ example: 'Nguyen Van A' })
+  customerName!: string;
+
   @ApiProperty({ format: 'uuid' })
   userId!: string;
 

@@ -165,17 +165,29 @@ export class OrdersService {
   ): Promise<SellerOrdersListResponse> {
     const page = this.resolvePage(filters.page);
     const limit = this.resolveLimit(filters.limit);
+    const search = this.normalizeSearch(filters.search);
+    const placedFrom = this.resolveStartOfDate(filters.placedFrom);
+    const placedToExclusive = this.resolveEndExclusiveOfDate(filters.placedTo);
+
+    if (placedFrom && placedToExclusive && placedFrom >= placedToExclusive) {
+      throw new BadRequestException('placedFrom must not be after placedTo');
+    }
 
     const [orders, totalItems] = await Promise.all([
       this.ordersRepository.findSellerOrdersByUserId(sellerUserId, {
         page,
         limit,
         status: filters.status,
+        search,
+        placedFrom,
+        placedToExclusive,
       }),
-      this.ordersRepository.countSellerOrdersByUserId(
-        sellerUserId,
-        filters.status,
-      ),
+      this.ordersRepository.countSellerOrdersByUserId(sellerUserId, {
+        status: filters.status,
+        search,
+        placedFrom,
+        placedToExclusive,
+      }),
     ]);
 
     return {
@@ -358,6 +370,7 @@ export class OrdersService {
     return {
       id: order.id,
       orderNumber: order.orderNumber,
+      customerName: order.user.fullName,
       userId: order.userId,
       shopId: order.shopId,
       shippingAddressId: order.shippingAddressId,
@@ -442,6 +455,45 @@ export class OrdersService {
     }
 
     return limit;
+  }
+
+  private normalizeSearch(search?: string): string | undefined {
+    const normalized = search?.trim();
+
+    if (!normalized || normalized.length === 0) {
+      return undefined;
+    }
+
+    return normalized;
+  }
+
+  private resolveStartOfDate(value?: string): Date | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+
+    if (Number.isNaN(parsed.getTime())) {
+      throw new BadRequestException('Invalid placedFrom value');
+    }
+
+    return parsed;
+  }
+
+  private resolveEndExclusiveOfDate(value?: string): Date | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+
+    if (Number.isNaN(parsed.getTime())) {
+      throw new BadRequestException('Invalid placedTo value');
+    }
+
+    parsed.setUTCDate(parsed.getUTCDate() + 1);
+    return parsed;
   }
 
   private normalizeMoney(value: string): string {

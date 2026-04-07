@@ -33,6 +33,18 @@ function toQueryString(filters: SellerOrdersFilterRequest): string {
         params.set("status", filters.status);
     }
 
+    if (typeof filters.search === "string" && filters.search.trim().length > 0) {
+        params.set("search", filters.search.trim());
+    }
+
+    if (typeof filters.placedFrom === "string" && filters.placedFrom.trim().length > 0) {
+        params.set("placedFrom", filters.placedFrom);
+    }
+
+    if (typeof filters.placedTo === "string" && filters.placedTo.trim().length > 0) {
+        params.set("placedTo", filters.placedTo);
+    }
+
     return params.toString();
 }
 

@@ -40,6 +40,9 @@ export class SellerOrdersController {
   @ApiAuthSchemes()
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'placedFrom', required: false, type: String })
+  @ApiQuery({ name: 'placedTo', required: false, type: String })
   @ApiQuery({
     name: 'status',
     required: false,

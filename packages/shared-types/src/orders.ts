@@ -57,12 +57,16 @@ export interface CheckoutOrdersResponse {
 export interface SellerOrdersFilterRequest {
     page?: number;
     limit?: number;
+    search?: string;
+    placedFrom?: string;
+    placedTo?: string;
     status?: OrderStatus;
 }
 
 export interface SellerOrderItem {
     id: UUID;
     orderNumber: string;
+    customerName: string;
     userId: UUID;
     shopId: UUID;
     shippingAddressId: UUID;

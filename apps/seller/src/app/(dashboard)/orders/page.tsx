@@ -1,38 +1,37 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { OrdersFilters } from "./_components/orders-filters";
-import { OrdersTable } from "./_components/orders-table";
-import type {
-    OrderStatus,
-    SellerOrdersFilterRequest,
-    SellerOrdersListResponse,
-} from "@repo/shared-types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import type { OrderStatus, SellerOrderItem, SellerOrdersFilterRequest } from "@repo/shared-types";
+import { Button } from "@/components/ui";
 import { isApiRequestError } from "@/services/http-client";
 import { getSellerOrders } from "@/services/orders-service";
-import type { OrdersFilterValues, OrdersStatusOption } from "./types";
+import { OrdersFilters } from "./_components/orders-filters";
+import { OrdersTable } from "./_components/orders-table";
 
-const statusOptions: OrdersStatusOption[] = [
-    { value: "all", label: "Tất cả trạng thái" },
-    { value: "PENDING_PAYMENT", label: "Chờ thanh toán" },
-    { value: "PAID", label: "Đã thanh toán" },
-    { value: "PROCESSING", label: "Đang xử lý" },
-    { value: "SHIPPED", label: "Đang giao" },
-    { value: "DELIVERED", label: "Hoàn tất" },
-    { value: "CANCELLED", label: "Đã hủy" },
-];
+const DEFAULT_PAGE_SIZE = 10;
 
-const initialFilterValues: OrdersFilterValues = {
-    status: "all",
-};
+function parseMoney(value: string): number {
+    const amount = Number(value);
+
+    if (Number.isNaN(amount)) {
+        return 0;
+    }
+
+    return amount;
+}
 
 export default function OrdersPage() {
-    const [filterValues, setFilterValues] = useState<OrdersFilterValues>(initialFilterValues);
-    const [appliedFilterValues, setAppliedFilterValues] =
-        useState<OrdersFilterValues>(initialFilterValues);
+    const router = useRouter();
+    const [orders, setOrders] = useState<SellerOrderItem[]>([]);
+    const [keyword, setKeyword] = useState("");
+    const [placedFrom, setPlacedFrom] = useState("");
+    const [placedTo, setPlacedTo] = useState("");
+    const [statusFilter, setStatusFilter] = useState<OrderStatus | "ALL">("ALL");
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
-    const [ordersResponse, setOrdersResponse] = useState<SellerOrdersListResponse | null>(null);
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -48,7 +47,7 @@ export default function OrdersPage() {
                 return;
             }
 
-            setPageSize(10);
+            setPageSize(DEFAULT_PAGE_SIZE);
         };
 
         updatePageSize();
@@ -59,84 +58,108 @@ export default function OrdersPage() {
         };
     }, []);
 
-    useEffect(() => {
-        let isMounted = true;
+    const fetchOrders = useCallback(async () => {
+        setIsLoading(true);
 
-        const fetchOrders = async () => {
-            setIsLoading(true);
+        try {
+            const filters: SellerOrdersFilterRequest = {
+                page: currentPage,
+                limit: pageSize,
+                search: keyword.trim() || undefined,
+                placedFrom: placedFrom || undefined,
+                placedTo: placedTo || undefined,
+                status: statusFilter === "ALL" ? undefined : statusFilter,
+            };
 
-            try {
-                const filters: SellerOrdersFilterRequest = {
-                    page: currentPage,
-                    limit: pageSize,
-                };
-
-                if (appliedFilterValues.status !== "all") {
-                    filters.status = appliedFilterValues.status;
-                }
-
-                const response = await getSellerOrders(filters);
-
-                if (!isMounted) {
-                    return;
-                }
-
-                setOrdersResponse(response);
-                setErrorMessage(null);
-            } catch (error) {
-                if (!isMounted) {
-                    return;
-                }
-
-                if (isApiRequestError(error)) {
-                    setErrorMessage(error.message);
-                } else {
-                    setErrorMessage("Không thể tải danh sách đơn hàng. Vui lòng thử lại.");
-                }
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
+            const response = await getSellerOrders(filters);
+            setOrders(response.data);
+            setTotalItems(response.meta.totalItems);
+            setTotalPages(Math.max(1, response.meta.totalPages));
+            setErrorMessage(null);
+        } catch (error) {
+            if (isApiRequestError(error)) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage("Không thể tải danh sách đơn hàng. Vui lòng thử lại.");
             }
-        };
-
-        void fetchOrders();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [appliedFilterValues.status, currentPage, pageSize]);
-
-    const totalPages = useMemo(() => {
-        return Math.max(1, ordersResponse?.meta.totalPages ?? 1);
-    }, [ordersResponse?.meta.totalPages]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [currentPage, keyword, pageSize, placedFrom, placedTo, statusFilter]);
 
     useEffect(() => {
-        setCurrentPage((prev) => Math.min(prev, totalPages));
+        void fetchOrders();
+    }, [fetchOrders]);
+
+    useEffect(() => {
+        setCurrentPage((previousPage) => Math.min(previousPage, totalPages));
     }, [totalPages]);
 
-    const handleApplyFilters = () => {
-        setAppliedFilterValues(filterValues);
-        setCurrentPage(1);
-    };
+    const pendingSettlementCount = useMemo(
+        () => orders.filter((order) => order.settlementStatus === "PENDING").length,
+        [orders],
+    );
 
-    const handleResetFilters = () => {
-        setFilterValues(initialFilterValues);
-        setAppliedFilterValues(initialFilterValues);
-        setCurrentPage(1);
+    const currentPageTotalAmount = useMemo(
+        () => orders.reduce((sum, order) => sum + parseMoney(order.totalAmount), 0),
+        [orders],
+    );
+
+    const openDetailPage = (orderId: string) => {
+        router.push(`/orders/${orderId}`);
     };
 
     return (
-        <section className="mx-auto grid w-full max-w-7xl gap-6 pb-10">
+        <section className="mx-auto grid w-full max-w-7xl gap-4 pb-10">
+            <section className="grid gap-3 md:grid-cols-3">
+                <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Tổng đơn hàng
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-slate-900">{totalItems}</p>
+                </div>
+
+                <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Tổng tiền trang hiện tại
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-slate-900">
+                        {currentPageTotalAmount.toLocaleString("vi-VN")}đ
+                    </p>
+                </div>
+
+                <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Chờ đối soát trang hiện tại
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-slate-900">
+                        {pendingSettlementCount}
+                    </p>
+                </div>
+            </section>
+
             <OrdersFilters
-                values={filterValues}
-                statusOptions={statusOptions}
+                keyword={keyword}
+                placedFrom={placedFrom}
+                placedTo={placedTo}
+                status={statusFilter}
                 isDisabled={isLoading}
-                onStatusChange={(value) =>
-                    setFilterValues((prev) => ({ ...prev, status: value as OrderStatus | "all" }))
-                }
-                onApplyFilters={handleApplyFilters}
-                onResetFilters={handleResetFilters}
+                onKeywordChange={(value) => {
+                    setKeyword(value);
+                    setCurrentPage(1);
+                }}
+                onPlacedFromChange={(value) => {
+                    setPlacedFrom(value);
+                    setCurrentPage(1);
+                }}
+                onPlacedToChange={(value) => {
+                    setPlacedTo(value);
+                    setCurrentPage(1);
+                }}
+                onStatusChange={(value) => {
+                    setStatusFilter(value);
+                    setCurrentPage(1);
+                }}
             />
 
             {errorMessage ? (
@@ -145,15 +168,29 @@ export default function OrdersPage() {
                 </section>
             ) : null}
 
-            <OrdersTable
-                rows={ordersResponse?.data ?? []}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                pageSize={pageSize}
-                totalOrdersCount={ordersResponse?.meta.totalItems ?? 0}
-                isLoading={isLoading}
-                onPageChange={setCurrentPage}
-            />
+            <OrdersTable rows={orders} isLoading={isLoading} onRowClick={openDetailPage} />
+
+            <section className="flex items-center justify-end gap-2">
+                <Button
+                    type="button"
+                    variant="outline"
+                    disabled={currentPage <= 1 || isLoading}
+                    onClick={() => setCurrentPage((previous) => Math.max(1, previous - 1))}
+                >
+                    Trước
+                </Button>
+                <span className="text-sm text-slate-600">
+                    Trang {currentPage}/{totalPages}
+                </span>
+                <Button
+                    type="button"
+                    variant="outline"
+                    disabled={currentPage >= totalPages || isLoading}
+                    onClick={() => setCurrentPage((previous) => Math.min(totalPages, previous + 1))}
+                >
+                    Sau
+                </Button>
+            </section>
         </section>
     );
 }
