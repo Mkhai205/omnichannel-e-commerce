@@ -106,7 +106,6 @@ export class AdminCatalogService {
       description: product.description,
       imageKey: product.imageKey,
       imageUrl: resolveCatalogImageUrl(this.storageService, product.imageKey),
-      omnichannelSyncStatus: this.toStringRecord(product.omnichannelSyncStatus),
       status: product.status,
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),

@@ -141,7 +141,6 @@ export const ProductScalarFieldEnum = {
   name: 'name',
   description: 'description',
   imageKey: 'imageKey',
-  omnichannelSyncStatus: 'omnichannelSyncStatus',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

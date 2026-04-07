@@ -30,7 +30,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.smartphones,
             name: randomVietnameseProductName("smartphones"),
             description: randomVietnameseProductDescription(),
-            omnichannelSyncStatus: { tiktok: "pending", lazada: "success" },
             status: "ACTIVE",
         },
         {
@@ -39,7 +38,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.smartphones,
             name: randomVietnameseProductName("smartphones"),
             description: randomVietnameseProductDescription(),
-            omnichannelSyncStatus: { tiktok: "success", shopee: "pending" },
             status: "ACTIVE",
         },
         {
@@ -48,7 +46,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.laptops,
             name: randomVietnameseProductName("laptops"),
             description: randomVietnameseProductDescription(),
-            omnichannelSyncStatus: { tiktok: "disabled" },
             status: "ACTIVE",
         },
         {
@@ -57,7 +54,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.menFashion,
             name: randomVietnameseProductName("menFashion"),
             description: randomVietnameseProductDescription(),
-            omnichannelSyncStatus: {},
             status: "DRAFT",
         },
         {
@@ -66,7 +62,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.kitchen,
             name: randomVietnameseProductName("kitchen"),
             description: randomVietnameseProductDescription(),
-            omnichannelSyncStatus: { lazada: "pending" },
             status: "ACTIVE",
         },
         {
@@ -75,7 +70,6 @@ function buildFixedCatalog(): {
             categoryId: SEED_IDS.categories.electronics,
             name: randomVietnameseProductName("electronics"),
             description: randomVietnameseProductDescription(),
-            omnichannelSyncStatus: {},
             status: "HIDDEN",
         },
     ];
@@ -217,10 +211,6 @@ function buildExtraCatalog(): {
             categoryId,
             name: randomVietnameseProductName(categoryKey),
             description: randomVietnameseProductDescription(),
-            omnichannelSyncStatus: {
-                tiktok: faker.helpers.arrayElement(["pending", "success", "failed"]),
-                lazada: faker.helpers.arrayElement(["pending", "success", "disabled"]),
-            },
             status: productStatus,
         });
 

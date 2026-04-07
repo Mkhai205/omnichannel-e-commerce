@@ -1,12 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsIn,
-  IsObject,
-  IsOptional,
-  IsString,
-  IsUUID,
-  MaxLength,
-} from 'class-validator';
+import { IsIn, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 import type { UpdateProductRequest } from '@repo/shared-types';
 
 export class UpdateProductDto implements UpdateProductRequest {
@@ -40,13 +33,4 @@ export class UpdateProductDto implements UpdateProductRequest {
   @IsOptional()
   @IsIn(['DRAFT', 'ACTIVE', 'HIDDEN'])
   status?: 'DRAFT' | 'ACTIVE' | 'HIDDEN';
-
-  @ApiPropertyOptional({
-    type: 'object',
-    additionalProperties: { type: 'string' },
-    example: { tiktok: 'failed' },
-  })
-  @IsOptional()
-  @IsObject()
-  omnichannelSyncStatus?: Record<string, string>;
 }

@@ -330,8 +330,6 @@ export default function ProductDetailPage() {
         }
     };
 
-    const title = isCreateMode ? "Thêm sản phẩm mới" : "Chi tiết sản phẩm";
-
     return (
         <section className="mx-auto grid w-full max-w-7xl gap-4 pb-10">
             {errorMessage ? (

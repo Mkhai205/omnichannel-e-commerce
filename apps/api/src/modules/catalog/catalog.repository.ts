@@ -32,7 +32,6 @@ const PRODUCT_SELECT = {
   name: true,
   description: true,
   imageKey: true,
-  omnichannelSyncStatus: true,
   status: true,
   createdAt: true,
   updatedAt: true,

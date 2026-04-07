@@ -115,7 +115,6 @@ export class SellerCatalogService {
       description: payload.description?.trim() || null,
       imageKey: this.normalizeImageKey(payload.imageKey),
       status: payload.status ?? 'DRAFT',
-      omnichannelSyncStatus: payload.omnichannelSyncStatus ?? {},
     });
 
     return this.toProductItem(product);
@@ -144,8 +143,7 @@ export class SellerCatalogService {
       payload.name !== undefined ||
       payload.description !== undefined ||
       payload.imageKey !== undefined ||
-      payload.status !== undefined ||
-      payload.omnichannelSyncStatus !== undefined;
+      payload.status !== undefined;
 
     if (!hasPayload) {
       throw new BadRequestException('At least one field must be provided');
@@ -161,9 +159,6 @@ export class SellerCatalogService {
         ? { imageKey: this.normalizeImageKey(payload.imageKey) }
         : {}),
       ...(payload.status ? { status: payload.status } : {}),
-      ...(payload.omnichannelSyncStatus
-        ? { omnichannelSyncStatus: payload.omnichannelSyncStatus }
-        : {}),
     });
 
     return this.toProductItem(updated);
@@ -350,7 +345,6 @@ export class SellerCatalogService {
       description: product.description,
       imageKey: product.imageKey,
       imageUrl: resolveCatalogImageUrl(this.storageService, product.imageKey),
-      omnichannelSyncStatus: this.toStringRecord(product.omnichannelSyncStatus),
       status: product.status,
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),

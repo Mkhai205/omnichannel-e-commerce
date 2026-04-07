@@ -8,8 +8,6 @@ export type InventoryStockStatus = "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
 
 export type VariantAttributes = Record<string, string>;
 
-export type OmnichannelSyncStatus = Record<string, string>;
-
 export interface CategoryItem {
     id: UUID;
     parentId?: UUID | null;
@@ -42,7 +40,6 @@ export interface ProductItem {
     description?: string | null;
     imageKey?: string | null;
     imageUrl?: string | null;
-    omnichannelSyncStatus: OmnichannelSyncStatus;
     status: ProductStatus;
     createdAt: string;
     updatedAt: string;
@@ -87,7 +84,6 @@ export interface CreateProductRequest {
     description?: string;
     imageKey?: string | null;
     status?: ProductStatus;
-    omnichannelSyncStatus?: OmnichannelSyncStatus;
 }
 
 export interface UpdateProductRequest {
@@ -96,7 +92,6 @@ export interface UpdateProductRequest {
     description?: string;
     imageKey?: string | null;
     status?: ProductStatus;
-    omnichannelSyncStatus?: OmnichannelSyncStatus;
 }
 
 export interface UpdateProductStatusRequest {
