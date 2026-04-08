@@ -3,12 +3,25 @@
 :root {
     --background: #ffffff;
     --foreground: #171717;
+    --gray-50: #f2f2f2;
+    --gray-100: #e5e5e5;
+    --gray-200: #cccccc;
+    --gray-300: #b3b3b3;
+    --gray-400: #999999;
+    --gray-500: #808080;
+    --gray-600: #666666;
+    --gray-700: #4d4d4d;
+    --gray-800: #333333;
+    --gray-900: #1a1a1a;
     --card: #ffffff;
     --card-foreground: #171717;
     --popover: #ffffff;
     --popover-foreground: #171717;
     --primary: #1d4ed8;
     --primary-foreground: #ffffff;
+    --success: #00b207;
+    --success-dark: #2c742f;
+    --success-foreground: #ffffff;
     --secondary: #f3f4f6;
     --secondary-foreground: #111827;
     --muted: #f3f4f6;
@@ -32,8 +45,21 @@
     --color-card-foreground: var(--card-foreground);
     --color-popover: var(--popover);
     --color-popover-foreground: var(--popover-foreground);
+    --color-gray-50: var(--gray-50);
+    --color-gray-100: var(--gray-100);
+    --color-gray-200: var(--gray-200);
+    --color-gray-300: var(--gray-300);
+    --color-gray-400: var(--gray-400);
+    --color-gray-500: var(--gray-500);
+    --color-gray-600: var(--gray-600);
+    --color-gray-700: var(--gray-700);
+    --color-gray-800: var(--gray-800);
+    --color-gray-900: var(--gray-900);
     --color-primary: var(--primary);
     --color-primary-foreground: var(--primary-foreground);
+    --color-success: var(--success);
+    --color-success-dark: var(--success-dark);
+    --color-success-foreground: var(--success-foreground);
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
     --color-muted: var(--muted);
@@ -55,6 +81,14 @@
     :root {
         --background: #0a0a0a;
         --foreground: #ededed;
+        --card: #141414;
+        --card-foreground: #ededed;
+        --popover: #141414;
+        --popover-foreground: #ededed;
+        --border: #2f2f2f;
+        --input: #2f2f2f;
+        --muted: #1f1f1f;
+        --muted-foreground: #9f9f9f;
     }
 }
 
