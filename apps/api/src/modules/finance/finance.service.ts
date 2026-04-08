@@ -10,7 +10,7 @@ import type {
   SellerWalletSummaryResponse,
 } from '@repo/shared-types';
 import { FinanceRepository } from './finance.repository';
-import { SETTLEMENT_CONFIG_KEY } from 'src/core/config/env.constant';
+import { SETTLEMENT_CONFIG_KEY } from '../../core/config/env.constant';
 import type {
   SellerPaymentOrderRecord,
   SellerSettlementCashflowRecord,

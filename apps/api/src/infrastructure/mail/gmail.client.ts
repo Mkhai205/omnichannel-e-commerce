@@ -12,7 +12,7 @@ import type {
   SendMailParams,
   SendMailResult,
 } from './mail.types';
-import { MAIL_CONFIG_KEY } from 'src/core/config/env.constant';
+import { MAIL_CONFIG_KEY } from '../../core/config/env.constant';
 
 interface MailSendInfo {
   messageId: string;

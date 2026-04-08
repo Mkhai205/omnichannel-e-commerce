@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { AUTH_COOKIE_CONFIG_KEY } from 'src/core/config/env.constant';
+import { AUTH_COOKIE_CONFIG_KEY } from '../../../core/config/env.constant';
 
 interface TokenCookieOptions {
   secure: boolean;

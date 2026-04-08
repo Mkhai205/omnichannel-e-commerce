@@ -9,7 +9,7 @@ import { randomUUID } from 'crypto';
 import {
   AUTH_COOKIE_CONFIG_KEY,
   FRONTEND_REDIRECT_URI_CONFIG_KEY,
-} from 'src/core/config/env.constant';
+} from '../../core/config/env.constant';
 import {
   GOOGLE_LOGIN_SOURCES,
   type GoogleLoginSource,

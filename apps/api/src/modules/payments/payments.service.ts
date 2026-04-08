@@ -24,7 +24,7 @@ import {
 } from 'vnpay';
 import { FinanceService } from '../finance/finance.service';
 import { PaymentsRepository } from './payments.repository';
-import { VNPAY_CONFIG_KEY } from 'src/core/config/env.constant';
+import { VNPAY_CONFIG_KEY } from '../../core/config/env.constant';
 
 const IPN_SUCCESS: VnpayIpnResponse = {
   RspCode: '00',

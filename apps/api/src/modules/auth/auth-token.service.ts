@@ -9,7 +9,7 @@ import type { JwtPayload } from './types/jwt-payload.type';
 import {
   AUTH_COOKIE_CONFIG_KEY,
   JWT_CONFIG_KEY,
-} from 'src/core/config/env.constant';
+} from '../../core/config/env.constant';
 
 interface RequestMeta {
   ipAddress?: string;

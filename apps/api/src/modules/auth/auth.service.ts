@@ -25,7 +25,7 @@ import {
   type GoogleLoginSource,
 } from './dto/google-login-query.dto';
 import { REGISTRATION_ROLES } from './dto/register.dto';
-import { FRONTEND_REDIRECT_URI_CONFIG_KEY } from 'src/core/config/env.constant';
+import { FRONTEND_REDIRECT_URI_CONFIG_KEY } from '../../core/config/env.constant';
 
 interface RequestMeta {
   ipAddress?: string;
