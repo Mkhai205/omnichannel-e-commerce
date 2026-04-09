@@ -27,10 +27,10 @@ const FOOTER_COLUMNS = [
 ];
 
 const PAYMENT_METHODS = [
-    { name: "Apple Pay", src: "/ApplePay.svg", width: 33, height: 14 },
-    { name: "Visa", src: "/visa-logo.svg", width: 32, height: 11 },
-    { name: "Discover", src: "/discover.svg", width: 40, height: 19 },
-    { name: "Mastercard", src: "/mastercard.svg", width: 30, height: 18 },
+    { name: "Apple Pay", src: "/icon/ApplePay.svg", width: 33, height: 14 },
+    { name: "Visa", src: "/icon/visa-logo.svg", width: 32, height: 11 },
+    { name: "Discover", src: "/icon/discover.svg", width: 40, height: 19 },
+    { name: "Mastercard", src: "/icon/mastercard.svg", width: 30, height: 18 },
 ] as const;
 
 export function SiteFooter() {
