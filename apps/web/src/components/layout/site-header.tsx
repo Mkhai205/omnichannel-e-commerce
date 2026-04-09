@@ -47,7 +47,7 @@ export function SiteHeader() {
     return (
         <header>
             <div className="border-b border-gray-100 bg-white">
-                <div className="mx-auto grid w-full max-w-425 grid-cols-1 items-center gap-5 px-4 py-3 md:grid-cols-[auto_1fr_auto] md:px-6">
+                <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-5 px-4 py-3 md:grid-cols-[auto_1fr_auto] md:px-6">
                     <BrandLogo />
 
                     <form
@@ -119,16 +119,16 @@ export function SiteHeader() {
                 </div>
             </div>
 
-            <div className="border-b border-gray-100 bg-white">
-                <div className="mx-auto flex w-full max-w-425 items-center justify-between px-4 py-4 md:px-6">
-                    <nav className="hidden items-center gap-8 text-sm text-gray-700 md:flex">
+            <div className="border-b border-gray-100 bg-neutral-800 text-white">
+                <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-6">
+                    <nav className="hidden items-center gap-8 text-sm md:flex">
                         {NAV_ITEMS.map((item) => (
                             <Link key={item.label} href={item.href} className="hover:text-success">
                                 {item.label}
                             </Link>
                         ))}
                     </nav>
-                    <div className="inline-flex items-center gap-2 text-sm text-gray-700">
+                    <div className="inline-flex items-center gap-2 text-sm">
                         <PhoneCallIcon className="size-4" />
                         <span>(+84) 123 456 789</span>
                     </div>

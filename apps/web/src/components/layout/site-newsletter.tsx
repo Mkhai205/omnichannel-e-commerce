@@ -35,7 +35,7 @@ export function SiteNewsletter() {
 
     return (
         <section className="bg-gray-50">
-            <div className="mx-auto grid w-full max-w-425 gap-6 px-4 py-10 md:grid-cols-[1fr_auto] md:items-center md:px-6">
+            <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-10 md:grid-cols-[1fr_auto] md:items-center md:px-6">
                 <div>
                     <h3 className="text-3xl font-semibold text-gray-900">Đăng ký nhận bản tin</h3>
                     <p className="mt-1 max-w-xl text-sm text-gray-500">

@@ -36,7 +36,7 @@ const PAYMENT_METHODS = [
 export function SiteFooter() {
     return (
         <footer className="bg-gray-900">
-            <div className="mx-auto grid w-full max-w-425 gap-10 px-4 py-14 md:grid-cols-[1.2fr_2fr] md:px-6">
+            <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 md:grid-cols-[1.2fr_2fr] md:px-6">
                 <div>
                     <BrandLogo dark />
                     <p className="mt-4 max-w-sm text-sm text-gray-500">
@@ -73,7 +73,7 @@ export function SiteFooter() {
             </div>
 
             <div className="border-t border-gray-800">
-                <div className="mx-auto flex w-full max-w-425 flex-col items-center justify-between gap-3 px-4 py-6 text-sm text-gray-500 sm:flex-row md:px-6">
+                <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-sm text-gray-500 sm:flex-row md:px-6">
                     <p>Ecommerce © 2026. All Rights Reserved.</p>
                     <div className="inline-flex items-center gap-2 text-xs text-gray-400">
                         {PAYMENT_METHODS.map((method) => (
