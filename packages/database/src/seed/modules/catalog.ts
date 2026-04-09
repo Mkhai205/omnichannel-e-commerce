@@ -492,12 +492,12 @@ function buildProductReviews(products: Prisma.ProductCreateManyInput[]): Product
     const reviews: ProductReviewSeedInput[] = [];
 
     for (const product of products) {
-        if (!product.id || product.status !== "ACTIVE") {
+        if (!product.id) {
             continue;
         }
 
         const reviewerPool = faker.helpers.shuffle([...REVIEWER_USER_IDS]);
-        const reviewCount = faker.number.int({ min: 0, max: reviewerPool.length });
+        const reviewCount = faker.number.int({ min: 1, max: reviewerPool.length });
 
         for (let index = 0; index < reviewCount; index += 1) {
             const userId = reviewerPool[index];
