@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { BrandLogo } from "@/components/layout/brand-logo";
 
 const FOOTER_COLUMNS = [
@@ -24,6 +25,13 @@ const FOOTER_COLUMNS = [
         ],
     },
 ];
+
+const PAYMENT_METHODS = [
+    { name: "Apple Pay", src: "/ApplePay.svg", width: 33, height: 14 },
+    { name: "Visa", src: "/visa-logo.svg", width: 32, height: 11 },
+    { name: "Discover", src: "/discover.svg", width: 40, height: 19 },
+    { name: "Mastercard", src: "/mastercard.svg", width: 30, height: 18 },
+] as const;
 
 export function SiteFooter() {
     return (
@@ -68,10 +76,20 @@ export function SiteFooter() {
                 <div className="mx-auto flex w-full max-w-425 flex-col items-center justify-between gap-3 px-4 py-6 text-sm text-gray-500 sm:flex-row md:px-6">
                     <p>Ecommerce © 2026. All Rights Reserved.</p>
                     <div className="inline-flex items-center gap-2 text-xs text-gray-400">
-                        <span className="rounded border border-gray-700 px-2 py-1">Apple Pay</span>
-                        <span className="rounded border border-gray-700 px-2 py-1">Visa</span>
-                        <span className="rounded border border-gray-700 px-2 py-1">Discover</span>
-                        <span className="rounded border border-gray-700 px-2 py-1">Mastercard</span>
+                        {PAYMENT_METHODS.map((method) => (
+                            <span
+                                key={method.name}
+                                className="inline-flex h-8 min-w-12 items-center justify-center rounded border border-gray-700 bg-gray-800/40 px-2"
+                                aria-label={method.name}
+                            >
+                                <Image
+                                    src={method.src}
+                                    alt={method.name}
+                                    width={method.width}
+                                    height={method.height}
+                                />
+                            </span>
+                        ))}
                     </div>
                 </div>
             </div>
