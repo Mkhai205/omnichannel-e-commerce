@@ -41,6 +41,12 @@ const PRODUCT_SELECT = {
   },
 } satisfies Prisma.ProductSelect;
 
+const PRODUCT_SUGGESTION_CANDIDATE_SELECT = {
+  id: true,
+  categoryId: true,
+  createdAt: true,
+} satisfies Prisma.ProductSelect;
+
 const SELLER_SHOP_SELECT = {
   id: true,
   userId: true,
@@ -58,6 +64,10 @@ export type ProductVariantRecord = Prisma.ProductVariantGetPayload<{
   select: typeof PRODUCT_VARIANT_SELECT;
 }>;
 
+export type ProductSuggestionCandidateRecord = Prisma.ProductGetPayload<{
+  select: typeof PRODUCT_SUGGESTION_CANDIDATE_SELECT;
+}>;
+
 export interface CategoriesQueryInput {
   page: number;
   limit: number;
@@ -73,6 +83,13 @@ export interface ProductsQueryInput {
   shopId?: string;
   status?: ProductStatus;
 }
+
+type ProductsWhereFilterInput = {
+  search?: string;
+  categoryId?: string;
+  shopId?: string;
+  status?: ProductStatus;
+};
 
 @Injectable()
 export class CatalogRepository {
@@ -117,6 +134,38 @@ export class CatalogRepository {
       skip: (input.page - 1) * input.limit,
       take: input.limit,
       orderBy: { createdAt: 'desc' },
+      select: PRODUCT_SELECT,
+    });
+  }
+
+  findPublicProductSuggestionCandidates(
+    input: Omit<ProductsQueryInput, 'page' | 'limit'> & {
+      take: number;
+    },
+  ) {
+    return this.prisma.product.findMany({
+      where: this.buildProductsWhere({
+        ...input,
+        status: 'ACTIVE',
+      }),
+      take: input.take,
+      orderBy: { createdAt: 'desc' },
+      select: PRODUCT_SUGGESTION_CANDIDATE_SELECT,
+    });
+  }
+
+  async findPublicProductsByIds(productIds: string[]) {
+    if (productIds.length === 0) {
+      return [];
+    }
+
+    return this.prisma.product.findMany({
+      where: {
+        id: {
+          in: productIds,
+        },
+        status: 'ACTIVE',
+      },
       select: PRODUCT_SELECT,
     });
   }
@@ -307,7 +356,7 @@ export class CatalogRepository {
   }
 
   private buildProductsWhere(
-    input: ProductsQueryInput,
+    input: ProductsWhereFilterInput,
   ): Prisma.ProductWhereInput {
     const where: Prisma.ProductWhereInput = {};
 

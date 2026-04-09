@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightIcon, Loader2Icon } from "lucide-react";
@@ -9,12 +9,15 @@ import {
     mapProductToTodaySuggestionCardItem,
     type TodaySuggestionCardItem,
 } from "@/lib/home-today-suggestions";
-import { getTodaySuggestionProductsPage } from "@/services/catalog-service";
+import { getTodaySuggestionProductsChunk } from "@/services/catalog-service";
+
+const AUTO_LOAD_LIMIT = 100;
 
 type HomeTodaySuggestionsClientProps = {
     initialItems: TodaySuggestionCardItem[];
-    initialPage: number;
-    initialTotalPages: number;
+    initialNextCursor: string | null;
+    initialHasMore: boolean;
+    sessionKey: string;
     pageSize: number;
 };
 
@@ -55,31 +58,36 @@ function HomeTodaySuggestionProductCard({ item }: { item: TodaySuggestionCardIte
 
 export function HomeTodaySuggestionsClient({
     initialItems,
-    initialPage,
-    initialTotalPages,
+    initialNextCursor,
+    initialHasMore,
+    sessionKey,
     pageSize,
 }: HomeTodaySuggestionsClientProps) {
     const [items, setItems] = useState(initialItems);
-    const [currentPage, setCurrentPage] = useState(initialPage);
-    const [totalPages, setTotalPages] = useState(initialTotalPages);
+    const [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor);
+    const [hasMore, setHasMore] = useState(initialHasMore);
     const [isLoading, setIsLoading] = useState(false);
     const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+    const loadMoreTriggerRef = useRef<HTMLDivElement | null>(null);
+    const isFetchingRef = useRef(false);
+    const shouldUseManualLoad = items.length > AUTO_LOAD_LIMIT;
 
-    const hasMore = useMemo(() => currentPage < totalPages, [currentPage, totalPages]);
-
-    const handleLoadMore = async () => {
-        if (isLoading || !hasMore) {
+    const handleLoadMore = useCallback(async () => {
+        if (isFetchingRef.current || !hasMore || !nextCursor) {
             return;
         }
 
+        isFetchingRef.current = true;
         setIsLoading(true);
         setLoadMoreError(null);
 
-        const nextPage = currentPage + 1;
-
         try {
-            const pageResult = await getTodaySuggestionProductsPage(nextPage, pageSize);
-            const nextItems = pageResult.items.map(mapProductToTodaySuggestionCardItem);
+            const chunk = await getTodaySuggestionProductsChunk({
+                sessionKey,
+                cursor: nextCursor,
+                limit: pageSize,
+            });
+            const nextItems = chunk.items.map(mapProductToTodaySuggestionCardItem);
 
             setItems((previousItems) => {
                 const existedIds = new Set(previousItems.map((item) => item.id));
@@ -96,18 +104,48 @@ export function HomeTodaySuggestionsClient({
 
                 return mergedItems;
             });
-
-            const resolvedPage = pageResult.meta?.page ?? nextPage;
-            const resolvedTotalPages = pageResult.meta?.totalPages ?? totalPages;
-
-            setCurrentPage(resolvedPage);
-            setTotalPages(resolvedTotalPages);
+            setHasMore(chunk.hasMore);
+            setNextCursor(chunk.nextCursor);
         } catch {
             setLoadMoreError("Không thể tải thêm sản phẩm. Vui lòng thử lại.");
         } finally {
+            isFetchingRef.current = false;
             setIsLoading(false);
         }
-    };
+    }, [hasMore, nextCursor, pageSize, sessionKey]);
+
+    useEffect(() => {
+        if (shouldUseManualLoad || !hasMore || !nextCursor) {
+            return;
+        }
+
+        const triggerNode = loadMoreTriggerRef.current;
+
+        if (!triggerNode) {
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const shouldLoad = entries.some((entry) => entry.isIntersecting);
+
+                if (shouldLoad) {
+                    void handleLoadMore();
+                }
+            },
+            {
+                root: null,
+                rootMargin: "220px 0px",
+                threshold: 0.1,
+            },
+        );
+
+        observer.observe(triggerNode);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [handleLoadMore, hasMore, nextCursor, shouldUseManualLoad]);
 
     return (
         <section className="mx-auto w-full max-w-7xl px-4 pb-12 md:px-6">
@@ -135,25 +173,44 @@ export function HomeTodaySuggestionsClient({
                 ))}
             </div>
 
-            {hasMore ? (
-                <div className="mt-6 flex items-center justify-center">
-                    <Button
-                        type="button"
-                        size="lg"
-                        onClick={handleLoadMore}
-                        disabled={isLoading}
-                        className="min-w-36"
+            {hasMore && nextCursor ? (
+                shouldUseManualLoad ? (
+                    <div className="mt-6 flex items-center justify-center">
+                        <Button
+                            type="button"
+                            size="lg"
+                            onClick={() => {
+                                void handleLoadMore();
+                            }}
+                            disabled={isLoading}
+                            className="min-w-40"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <Loader2Icon className="size-4 animate-spin" />
+                                    Đang tải thêm sản phẩm...
+                                </>
+                            ) : (
+                                "Xem thêm sản phẩm"
+                            )}
+                        </Button>
+                    </div>
+                ) : (
+                    <div
+                        ref={loadMoreTriggerRef}
+                        className="mt-6 flex items-center justify-center py-3 text-sm text-gray-500"
+                        aria-live="polite"
                     >
                         {isLoading ? (
                             <>
                                 <Loader2Icon className="size-4 animate-spin" />
-                                Đang tải
+                                <span className="ml-2">Đang tải thêm sản phẩm...</span>
                             </>
                         ) : (
-                            "Xem thêm"
+                            <span>Cuộn xuống để tải thêm sản phẩm</span>
                         )}
-                    </Button>
-                </div>
+                    </div>
+                )
             ) : null}
 
             {loadMoreError ? (

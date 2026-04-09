@@ -97,7 +97,7 @@ export function HomeHeroCarousel() {
     return (
         <section className="mx-auto w-full max-w-7xl px-4 pt-8 pb-6 md:px-6 md:pt-10">
             <Carousel className="w-full" opts={{ loop: true }} setApi={setApi}>
-                <CarouselContent className="-ml-0">
+                <CarouselContent className="ml-0">
                     {HERO_SLIDES.map((slide) => (
                         <CarouselItem key={slide.src} className="pl-0">
                             <Link href="/shop" className="group block">
@@ -108,7 +108,7 @@ export function HomeHeroCarousel() {
                                         width={1600}
                                         height={520}
                                         priority={slide.src === "/hero/hero0.webp"}
-                                        className="h-[190px] w-full object-cover transition-transform duration-500 group-hover:scale-[1.01] sm:h-[260px] lg:h-[360px]"
+                                        className="h-47 w-full object-cover transition-transform duration-500 group-hover:scale-[1.01] sm:h-65 lg:h-90"
                                     />
                                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/45 to-transparent" />
                                     <div className="absolute top-3 left-3 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold text-gray-800">

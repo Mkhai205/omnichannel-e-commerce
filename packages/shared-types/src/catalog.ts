@@ -54,6 +54,21 @@ export interface PublicProductsFilterRequest {
     shopId?: UUID;
 }
 
+export interface PublicProductSuggestionsRequest {
+    limit?: number;
+    cursor?: string;
+    sessionKey: string;
+    search?: string;
+    categoryId?: UUID;
+    shopId?: UUID;
+}
+
+export interface PublicProductSuggestionsResponse {
+    items: ProductItem[];
+    nextCursor?: string | null;
+    hasMore: boolean;
+}
+
 export interface SellerProductsFilterRequest {
     page?: number;
     limit?: number;

@@ -4,6 +4,7 @@ import type {
   ApiResponse,
   CategoriesListResponse,
   ProductItem,
+  PublicProductSuggestionsResponse,
   PublicProductsListResponse,
 } from '@repo/shared-types';
 import { Public } from '../../core/decorators';
@@ -15,10 +16,12 @@ import {
 import { PublicCatalogService } from './public-catalog.service';
 import {
   CategoriesListDataSwaggerDto,
+  ProductSuggestionsDataSwaggerDto,
   ProductSwaggerDto,
   ProductsListDataSwaggerDto,
 } from './dto/catalog-swagger.dto';
 import { PublicCategoriesFilterDto } from './dto/public-categories-filter.dto';
+import { PublicProductSuggestionsFilterDto } from './dto/public-product-suggestions-filter.dto';
 import { PublicProductsFilterDto } from './dto/public-products-filter.dto';
 
 @ApiTags('Catalog')
@@ -76,6 +79,35 @@ export class CatalogController {
 
     return createSuccessResponse(response, {
       message: 'Public products list retrieved successfully',
+    });
+  }
+
+  @Public()
+  @Get('products/suggestions')
+  @ApiOperation({ summary: 'Get diversified public product suggestions' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'cursor', required: false, type: String })
+  @ApiQuery({ name: 'sessionKey', required: true, type: String })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'categoryId', required: false, type: String })
+  @ApiQuery({ name: 'shopId', required: false, type: String })
+  @ApiOkEnvelopeResponse(
+    ProductSuggestionsDataSwaggerDto,
+    'Public product suggestions retrieved successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid query parameters',
+    unauthorized: false,
+    notFound: false,
+  })
+  async getProductSuggestions(
+    @Query() filters: PublicProductSuggestionsFilterDto,
+  ): Promise<ApiResponse<PublicProductSuggestionsResponse>> {
+    const response =
+      await this.publicCatalogService.getProductSuggestions(filters);
+
+    return createSuccessResponse(response, {
+      message: 'Public product suggestions retrieved successfully',
     });
   }
 

@@ -149,6 +149,17 @@ export class ProductsListDataSwaggerDto {
   meta!: PaginationMetaSwaggerDto;
 }
 
+export class ProductSuggestionsDataSwaggerDto {
+  @ApiProperty({ type: [ProductSwaggerDto] })
+  items!: ProductSwaggerDto[];
+
+  @ApiPropertyOptional({ nullable: true })
+  nextCursor?: string | null;
+
+  @ApiProperty({ example: true })
+  hasMore!: boolean;
+}
+
 export class UploadCatalogImageResultSwaggerDto {
   @ApiProperty({ example: 'products' })
   bucketName!: string;
