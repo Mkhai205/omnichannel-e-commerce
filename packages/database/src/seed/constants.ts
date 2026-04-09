@@ -1,4 +1,5 @@
 export const DEFAULT_SEED_PASSWORD = "password";
+export const DEFAULT_SEED_ADMIN_WALLET_CODE = "SEED-MAIN";
 
 export const DEFAULT_SEED_VALUE = 20260401;
 export const DEFAULT_PRODUCTS_PER_CATEGORY = 2;
@@ -83,5 +84,28 @@ export const SEED_IDS = {
         pendingPayment: "00000000-0000-4000-8000-000000007001",
         paidA: "00000000-0000-4000-8000-000000007002",
         paidB: "00000000-0000-4000-8000-000000007003",
+    },
+    payments: {
+        pendingOrder: "00000000-0000-4000-8000-000000008001",
+        paidA: "00000000-0000-4000-8000-000000008002",
+        paidB: "00000000-0000-4000-8000-000000008003",
+    },
+    adminWallets: {
+        main: "00000000-0000-4000-8000-000000009001",
+    },
+    sellerWallets: {
+        approved: "00000000-0000-4000-8000-000000010001",
+        pending: "00000000-0000-4000-8000-000000010002",
+        rejected: "00000000-0000-4000-8000-000000010003",
+    },
+    adminWalletLedgers: {
+        paymentInflowA: "00000000-0000-4000-8000-000000011001",
+        paymentInflowB: "00000000-0000-4000-8000-000000011002",
+        sellerSettlementA: "00000000-0000-4000-8000-000000011003",
+        sellerSettlementB: "00000000-0000-4000-8000-000000011004",
+    },
+    sellerSettlements: {
+        paidA: "00000000-0000-4000-8000-000000012001",
+        paidB: "00000000-0000-4000-8000-000000012002",
     },
 } as const;

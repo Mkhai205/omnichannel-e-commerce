@@ -523,6 +523,7 @@ function buildProductReviews(products: Prisma.ProductCreateManyInput[]): Product
 
 async function refreshProductRatings(prisma: PrismaClient, productIds: string[]): Promise<void> {
     const uniqueProductIds = [...new Set(productIds)];
+    const ratingUpdateBatchSize = 100;
 
     if (uniqueProductIds.length === 0) {
         return;
@@ -545,23 +546,25 @@ async function refreshProductRatings(prisma: PrismaClient, productIds: string[])
 
     const ratingByProductId = new Map(groupedRatings.map((item) => [item.productId, item]));
 
-    await prisma.$transaction(
-        uniqueProductIds.map((productId) => {
+    for (let start = 0; start < uniqueProductIds.length; start += ratingUpdateBatchSize) {
+        const productIdsBatch = uniqueProductIds.slice(start, start + ratingUpdateBatchSize);
+
+        for (const productId of productIdsBatch) {
             const ratingAggregate = ratingByProductId.get(productId);
             const averageRating = Number(ratingAggregate?._avg.rating ?? 0);
             const normalizedAverage = Number.isFinite(averageRating)
                 ? Number(averageRating.toFixed(2))
                 : 0;
 
-            return prisma.product.update({
+            await prisma.product.update({
                 where: { id: productId },
                 data: {
                     ratingAverage: normalizedAverage.toFixed(2),
                     ratingCount: ratingAggregate?._count._all ?? 0,
                 },
             });
-        }),
-    );
+        }
+    }
 }
 
 export async function seedCatalog(

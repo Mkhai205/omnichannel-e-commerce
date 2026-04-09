@@ -1,121 +1,98 @@
-# Seed Data Guide
+# Hướng Dẫn Seed Dữ Liệu
 
-## Scope
+## Mục tiêu
 
-Current seed implementation supports 2 modes:
+Tài liệu này giúp bạn chọn đúng lệnh seed theo mục đích, hiểu rõ option, và tránh thao tác rủi ro.
 
-- `full`: clean database then seed full core fixtures
-- `catalog`: append category/product/variant data for load-testing without cleaning existing core fixtures
+## Lệnh nào dùng để làm gì
 
-Core seed data includes:
+Dùng các lệnh từ root monorepo:
 
-- users
-- shops
-- categories
-- products
-- product variants
-- inventory logs
-- addresses
-- carts
-- cart items
-- orders
-- order items
+| Lệnh                         | Mục đích                                               | Khi dùng                              |
+| ---------------------------- | ------------------------------------------------------ | ------------------------------------- |
+| `pnpm db:seed`               | Alias mặc định (tương đương `core`)                    | Seed nhanh cho local dev              |
+| `pnpm db:seed:core`          | Seed dữ liệu nền (user/shop/catalog/cart/order cơ bản) | Dev UI/API hằng ngày                  |
+| `pnpm db:seed:qa`            | Seed `core` + payment/wallet/settlement                | Test nghiệp vụ order-payment-đối soát |
+| `pnpm db:seed:catalog`       | Append catalog nhẹ, không clean                        | Bổ sung dữ liệu demo nhanh            |
+| `pnpm db:seed:catalog:load`  | Seed catalog số lượng lớn                              | Benchmark listing/search/paging       |
+| `pnpm db:seed:catalog:heavy` | Seed catalog cực lớn                                   | Stress test                           |
+| `pnpm db:seed:dry-run`       | Chỉ preview cleanup, không ghi DB                      | Kiểm tra tác động trước khi chạy thật |
 
-Product catalog behavior:
+## Profile và mode
 
-- 6 fixed baseline products (used by carts/orders fixtures) in `full` mode
-- generated products for each seeded category (configurable)
-- configurable variant range per generated product
-- Home-aligned category coverage (fashion, shoes, beauty, electronics, kitchen/home, pets, sports, toys, books, vouchers...)
+- `core`: dữ liệu nền cho dev, cleanup mặc định `reset-seed-only`.
+- `qa`: `core` + dữ liệu tài chính.
+- `catalog-load`: ưu tiên volume catalog lớn, cleanup mặc định `prune-catalog-generated`.
 
-It intentionally does **not** seed payment/webhook/finance settlement records in this phase.
+- `full`: seed đầy đủ luồng core (có thể kèm finance nếu bật).
+- `catalog`: chỉ xử lý category/product/variant theo hướng append.
 
-## File Structure
+## Cách dùng option
 
-Seed logic is split by responsibility under [packages/database/src/seed](packages/database/src/seed):
-
-- [packages/database/src/seed/core.ts](packages/database/src/seed/core.ts): orchestrates seeding flow
-- [packages/database/src/seed/cleanup.ts](packages/database/src/seed/cleanup.ts): clean phase
-- [packages/database/src/seed/modules](packages/database/src/seed/modules): domain modules
-- [packages/database/src/seed/utils.ts](packages/database/src/seed/utils.ts): money/slug/helpers
-- [packages/database/src/seed/constants.ts](packages/database/src/seed/constants.ts): deterministic IDs and seed constants
-
-## Commands
-
-From repository root:
+Lệnh mẫu:
 
 ```bash
-pnpm db:seed
-pnpm db:seed:catalog
-pnpm db:seed:catalog:heavy
+pnpm --filter @repo/database db:seed -- --profile qa --cleanup-mode reset-seed-only --seed-value 20270001
 ```
 
-Directly in database package:
+| Option                                                                       | Ý nghĩa                                       | Khi nên dùng                                               |
+| ---------------------------------------------------------------------------- | --------------------------------------------- | ---------------------------------------------------------- |
+| `--profile <core, qa, catalog-load>`                                         | Chọn preset seed                              | Luôn đặt rõ profile để tránh chạy sai mục đích             |
+| `--mode <full, catalog>`                                                     | Ghi đè mode của profile                       | Khi cần ép profile chạy theo mode khác mặc định            |
+| `--cleanup-mode <none, reset-all, reset-seed-only, prune-catalog-generated>` | Chọn chiến lược dọn dữ liệu trước seed        | Khi DB có dữ liệu quan trọng cần kiểm soát phạm vi cleanup |
+| `--dry-run`                                                                  | Chỉ in preview cleanup, không xóa/tạo dữ liệu | Nên chạy trước với cleanup mode mới                        |
+| `--include-finance <true, false>`                                            | Bật/tắt seed payment-wallet trong mode `full` | Bật khi test tài chính; tắt để seed nhanh                  |
+| `--seed-value <number>`                                                      | Cố định dữ liệu faker để tái lập              | QA, debug, bug reproduction                                |
+| `--products-per-category <n>`                                                | Số product tạo thêm mỗi category              | Scale catalog theo nhu cầu test                            |
+| `--variants-min <n>`                                                         | Số variant tối thiểu mỗi product              | Tăng độ đa dạng dữ liệu                                    |
+| `--variants-max <n>`                                                         | Số variant tối đa mỗi product                 | Dùng cùng `variants-min`                                   |
+| `--active-ratio <0..1>`                                                      | Tỉ lệ product `ACTIVE`                        | Test hành vi filter/listing theo status                    |
+
+## Cleanup mode (chọn nhanh)
+
+- `none`: không xóa gì trước seed.
+- `reset-seed-only`: chỉ xóa dữ liệu có marker seed (an toàn nhất cho DB dev trộn dữ liệu).
+- `prune-catalog-generated`: chỉ xóa catalog sinh tự động (`SEED-EXT-*`) và dữ liệu phụ thuộc.
+- `reset-all`: xóa toàn bộ dữ liệu nghiệp vụ trong phạm vi cleanup, cần rất thận trọng.
+
+## Quy tắc an toàn
+
+- Local-only guard bật mặc định.
+- Seed bị chặn nếu `DATABASE_URL` không thuộc host local allowlist.
+- Chỉ tắt guard khi thực sự cần:
 
 ```bash
-pnpm --filter @repo/database db:seed
-pnpm --filter @repo/database db:seed:catalog
-pnpm --filter @repo/database db:seed:catalog:heavy
+SEED_LOCAL_ONLY=false pnpm db:seed:core
 ```
 
-CLI options (available for both root and package-level command):
+## Kịch bản chạy nhanh
+
+### 1) Setup local dev
 
 ```bash
-pnpm --filter @repo/database db:seed -- --mode catalog --products-per-category 80 --variants-min 2 --variants-max 4 --active-ratio 0.9 --seed-value 20270001
+pnpm db:seed:core
 ```
 
-- `--mode`: `full` (default) or `catalog`
-- `--seed-value`: deterministic faker seed value
-- `--products-per-category`: generated products per category
-- `--variants-min`: min variants per generated product
-- `--variants-max`: max variants per generated product
-- `--active-ratio`: active product ratio in range `0..1`
-
-## Safety Guard
-
-The local-only guard exists and can be enabled in the seed entrypoint.
-
-When enabled, seed stops if `DATABASE_URL` host is not one of:
-
-- `localhost`
-- `127.0.0.1`
-- `0.0.0.0`
-- `postgres`
-- `db`
-- `host.docker.internal`
-
-This prevents accidental writes to non-local databases.
-
-## Deterministic Fake Data
-
-Seed uses `@faker-js/faker` with a deterministic seed value.
-
-- Default seed value: `20260401`
-- Override via env: `SEED_RANDOM_SEED=<number>`
-- Override via CLI: `--seed-value <number>`
-
-Example:
+### 2) Test full flow đơn hàng + thanh toán
 
 ```bash
-SEED_RANDOM_SEED=20270001 pnpm db:seed
+pnpm db:seed:qa -- --seed-value 20270001
 ```
 
-## Data Reset Strategy
+### 3) Bơm lớn dữ liệu catalog
 
-- `full` mode uses **Clean Then Seed**:
+```bash
+pnpm db:seed:catalog:load
+```
 
-1. delete domain data in FK-safe order
-2. insert seeded fixtures in dependency order
+### 4) Xem trước cleanup
 
-- `catalog` mode uses **Append Seed**:
+```bash
+pnpm db:seed:dry-run
+```
 
-1. upsert categories by slug
-2. append generated products and variants with unique SKU pattern
+## Lưu ý
 
-Use `catalog` mode when you need larger product volume quickly without resetting users/orders/carts.
-
-## Notes
-
-- Demo account raw password is defined in [packages/database/src/seed/constants.ts](packages/database/src/seed/constants.ts) and bcrypt hash is generated at seed runtime.
-- Order money fields are calculated via cents-based helpers to keep decimal precision stable.
-- Category seeding is idempotent (upsert by slug), safe for repeated catalog append runs.
+- Category seed idempotent theo slug.
+- Tiền được tính theo cents-based để tránh sai số dấu phẩy động.
+- Muốn kết quả lặp lại giữa nhiều lần seed, luôn khóa `--seed-value`.
