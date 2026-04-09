@@ -20,7 +20,7 @@ type HomeHotDealProductCardProps = {
 function HomeHotDealProductCard({ product, variant = "compact" }: HomeHotDealProductCardProps) {
     if (variant === "featured") {
         return (
-            <article className="h-full rounded-3xl border border-success/35 bg-white p-4 shadow-sm">
+            <article className="h-full rounded-3xl border border-success/35 bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:scale-[1.01] hover:shadow-md cursor-pointer">
                 <div className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold">
                     <span className="rounded bg-red-500 px-2 py-0.5 text-white">
                         {product.discount ?? "Giảm giá"}
@@ -87,7 +87,7 @@ function HomeHotDealProductCard({ product, variant = "compact" }: HomeHotDealPro
     }
 
     return (
-        <article className="group relative rounded-3xl border border-gray-200 bg-white p-3 transition hover:border-success/40 hover:shadow-sm">
+        <article className="group relative rounded-3xl border border-gray-200 bg-white p-3 transition duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:border-success/40 hover:shadow-md cursor-pointer">
             {product.discount ? (
                 <div className="absolute top-2 left-2 z-10 rounded bg-red-500 px-1.5 py-0.5 text-[9px] font-semibold text-white">
                     {product.discount}

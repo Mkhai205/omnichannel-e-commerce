@@ -21,7 +21,9 @@
         "db:push": "prisma db push",
         "db:migrate:dev": "prisma migrate dev && prisma generate",
         "db:studio": "prisma studio",
-        "db:seed": "tsx src/seed.ts"
+        "db:seed": "tsx src/seed.ts",
+        "db:seed:catalog": "tsx src/seed.ts --mode catalog",
+        "db:seed:catalog:heavy": "tsx src/seed.ts --mode catalog --products-per-category 300 --variants-min 2 --variants-max 4 --active-ratio 0.9"
     },
     "dependencies": {
         "@prisma/adapter-pg": "^7.5.0",

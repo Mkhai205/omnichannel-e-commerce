@@ -4,6 +4,7 @@ import { HomeHotDealsProducts } from "./_components/home-hot-deals-products";
 import { HomeEntryPopup } from "./_components/home-entry-popup";
 import { HomePopularCategories } from "./_components/home-popular-categories";
 import { HomeServiceHighlights } from "./_components/home-service-highlights";
+import { HomeTodaySuggestions } from "./_components/home-today-suggestions";
 import { HomeTestimonialsSection } from "./_components/home-testimonials-section";
 
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
             <HomePopularCategories />
             <HomeHotDealsBanner />
             <HomeHotDealsProducts />
+            <HomeTodaySuggestions />
             <HomeTestimonialsSection />
         </main>
     );

@@ -2,7 +2,12 @@
 
 ## Scope
 
-Current seed implementation targets **Core domain data** only:
+Current seed implementation supports 2 modes:
+
+- `full`: clean database then seed full core fixtures
+- `catalog`: append category/product/variant data for load-testing without cleaning existing core fixtures
+
+Core seed data includes:
 
 - users
 - shops
@@ -16,11 +21,12 @@ Current seed implementation targets **Core domain data** only:
 - orders
 - order items
 
-Product catalog is seeded with a larger dataset:
+Product catalog behavior:
 
-- 6 fixed baseline products (used by carts/orders fixtures)
-- 30 additional generated products
-- 2-3 variants per additional product
+- 6 fixed baseline products (used by carts/orders fixtures) in `full` mode
+- generated products for each seeded category (configurable)
+- configurable variant range per generated product
+- Home-aligned category coverage (fashion, shoes, beauty, electronics, kitchen/home, pets, sports, toys, books, vouchers...)
 
 It intentionally does **not** seed payment/webhook/finance settlement records in this phase.
 
@@ -40,13 +46,30 @@ From repository root:
 
 ```bash
 pnpm db:seed
+pnpm db:seed:catalog
+pnpm db:seed:catalog:heavy
 ```
 
 Directly in database package:
 
 ```bash
 pnpm --filter @repo/database db:seed
+pnpm --filter @repo/database db:seed:catalog
+pnpm --filter @repo/database db:seed:catalog:heavy
 ```
+
+CLI options (available for both root and package-level command):
+
+```bash
+pnpm --filter @repo/database db:seed -- --mode catalog --products-per-category 80 --variants-min 2 --variants-max 4 --active-ratio 0.9 --seed-value 20270001
+```
+
+- `--mode`: `full` (default) or `catalog`
+- `--seed-value`: deterministic faker seed value
+- `--products-per-category`: generated products per category
+- `--variants-min`: min variants per generated product
+- `--variants-max`: max variants per generated product
+- `--active-ratio`: active product ratio in range `0..1`
 
 ## Safety Guard
 
@@ -68,7 +91,8 @@ This prevents accidental writes to non-local databases.
 Seed uses `@faker-js/faker` with a deterministic seed value.
 
 - Default seed value: `20260401`
-- Override: `SEED_RANDOM_SEED=<number>`
+- Override via env: `SEED_RANDOM_SEED=<number>`
+- Override via CLI: `--seed-value <number>`
 
 Example:
 
@@ -78,14 +102,20 @@ SEED_RANDOM_SEED=20270001 pnpm db:seed
 
 ## Data Reset Strategy
 
-The script uses **Clean Then Seed**:
+- `full` mode uses **Clean Then Seed**:
 
 1. delete domain data in FK-safe order
 2. insert seeded fixtures in dependency order
 
-Run this only when you accept replacing existing local data.
+- `catalog` mode uses **Append Seed**:
+
+1. upsert categories by slug
+2. append generated products and variants with unique SKU pattern
+
+Use `catalog` mode when you need larger product volume quickly without resetting users/orders/carts.
 
 ## Notes
 
 - Demo account raw password is defined in [packages/database/src/seed/constants.ts](packages/database/src/seed/constants.ts) and bcrypt hash is generated at seed runtime.
 - Order money fields are calculated via cents-based helpers to keep decimal precision stable.
+- Category seeding is idempotent (upsert by slug), safe for repeated catalog append runs.

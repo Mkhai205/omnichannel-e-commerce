@@ -1,5 +1,29 @@
 import type { Prisma } from "../generated/prisma/client.js";
 
+export type SeedMode = "full" | "catalog";
+
+export type SeedCategoryRecord = {
+    key: string;
+    id: string;
+    slug: string;
+    catalogKey: string;
+    includeInExtraCatalog: boolean;
+};
+
+export type SeedCategoriesResult = {
+    count: number;
+    records: SeedCategoryRecord[];
+};
+
+export type CatalogSeedOptions = {
+    includeFixedProducts?: boolean;
+    categoryRecords?: SeedCategoryRecord[];
+    productsPerCategory?: number;
+    variantsMin?: number;
+    variantsMax?: number;
+    activeRatio?: number;
+};
+
 export type SeedSummary = {
     users: number;
     shops: number;
