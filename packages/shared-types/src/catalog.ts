@@ -41,9 +41,32 @@ export interface ProductItem {
     imageKey?: string | null;
     imageUrl?: string | null;
     status: ProductStatus;
+    ratingAverage: number;
+    ratingCount: number;
     createdAt: string;
     updatedAt: string;
     variants: ProductVariantItem[];
+}
+
+export interface ProductReviewItem {
+    id: UUID;
+    productId: UUID;
+    userId: UUID;
+    rating: number;
+    comment?: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface UpsertProductReviewRequest {
+    rating: number;
+    comment?: string;
+}
+
+export interface UpsertProductReviewResponse {
+    review: ProductReviewItem;
+    ratingAverage: number;
+    ratingCount: number;
 }
 
 export interface PublicProductsFilterRequest {

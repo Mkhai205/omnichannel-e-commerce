@@ -8,8 +8,30 @@ export type TodaySuggestionCardItem = {
     imageSrc: string;
     displayPrice: string;
     availabilityLabel: string;
+    ratingAverage: number;
+    ratingCount: number;
     href: string;
 };
+
+function normalizeRatingAverage(value: number): number {
+    if (!Number.isFinite(value) || value < 0) {
+        return 0;
+    }
+
+    if (value > 5) {
+        return 5;
+    }
+
+    return value;
+}
+
+function normalizeRatingCount(value: number): number {
+    if (!Number.isFinite(value) || value < 0) {
+        return 0;
+    }
+
+    return Math.floor(value);
+}
 
 function toPositivePrice(variant: ProductVariantItem): number | null {
     const parsed = Number.parseFloat(variant.price);
@@ -69,6 +91,8 @@ export function mapProductToTodaySuggestionCardItem(product: ProductItem): Today
         imageSrc: resolveProductImageSrc(product.imageUrl),
         displayPrice: formatVndPrice(resolveLowestVariantPrice(product.variants)),
         availabilityLabel: totalStock > 0 ? "Còn hàng" : "Hết hàng",
+        ratingAverage: normalizeRatingAverage(product.ratingAverage),
+        ratingCount: normalizeRatingCount(product.ratingCount),
         href: "/shop",
     };
 }

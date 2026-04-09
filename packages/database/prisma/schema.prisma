@@ -8,22 +8,23 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid()) @db.Uuid
-  email         String         @unique @db.VarChar(255)
-  passwordHash  String?        @map("password_hash") @db.VarChar(255)
-  fullName      String         @map("full_name") @db.VarChar(255)
-  phone         String?        @unique @db.VarChar(20)
-  role          UserRole       @default(CUSTOMER)
-  status        UserStatus     @default(ACTIVE)
-  shop          Shop?
-  cart          Cart?
-  addresses     Address[]
-  oauthAccounts OauthAccount[]
-  refreshTokens RefreshToken[]
-  orders        Order[]
-  payments      Payment[]
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
+  id             String          @id @default(uuid()) @db.Uuid
+  email          String          @unique @db.VarChar(255)
+  passwordHash   String?         @map("password_hash") @db.VarChar(255)
+  fullName       String          @map("full_name") @db.VarChar(255)
+  phone          String?         @unique @db.VarChar(20)
+  role           UserRole        @default(CUSTOMER)
+  status         UserStatus      @default(ACTIVE)
+  shop           Shop?
+  cart           Cart?
+  addresses      Address[]
+  oauthAccounts  OauthAccount[]
+  refreshTokens  RefreshToken[]
+  productReviews ProductReview[]
+  orders         Order[]
+  payments       Payment[]
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
 
   @@map("users")
 }
@@ -68,18 +69,21 @@ model Category {
 }
 
 model Product {
-  id          String           @id @default(uuid()) @db.Uuid
-  shopId      String           @map("shop_id") @db.Uuid
-  categoryId  String           @map("category_id") @db.Uuid
-  name        String           @db.VarChar(255)
-  description String?          @db.Text
-  imageKey    String?          @map("image_key") @db.VarChar(500)
-  status      ProductStatus    @default(DRAFT)
-  createdAt   DateTime         @default(now()) @map("created_at")
-  updatedAt   DateTime         @updatedAt @map("updated_at")
-  shop        Shop             @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  category    Category         @relation(fields: [categoryId], references: [id])
-  variants    ProductVariant[]
+  id            String           @id @default(uuid()) @db.Uuid
+  shopId        String           @map("shop_id") @db.Uuid
+  categoryId    String           @map("category_id") @db.Uuid
+  name          String           @db.VarChar(255)
+  description   String?          @db.Text
+  imageKey      String?          @map("image_key") @db.VarChar(500)
+  status        ProductStatus    @default(DRAFT)
+  ratingAverage Decimal          @default(0) @map("rating_average") @db.Decimal(3, 2)
+  ratingCount   Int              @default(0) @map("rating_count")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+  shop          Shop             @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  category      Category         @relation(fields: [categoryId], references: [id])
+  variants      ProductVariant[]
+  reviews       ProductReview[]
 
   @@index([shopId])
   @@index([categoryId])
@@ -103,6 +107,23 @@ model ProductVariant {
 
   @@index([productId])
   @@map("product_variants")
+}
+
+model ProductReview {
+  id        String   @id @default(uuid()) @db.Uuid
+  productId String   @map("product_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  rating    Int      @db.SmallInt
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId])
+  @@index([productId])
+  @@index([userId])
+  @@map("product_reviews")
 }
 
 model Cart {

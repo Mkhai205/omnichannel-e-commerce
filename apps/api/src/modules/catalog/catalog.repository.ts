@@ -33,6 +33,8 @@ const PRODUCT_SELECT = {
   description: true,
   imageKey: true,
   status: true,
+  ratingAverage: true,
+  ratingCount: true,
   createdAt: true,
   updatedAt: true,
   variants: {
@@ -40,6 +42,16 @@ const PRODUCT_SELECT = {
     select: PRODUCT_VARIANT_SELECT,
   },
 } satisfies Prisma.ProductSelect;
+
+const PRODUCT_REVIEW_SELECT = {
+  id: true,
+  productId: true,
+  userId: true,
+  rating: true,
+  comment: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.ProductReviewSelect;
 
 const PRODUCT_SUGGESTION_CANDIDATE_SELECT = {
   id: true,
@@ -66,6 +78,10 @@ export type ProductVariantRecord = Prisma.ProductVariantGetPayload<{
 
 export type ProductSuggestionCandidateRecord = Prisma.ProductGetPayload<{
   select: typeof PRODUCT_SUGGESTION_CANDIDATE_SELECT;
+}>;
+
+export type ProductReviewRecord = Prisma.ProductReviewGetPayload<{
+  select: typeof PRODUCT_REVIEW_SELECT;
 }>;
 
 export interface CategoriesQueryInput {
@@ -186,6 +202,18 @@ export class CatalogRepository {
         status: 'ACTIVE',
       },
       select: PRODUCT_SELECT,
+    });
+  }
+
+  findActiveProductId(productId: string) {
+    return this.prisma.product.findFirst({
+      where: {
+        id: productId,
+        status: 'ACTIVE',
+      },
+      select: {
+        id: true,
+      },
     });
   }
 
@@ -323,6 +351,73 @@ export class CatalogRepository {
   countAdminProducts(input: ProductsQueryInput) {
     return this.prisma.product.count({
       where: this.buildProductsWhere(input),
+    });
+  }
+
+  async upsertProductReviewAndRefreshRating(input: {
+    productId: string;
+    userId: string;
+    rating: number;
+    comment?: string | null;
+  }): Promise<{
+    review: ProductReviewRecord;
+    ratingAverage: number;
+    ratingCount: number;
+  }> {
+    return this.prisma.$transaction(async (tx) => {
+      const review = await tx.productReview.upsert({
+        where: {
+          productId_userId: {
+            productId: input.productId,
+            userId: input.userId,
+          },
+        },
+        create: {
+          productId: input.productId,
+          userId: input.userId,
+          rating: input.rating,
+          comment: input.comment,
+        },
+        update: {
+          rating: input.rating,
+          comment: input.comment,
+        },
+        select: PRODUCT_REVIEW_SELECT,
+      });
+
+      const aggregate = await tx.productReview.aggregate({
+        where: {
+          productId: input.productId,
+        },
+        _avg: {
+          rating: true,
+        },
+        _count: {
+          _all: true,
+        },
+      });
+
+      const averageRating = Number(aggregate._avg.rating ?? 0);
+      const normalizedAverageRating = Number.isFinite(averageRating)
+        ? Number(averageRating.toFixed(2))
+        : 0;
+      const ratingCount = aggregate._count._all;
+
+      await tx.product.update({
+        where: {
+          id: input.productId,
+        },
+        data: {
+          ratingAverage: new Prisma.Decimal(normalizedAverageRating),
+          ratingCount,
+        },
+      });
+
+      return {
+        review,
+        ratingAverage: normalizedAverageRating,
+        ratingCount,
+      };
     });
   }
 

@@ -17,7 +17,7 @@ export async function seedCore(
     const users = await seedUsers(prisma);
     const shops = await seedShops(prisma);
     const categoriesResult = await seedCategories(prisma);
-    const { products, productVariants, variants } = await seedCatalog(prisma, {
+    const { products, productVariants, productReviews, variants } = await seedCatalog(prisma, {
         ...options.catalog,
         includeFixedProducts: options.catalog?.includeFixedProducts ?? true,
         categoryRecords: categoriesResult.records,
@@ -32,6 +32,7 @@ export async function seedCore(
         categories: categoriesResult.count,
         products,
         productVariants,
+        productReviews,
         addresses,
         carts,
         cartItems,

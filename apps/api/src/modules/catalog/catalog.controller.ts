@@ -1,4 +1,12 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import type {
   ApiResponse,
@@ -6,23 +14,28 @@ import type {
   ProductItem,
   PublicProductSuggestionsResponse,
   PublicProductsListResponse,
+  UpsertProductReviewResponse,
 } from '@repo/shared-types';
-import { Public } from '../../core/decorators';
+import { CurrentUser, Public, Roles } from '../../core/decorators';
 import { createSuccessResponse } from '../../core/http/api-response.util';
 import {
+  ApiAuthSchemes,
   ApiCommonErrorResponses,
   ApiOkEnvelopeResponse,
 } from '../../core/http/swagger-response.decorator';
+import type { JwtPayload } from '../auth/types/jwt-payload.type';
 import { PublicCatalogService } from './public-catalog.service';
 import {
   CategoriesListDataSwaggerDto,
   ProductSuggestionsDataSwaggerDto,
   ProductSwaggerDto,
   ProductsListDataSwaggerDto,
+  UpsertProductReviewDataSwaggerDto,
 } from './dto/catalog-swagger.dto';
 import { PublicCategoriesFilterDto } from './dto/public-categories-filter.dto';
 import { PublicProductSuggestionsFilterDto } from './dto/public-product-suggestions-filter.dto';
 import { PublicProductsFilterDto } from './dto/public-products-filter.dto';
+import { UpsertProductReviewDto } from './dto/upsert-product-review.dto';
 
 @ApiTags('Catalog')
 @Controller('catalog')
@@ -131,6 +144,38 @@ export class CatalogController {
 
     return createSuccessResponse(product, {
       message: 'Public product detail retrieved successfully',
+    });
+  }
+
+  @Put('products/:id/review')
+  @Roles('CUSTOMER')
+  @ApiOperation({
+    summary: 'Create or update current customer review for a product',
+  })
+  @ApiAuthSchemes()
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOkEnvelopeResponse(
+    UpsertProductReviewDataSwaggerDto,
+    'Product review upserted successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid payload or product id',
+    unauthorized: 'Authentication required',
+    notFound: 'Product not found',
+  })
+  async upsertProductReview(
+    @CurrentUser() currentUser: JwtPayload,
+    @Param('id', new ParseUUIDPipe()) productId: string,
+    @Body() payload: UpsertProductReviewDto,
+  ): Promise<ApiResponse<UpsertProductReviewResponse>> {
+    const response = await this.publicCatalogService.upsertProductReview(
+      currentUser.sub,
+      productId,
+      payload,
+    );
+
+    return createSuccessResponse(response, {
+      message: 'Product review upserted successfully',
     });
   }
 }

@@ -8,17 +8,21 @@ import type {
   CategoriesListResponse,
   CategoryItem,
   ProductItem,
+  ProductReviewItem,
   PublicProductSuggestionsRequest,
   PublicProductSuggestionsResponse,
   ProductVariantItem,
   PublicProductsFilterRequest,
   PublicProductsListResponse,
+  UpsertProductReviewRequest,
+  UpsertProductReviewResponse,
 } from '@repo/shared-types';
 import { resolveCatalogImageUrl } from '../../core/http/catalog-image-url.helper';
 import { StorageService } from '../../infrastructure/storage/storage.service';
 import type {
   CategoryRecord,
   ProductRecord,
+  ProductReviewRecord,
   ProductSuggestionCandidateRecord,
   ProductVariantRecord,
 } from './catalog.repository';
@@ -168,6 +172,33 @@ export class PublicCatalogService {
     }
 
     return this.toProductItem(product);
+  }
+
+  async upsertProductReview(
+    userId: string,
+    productId: string,
+    payload: UpsertProductReviewRequest,
+  ): Promise<UpsertProductReviewResponse> {
+    const activeProduct =
+      await this.catalogRepository.findActiveProductId(productId);
+
+    if (!activeProduct) {
+      throw new NotFoundException('Product not found');
+    }
+
+    const result =
+      await this.catalogRepository.upsertProductReviewAndRefreshRating({
+        productId,
+        userId,
+        rating: payload.rating,
+        comment: this.normalizeReviewComment(payload.comment),
+      });
+
+    return {
+      review: this.toProductReviewItem(result.review),
+      ratingAverage: result.ratingAverage,
+      ratingCount: result.ratingCount,
+    };
   }
 
   private resolvePage(page?: number): number {
@@ -322,6 +353,8 @@ export class PublicCatalogService {
   }
 
   private toProductItem(product: ProductRecord): ProductItem {
+    const ratingAverage = Number(product.ratingAverage.toString());
+
     return {
       id: product.id,
       shopId: product.shopId,
@@ -331,6 +364,8 @@ export class PublicCatalogService {
       imageKey: product.imageKey,
       imageUrl: resolveCatalogImageUrl(this.storageService, product.imageKey),
       status: product.status,
+      ratingAverage: Number.isFinite(ratingAverage) ? ratingAverage : 0,
+      ratingCount: product.ratingCount,
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
       variants: product.variants.map((variant) =>
@@ -359,6 +394,26 @@ export class PublicCatalogService {
       createdAt: variant.createdAt.toISOString(),
       updatedAt: variant.updatedAt.toISOString(),
     };
+  }
+
+  private toProductReviewItem(review: ProductReviewRecord): ProductReviewItem {
+    return {
+      id: review.id,
+      productId: review.productId,
+      userId: review.userId,
+      rating: review.rating,
+      comment: review.comment,
+      createdAt: review.createdAt.toISOString(),
+      updatedAt: review.updatedAt.toISOString(),
+    };
+  }
+
+  private normalizeReviewComment(comment?: string): string | null {
+    const normalizedComment = comment?.trim();
+
+    return normalizedComment && normalizedComment.length > 0
+      ? normalizedComment
+      : null;
   }
 
   private toStringRecord(value: unknown): Record<string, string> {

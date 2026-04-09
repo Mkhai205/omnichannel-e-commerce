@@ -66,6 +66,7 @@ async function main(): Promise<void> {
             categories: categoriesResult.count,
             products: catalogResult.products,
             productVariants: catalogResult.productVariants,
+            productReviews: catalogResult.productReviews,
         });
     } finally {
         await prisma.$disconnect();

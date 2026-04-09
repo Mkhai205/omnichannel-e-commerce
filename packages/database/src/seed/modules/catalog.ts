@@ -10,6 +10,7 @@ import {
 import type {
     CatalogSeedOptions,
     CatalogSeedResult,
+    ProductReviewSeedInput,
     SeedCategoryRecord,
     VariantSeedInput,
 } from "../types.js";
@@ -158,6 +159,21 @@ const FALLBACK_CATEGORY_RECORDS: SeedCategoryRecord[] = [
         includeInExtraCatalog: true,
     },
 ];
+
+const REVIEWER_USER_IDS = [
+    SEED_IDS.users.customerA,
+    SEED_IDS.users.customerB,
+    SEED_IDS.users.customerC,
+    SEED_IDS.users.customerD,
+] as const;
+
+const REVIEW_COMMENTS = [
+    "Chất lượng rất tốt, đúng mô tả.",
+    "Giao hàng nhanh, đóng gói chắc chắn.",
+    "Giá hợp lý so với chất lượng.",
+    "Sẽ ủng hộ shop thêm lần sau.",
+    "Sản phẩm dùng ổn định và đáng mua.",
+] as const;
 
 function normalizePositiveInteger(rawValue: number | undefined, fallbackValue: number): number {
     if (!rawValue || !Number.isFinite(rawValue) || rawValue < 1) {
@@ -450,6 +466,104 @@ function buildExtraCatalog(input: ExtraCatalogBuildInput): {
     };
 }
 
+function pickReviewRating(): number {
+    const score = faker.number.int({ min: 1, max: 100 });
+
+    if (score <= 5) {
+        return 1;
+    }
+
+    if (score <= 15) {
+        return 2;
+    }
+
+    if (score <= 35) {
+        return 3;
+    }
+
+    if (score <= 65) {
+        return 4;
+    }
+
+    return 5;
+}
+
+function buildProductReviews(products: Prisma.ProductCreateManyInput[]): ProductReviewSeedInput[] {
+    const reviews: ProductReviewSeedInput[] = [];
+
+    for (const product of products) {
+        if (!product.id || product.status !== "ACTIVE") {
+            continue;
+        }
+
+        const reviewerPool = faker.helpers.shuffle([...REVIEWER_USER_IDS]);
+        const reviewCount = faker.number.int({ min: 0, max: reviewerPool.length });
+
+        for (let index = 0; index < reviewCount; index += 1) {
+            const userId = reviewerPool[index];
+
+            if (!userId) {
+                continue;
+            }
+
+            const includeComment = faker.number.float({ min: 0, max: 1 }) <= 0.7;
+
+            reviews.push({
+                id: faker.string.uuid(),
+                productId: product.id,
+                userId,
+                rating: pickReviewRating(),
+                comment: includeComment ? faker.helpers.arrayElement(REVIEW_COMMENTS) : null,
+            });
+        }
+    }
+
+    return reviews;
+}
+
+async function refreshProductRatings(prisma: PrismaClient, productIds: string[]): Promise<void> {
+    const uniqueProductIds = [...new Set(productIds)];
+
+    if (uniqueProductIds.length === 0) {
+        return;
+    }
+
+    const groupedRatings = await prisma.productReview.groupBy({
+        by: ["productId"],
+        where: {
+            productId: {
+                in: uniqueProductIds,
+            },
+        },
+        _avg: {
+            rating: true,
+        },
+        _count: {
+            _all: true,
+        },
+    });
+
+    const ratingByProductId = new Map(groupedRatings.map((item) => [item.productId, item]));
+
+    await prisma.$transaction(
+        uniqueProductIds.map((productId) => {
+            const ratingAggregate = ratingByProductId.get(productId);
+            const averageRating = Number(ratingAggregate?._avg.rating ?? 0);
+            const normalizedAverage = Number.isFinite(averageRating)
+                ? Number(averageRating.toFixed(2))
+                : 0;
+
+            return prisma.product.update({
+                where: { id: productId },
+                data: {
+                    ratingAverage: normalizedAverage.toFixed(2),
+                    ratingCount: ratingAggregate?._count._all ?? 0,
+                },
+            });
+        }),
+    );
+}
+
 export async function seedCatalog(
     prisma: PrismaClient,
     options: CatalogSeedOptions = {},
@@ -514,9 +628,34 @@ export async function seedCatalog(
               ).count
             : 0;
 
+    const reviews = buildProductReviews(products);
+
+    const createdReviews =
+        reviews.length > 0
+            ? (
+                  await prisma.productReview.createMany({
+                      data: reviews.map((review) => ({
+                          id: review.id,
+                          productId: review.productId,
+                          userId: review.userId,
+                          rating: review.rating,
+                          comment: review.comment,
+                      })),
+                      skipDuplicates: true,
+                  })
+              ).count
+            : 0;
+
+    // Keep product aggregates aligned with the review rows that were just seeded.
+    await refreshProductRatings(
+        prisma,
+        reviews.map((review) => review.productId),
+    );
+
     return {
         products: createdProducts,
         productVariants: createdVariants,
+        productReviews: createdReviews,
         variants,
     };
 }

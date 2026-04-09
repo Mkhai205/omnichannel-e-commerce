@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRightIcon, Loader2Icon } from "lucide-react";
+import { ArrowRightIcon, Loader2Icon, StarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
     mapProductToTodaySuggestionCardItem,
     type TodaySuggestionCardItem,
@@ -22,6 +23,8 @@ type HomeTodaySuggestionsClientProps = {
 };
 
 function HomeTodaySuggestionProductCard({ item }: { item: TodaySuggestionCardItem }) {
+    const roundedStars = Math.round(item.ratingAverage);
+
     return (
         <article className="group rounded-3xl border border-gray-200 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-success/40 hover:shadow-md">
             <Link href={item.href} className="block">
@@ -38,6 +41,29 @@ function HomeTodaySuggestionProductCard({ item }: { item: TodaySuggestionCardIte
                 </div>
 
                 <p className="mt-3 line-clamp-2 text-sm font-semibold text-gray-900">{item.name}</p>
+
+                <div className="mt-1.5 flex items-center gap-2">
+                    <div className="inline-flex items-center gap-0.5" aria-hidden>
+                        {Array.from({ length: 5 }, (_, index) => (
+                            <StarIcon
+                                key={`${item.id}-rating-star-${index}`}
+                                className={cn(
+                                    "size-3.5",
+                                    index < roundedStars
+                                        ? "fill-amber-400 text-amber-400"
+                                        : "text-gray-300",
+                                )}
+                            />
+                        ))}
+                    </div>
+                    {item.ratingCount > 0 ? (
+                        <span className="text-xs font-medium text-gray-600">
+                            {item.ratingAverage.toFixed(1)} ({item.ratingCount})
+                        </span>
+                    ) : (
+                        <span className="text-xs text-gray-500">Chưa có đánh giá</span>
+                    )}
+                </div>
 
                 <div className="mt-2 flex items-center justify-between gap-3">
                     <span className="text-base font-bold text-success">{item.displayPrice}</span>

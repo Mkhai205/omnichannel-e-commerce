@@ -30,6 +30,7 @@ export type SeedSummary = {
     categories: number;
     products: number;
     productVariants: number;
+    productReviews: number;
     addresses: number;
     carts: number;
     cartItems: number;
@@ -46,8 +47,17 @@ export type VariantSeedInput = {
     stockQuantity: number;
 };
 
+export type ProductReviewSeedInput = {
+    id: string;
+    productId: string;
+    userId: string;
+    rating: number;
+    comment?: string | null;
+};
+
 export type CatalogSeedResult = {
     products: number;
     productVariants: number;
+    productReviews: number;
     variants: VariantSeedInput[];
 };
