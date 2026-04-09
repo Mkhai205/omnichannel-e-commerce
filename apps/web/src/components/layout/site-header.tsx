@@ -45,7 +45,7 @@ export function SiteHeader() {
     };
 
     return (
-        <header>
+        <header className="sticky top-0 z-50">
             <div className="border-b border-gray-100 bg-white">
                 <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-5 px-4 py-3 md:grid-cols-[auto_1fr_auto] md:px-6">
                     <BrandLogo />
