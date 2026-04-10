@@ -301,7 +301,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.smartphoneA,
             sku: "SEED-SMARTA-128",
             attributes: { color: randomVietnameseColor(), storage: "128GB" },
-            price: "999.00",
+            price: "9990000.00",
             stockQuantity: 30,
         },
         {
@@ -309,7 +309,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.smartphoneA,
             sku: "SEED-SMARTA-256",
             attributes: { color: randomVietnameseColor(), storage: "256GB" },
-            price: "1199.00",
+            price: "11990000.00",
             stockQuantity: 24,
         },
         {
@@ -317,7 +317,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.smartphoneB,
             sku: "SEED-SMARTB-128",
             attributes: { color: randomVietnameseColor(), storage: "128GB" },
-            price: "899.00",
+            price: "8990000.00",
             stockQuantity: 28,
         },
         {
@@ -325,7 +325,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.smartphoneB,
             sku: "SEED-SMARTB-256",
             attributes: { color: randomVietnameseColor(), storage: "256GB" },
-            price: "1099.00",
+            price: "10990000.00",
             stockQuantity: 20,
         },
         {
@@ -333,7 +333,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.laptopA,
             sku: "SEED-LAPTOPA-16GB",
             attributes: { ram: "16GB", storage: "512GB SSD" },
-            price: "1699.00",
+            price: "16990000.00",
             stockQuantity: 15,
         },
         {
@@ -341,7 +341,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.laptopA,
             sku: "SEED-LAPTOPA-32GB",
             attributes: { ram: "32GB", storage: "1TB SSD" },
-            price: "1999.00",
+            price: "19990000.00",
             stockQuantity: 9,
         },
         {
@@ -349,7 +349,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.jacketA,
             sku: "SEED-JACKETA-M",
             attributes: { size: "M", color: randomVietnameseColor() },
-            price: "129.00",
+            price: "1290000.00",
             stockQuantity: 40,
         },
         {
@@ -357,7 +357,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.jacketA,
             sku: "SEED-JACKETA-L",
             attributes: { size: "L", color: randomVietnameseColor() },
-            price: "129.00",
+            price: "1290000.00",
             stockQuantity: 35,
         },
         {
@@ -365,7 +365,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.blenderA,
             sku: "SEED-BLENDERA-WHITE",
             attributes: { color: "Trắng", power: "600W" },
-            price: "159.00",
+            price: "1590000.00",
             stockQuantity: 21,
         },
         {
@@ -373,7 +373,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.blenderA,
             sku: "SEED-BLENDERA-BLACK",
             attributes: { color: "Đen", power: "600W" },
-            price: "159.00",
+            price: "1590000.00",
             stockQuantity: 19,
         },
         {
@@ -381,7 +381,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.speakerA,
             sku: "SEED-SPEAKERA-BLACK",
             attributes: { color: "Đen", connectivity: "Bluetooth 5.3" },
-            price: "89.00",
+            price: "890000.00",
             stockQuantity: 50,
         },
         {
@@ -389,7 +389,7 @@ function buildFixedCatalog(): {
             productId: SEED_IDS.products.speakerA,
             sku: "SEED-SPEAKERA-BLUE",
             attributes: { color: "Xanh dương", connectivity: "Bluetooth 5.3" },
-            price: "89.00",
+            price: "890000.00",
             stockQuantity: 44,
         },
     ];
@@ -441,7 +441,8 @@ function buildExtraCatalog(input: ExtraCatalogBuildInput): {
             for (let variantIndex = 1; variantIndex <= variantCount; variantIndex += 1) {
                 variantSequence += 1;
                 const stockQuantity = faker.number.int({ min: 8, max: 160 });
-                const priceCents = faker.number.int({ min: 7900, max: 459900 });
+                const priceVnd = faker.number.int({ min: 1001, max: 4599000 });
+                const priceCents = BigInt(priceVnd) * 100n;
 
                 variants.push({
                     id: faker.string.uuid(),
@@ -453,7 +454,7 @@ function buildExtraCatalog(input: ExtraCatalogBuildInput): {
                         material: randomVietnameseMaterial(),
                         tier: `${category.key}-${productSequence}`,
                     },
-                    price: formatCents(BigInt(priceCents)),
+                    price: formatCents(priceCents),
                     stockQuantity,
                 });
             }

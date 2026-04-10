@@ -223,8 +223,13 @@ export function CartSummaryCard({
                 </div>
             </div>
 
-            <Button disabled className="mt-5 w-full bg-success cursor-pointer" size="lg">
-                Thanh toán (sắp ra mắt)
+            <Button
+                asChild
+                size="lg"
+                className="mt-5 w-full bg-success text-success-foreground hover:bg-success-dark"
+                disabled={isMutating || totalItems === 0}
+            >
+                <Link href="/checkout">Tiến hành thanh toán</Link>
             </Button>
 
             <Button

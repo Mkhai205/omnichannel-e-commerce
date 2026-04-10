@@ -240,7 +240,23 @@ export class CartService {
   }
 
   private normalizeMoney(value: string): string {
-    return this.formatCents(this.parseMoneyToCents(value));
+    return this.formatCents(
+      this.normalizeToWholeVndCents(this.parseMoneyToCents(value)),
+    );
+  }
+
+  private normalizeToWholeVndCents(cents: bigint): bigint {
+    const remainder = cents % 100n;
+
+    if (remainder === 0n) {
+      return cents;
+    }
+
+    if (remainder >= 50n) {
+      return cents + (100n - remainder);
+    }
+
+    return cents - remainder;
   }
 
   private parseMoneyToCents(value: string): bigint {
