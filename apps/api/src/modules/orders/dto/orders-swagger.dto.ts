@@ -298,3 +298,112 @@ export class SellerOrdersListDataSwaggerDto {
   @ApiProperty({ type: PaginationMetaSwaggerDto })
   meta!: PaginationMetaSwaggerDto;
 }
+
+export class CustomerOrderSwaggerDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ example: 'ORD-20260330-52A9D13B' })
+  orderNumber!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  userId!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  shopId!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  shippingAddressId!: string;
+
+  @ApiProperty({ example: 'PROCESSING' })
+  status!: string;
+
+  @ApiProperty({ example: '2598000.00' })
+  subtotal!: string;
+
+  @ApiProperty({ example: '2598000.00' })
+  totalAmount!: string;
+
+  @ApiProperty({ nullable: true, example: 'Please deliver in office hours.' })
+  note!: string | null;
+
+  @ApiProperty({ example: 3 })
+  itemCount!: number;
+
+  @ApiProperty({ nullable: true, example: '2026-03-30T10:05:00.000Z' })
+  shippedAt!: string | null;
+
+  @ApiProperty({ nullable: true, example: '2026-03-30T10:08:00.000Z' })
+  deliveredAt!: string | null;
+
+  @ApiProperty({ example: '2026-03-30T10:00:00.000Z' })
+  createdAt!: string;
+
+  @ApiProperty({ example: '2026-03-30T10:00:00.000Z' })
+  updatedAt!: string;
+}
+
+export class CustomerOrdersListDataSwaggerDto {
+  @ApiProperty({ type: [CustomerOrderSwaggerDto] })
+  data!: CustomerOrderSwaggerDto[];
+
+  @ApiProperty({ type: PaginationMetaSwaggerDto })
+  meta!: PaginationMetaSwaggerDto;
+}
+
+export class CustomerOrderPaymentInfoSwaggerDto {
+  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  paymentId?: string;
+
+  @ApiPropertyOptional({ nullable: true, example: 'VNPAY' })
+  paymentProvider?: string;
+
+  @ApiPropertyOptional({ nullable: true, example: 'SUCCESS' })
+  paymentStatus?: string;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example: 'PAY-1743367143518-AD14F3A1',
+  })
+  txnRef?: string;
+
+  @ApiPropertyOptional({ nullable: true, example: '2026-03-30T10:03:00.000Z' })
+  paidAt?: string | null;
+
+  @ApiPropertyOptional({ nullable: true, example: '2026-03-30T10:03:00.000Z' })
+  updatedAt?: string;
+}
+
+export class CustomerOrderTrackingEventSwaggerDto {
+  @ApiProperty({ example: 'ORDER_SHIPPED' })
+  eventType!: string;
+
+  @ApiProperty({ example: 'SHIPPED' })
+  status!: string;
+
+  @ApiProperty({ example: 'Đơn hàng đang trên đường giao' })
+  title!: string;
+
+  @ApiProperty({ example: 'Đơn vị vận chuyển đã nhận hàng và bắt đầu giao.' })
+  description!: string;
+
+  @ApiProperty({ example: '2026-03-30T10:05:00.000Z' })
+  timestamp!: string;
+}
+
+export class CustomerOrderDetailSwaggerDto extends CustomerOrderSwaggerDto {
+  @ApiProperty({ example: 'Cua hang Sport A' })
+  shopName!: string;
+
+  @ApiProperty({ type: SellerOrderShippingAddressSwaggerDto })
+  shippingAddress!: SellerOrderShippingAddressSwaggerDto;
+
+  @ApiProperty({ type: [SellerOrderDetailItemSwaggerDto] })
+  items!: SellerOrderDetailItemSwaggerDto[];
+
+  @ApiProperty({ type: CustomerOrderPaymentInfoSwaggerDto })
+  payment!: CustomerOrderPaymentInfoSwaggerDto;
+
+  @ApiProperty({ type: [CustomerOrderTrackingEventSwaggerDto] })
+  trackingTimeline!: CustomerOrderTrackingEventSwaggerDto[];
+}

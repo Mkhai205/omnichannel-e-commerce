@@ -1,6 +1,9 @@
 import type {
     ApiResponse,
+    AuthUser,
     CreateAddressRequest,
+    UpdateAddressRequest,
+    UpdateProfileRequest,
     UserAddress,
     UserAddressListResponse,
 } from "@repo/shared-types";
@@ -23,6 +26,35 @@ export async function createMyAddress(payload: CreateAddressRequest): Promise<Us
     const response = await requestApi<UserAddress>("/users/me/addresses", {
         method: "POST",
         body: JSON.stringify(payload),
+    });
+
+    return requireData(response);
+}
+
+export async function updateMyProfile(payload: UpdateProfileRequest): Promise<AuthUser> {
+    const response = await requestApi<AuthUser>("/users/me", {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+    });
+
+    return requireData(response);
+}
+
+export async function updateMyAddress(
+    addressId: string,
+    payload: UpdateAddressRequest,
+): Promise<UserAddress> {
+    const response = await requestApi<UserAddress>(`/users/me/addresses/${addressId}`, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+    });
+
+    return requireData(response);
+}
+
+export async function deleteMyAddress(addressId: string): Promise<{ success: boolean }> {
+    const response = await requestApi<{ success: boolean }>(`/users/me/addresses/${addressId}`, {
+        method: "DELETE",
     });
 
     return requireData(response);

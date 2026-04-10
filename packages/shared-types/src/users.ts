@@ -42,6 +42,19 @@ export interface CreateAddressRequest {
     isDefault?: boolean;
 }
 
+export interface UpdateAddressRequest {
+    type?: AddressType;
+    recipientName?: string;
+    recipientPhone?: string;
+    streetAddress?: string;
+    wardDistrict?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+    isDefault?: boolean;
+}
+
 export interface AdminUsersFilterRequest {
     page?: number;
     limit?: number;

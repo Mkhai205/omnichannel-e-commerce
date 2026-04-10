@@ -68,6 +68,27 @@ const SELLER_ORDER_SELECT = {
   updatedAt: true,
 } satisfies Prisma.OrderSelect;
 
+const CUSTOMER_ORDER_SELECT = {
+  id: true,
+  orderNumber: true,
+  userId: true,
+  shopId: true,
+  shippingAddressId: true,
+  status: true,
+  shippedAt: true,
+  deliveredAt: true,
+  subtotal: true,
+  totalAmount: true,
+  note: true,
+  createdAt: true,
+  updatedAt: true,
+  _count: {
+    select: {
+      items: true,
+    },
+  },
+} satisfies Prisma.OrderSelect;
+
 const ORDER_ITEM_SELECT = {
   id: true,
   orderId: true,
@@ -119,6 +140,49 @@ const SELLER_ORDER_DETAIL_SELECT = {
   },
 } satisfies Prisma.OrderSelect;
 
+const CUSTOMER_ORDER_DETAIL_SELECT = {
+  ...CUSTOMER_ORDER_SELECT,
+  shop: {
+    select: {
+      shopName: true,
+    },
+  },
+  shippingAddress: {
+    select: {
+      id: true,
+      recipientName: true,
+      recipientPhone: true,
+      streetAddress: true,
+      wardDistrict: true,
+      city: true,
+      state: true,
+      postalCode: true,
+      country: true,
+    },
+  },
+  items: {
+    select: ORDER_ITEM_SELECT,
+  },
+  paymentOrders: {
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: 1,
+    select: {
+      payment: {
+        select: {
+          id: true,
+          provider: true,
+          status: true,
+          txnRef: true,
+          paidAt: true,
+          updatedAt: true,
+        },
+      },
+    },
+  },
+} satisfies Prisma.OrderSelect;
+
 export type CheckoutCartItemRecord = Prisma.CartItemGetPayload<{
   select: typeof CHECKOUT_CART_ITEM_SELECT;
 }>;
@@ -135,6 +199,14 @@ export type SellerOrderDetailRecord = Prisma.OrderGetPayload<{
   select: typeof SELLER_ORDER_DETAIL_SELECT;
 }>;
 
+export type CustomerOrderRecord = Prisma.OrderGetPayload<{
+  select: typeof CUSTOMER_ORDER_SELECT;
+}>;
+
+export type CustomerOrderDetailRecord = Prisma.OrderGetPayload<{
+  select: typeof CUSTOMER_ORDER_DETAIL_SELECT;
+}>;
+
 export type OrderItemRecord = Prisma.OrderItemGetPayload<{
   select: typeof ORDER_ITEM_SELECT;
 }>;
@@ -142,6 +214,60 @@ export type OrderItemRecord = Prisma.OrderItemGetPayload<{
 @Injectable()
 export class OrdersRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  findCustomerOrdersByUserId(
+    userId: string,
+    input: {
+      page: number;
+      limit: number;
+      status?: OrderStatus;
+      search?: string;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.findMany({
+      where: this.buildCustomerOrdersWhere(userId, input),
+      skip: (input.page - 1) * input.limit,
+      take: input.limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: CUSTOMER_ORDER_SELECT,
+    });
+  }
+
+  countCustomerOrdersByUserId(
+    userId: string,
+    input: {
+      status?: OrderStatus;
+      search?: string;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.count({
+      where: this.buildCustomerOrdersWhere(userId, input),
+    });
+  }
+
+  findCustomerOrderDetailByIdForUser(
+    userId: string,
+    orderId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.findFirst({
+      where: {
+        id: orderId,
+        userId,
+      },
+      select: CUSTOMER_ORDER_DETAIL_SELECT,
+    });
+  }
 
   findSellerOrdersByUserId(
     sellerUserId: string,
@@ -383,6 +509,28 @@ export class OrdersRepository {
       where.createdAt = {
         ...(input.placedFrom ? { gte: input.placedFrom } : {}),
         ...(input.placedToExclusive ? { lt: input.placedToExclusive } : {}),
+      };
+    }
+
+    return where;
+  }
+
+  private buildCustomerOrdersWhere(
+    userId: string,
+    input: {
+      status?: OrderStatus;
+      search?: string;
+    },
+  ): Prisma.OrderWhereInput {
+    const where: Prisma.OrderWhereInput = {
+      userId,
+      ...(input.status ? { status: input.status } : {}),
+    };
+
+    if (input.search) {
+      where.orderNumber = {
+        contains: input.search,
+        mode: 'insensitive',
       };
     }
 
