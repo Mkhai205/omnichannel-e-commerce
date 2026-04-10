@@ -148,6 +148,11 @@ export class ProductReviewSwaggerDto {
   updatedAt!: string;
 }
 
+export class ProductReviewListItemSwaggerDto extends ProductReviewSwaggerDto {
+  @ApiProperty({ example: 'Nguyen Van A' })
+  reviewerName!: string;
+}
+
 export class UpsertProductReviewDataSwaggerDto {
   @ApiProperty({ type: ProductReviewSwaggerDto })
   review!: ProductReviewSwaggerDto;
@@ -171,6 +176,14 @@ export class PaginationMetaSwaggerDto {
 
   @ApiProperty({ example: 5 })
   totalPages!: number;
+}
+
+export class ProductReviewsListDataSwaggerDto {
+  @ApiProperty({ type: [ProductReviewListItemSwaggerDto] })
+  data!: ProductReviewListItemSwaggerDto[];
+
+  @ApiProperty({ type: PaginationMetaSwaggerDto })
+  meta!: PaginationMetaSwaggerDto;
 }
 
 export class CategoriesListDataSwaggerDto {

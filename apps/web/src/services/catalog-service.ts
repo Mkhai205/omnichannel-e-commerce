@@ -2,6 +2,7 @@ import type {
     CategoriesListResponse,
     CategoryItem,
     ProductItem,
+    ProductReviewsListResponse,
     PublicProductSuggestionsResponse,
     PublicProductsListResponse,
 } from "@repo/shared-types";
@@ -40,6 +41,11 @@ export type CatalogProductsQueryOptions = {
     minPrice?: string;
     maxPrice?: string;
     minRating?: number;
+};
+
+export type CatalogProductReviewsQueryOptions = {
+    page?: number;
+    limit?: number;
 };
 
 function normalizeLimit(limit: number): number {
@@ -135,6 +141,40 @@ export async function getCatalogProducts(
 
     if (!response.data) {
         throw new ApiRequestError("Empty products payload", 500, response);
+    }
+
+    return response.data;
+}
+
+export async function getCatalogProductById(productId: string): Promise<ProductItem> {
+    const normalizedProductId = productId.trim();
+
+    const response = await requestApi<ProductItem>(
+        `/catalog/products/${encodeURIComponent(normalizedProductId)}`,
+    );
+
+    if (!response.data) {
+        throw new ApiRequestError("Empty product payload", 500, response);
+    }
+
+    return response.data;
+}
+
+export async function getCatalogProductReviews(
+    productId: string,
+    options: CatalogProductReviewsQueryOptions = {},
+): Promise<ProductReviewsListResponse> {
+    const normalizedProductId = productId.trim();
+    const params = new URLSearchParams();
+    params.set("page", String(normalizePage(options.page)));
+    params.set("limit", String(normalizeLimit(options.limit ?? 10)));
+
+    const response = await requestApi<ProductReviewsListResponse>(
+        `/catalog/products/${encodeURIComponent(normalizedProductId)}/reviews?${params.toString()}`,
+    );
+
+    if (!response.data) {
+        throw new ApiRequestError("Empty product reviews payload", 500, response);
     }
 
     return response.data;

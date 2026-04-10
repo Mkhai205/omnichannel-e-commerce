@@ -53,6 +53,21 @@ const PRODUCT_REVIEW_SELECT = {
   updatedAt: true,
 } satisfies Prisma.ProductReviewSelect;
 
+const PRODUCT_PUBLIC_REVIEW_SELECT = {
+  id: true,
+  productId: true,
+  userId: true,
+  rating: true,
+  comment: true,
+  createdAt: true,
+  updatedAt: true,
+  user: {
+    select: {
+      fullName: true,
+    },
+  },
+} satisfies Prisma.ProductReviewSelect;
+
 const PRODUCT_SUGGESTION_CANDIDATE_SELECT = {
   id: true,
   categoryId: true,
@@ -82,6 +97,10 @@ export type ProductSuggestionCandidateRecord = Prisma.ProductGetPayload<{
 
 export type ProductReviewRecord = Prisma.ProductReviewGetPayload<{
   select: typeof PRODUCT_REVIEW_SELECT;
+}>;
+
+export type ProductPublicReviewRecord = Prisma.ProductReviewGetPayload<{
+  select: typeof PRODUCT_PUBLIC_REVIEW_SELECT;
 }>;
 
 export interface CategoriesQueryInput {
@@ -208,6 +227,36 @@ export class CatalogRepository {
         status: 'ACTIVE',
       },
       select: PRODUCT_SELECT,
+    });
+  }
+
+  findPublicProductReviews(input: {
+    productId: string;
+    page: number;
+    limit: number;
+  }) {
+    return this.prisma.productReview.findMany({
+      where: {
+        productId: input.productId,
+        product: {
+          status: 'ACTIVE',
+        },
+      },
+      skip: (input.page - 1) * input.limit,
+      take: input.limit,
+      orderBy: { createdAt: 'desc' },
+      select: PRODUCT_PUBLIC_REVIEW_SELECT,
+    });
+  }
+
+  countPublicProductReviews(productId: string) {
+    return this.prisma.productReview.count({
+      where: {
+        productId,
+        product: {
+          status: 'ACTIVE',
+        },
+      },
     });
   }
 

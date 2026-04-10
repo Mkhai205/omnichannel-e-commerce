@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ProductItem } from "@repo/shared-types";
 import Image from "next/image";
+import Link from "next/link";
 import { Loader2Icon, StarIcon } from "lucide-react";
 import { Button, cn } from "@/components/ui";
 import { mapProductToTodaySuggestionCardItem } from "@/lib/home-today-suggestions";
@@ -26,55 +27,61 @@ function CategoryProductCard({ product }: { product: ProductItem }) {
 
     return (
         <article className="group rounded-3xl border border-gray-200 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-success/40 hover:shadow-md">
-            <div className="relative overflow-hidden rounded-2xl bg-gray-50">
-                <div className="relative aspect-square">
-                    <Image
-                        src={cardItem.imageSrc}
-                        alt={cardItem.name}
-                        fill
-                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
-                        className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                    />
-                </div>
-            </div>
-
-            <p className="mt-3 line-clamp-2 text-sm font-semibold text-gray-900">{cardItem.name}</p>
-
-            <div className="mt-1.5 flex items-center gap-2">
-                <div className="inline-flex items-center gap-0.5" aria-hidden>
-                    {Array.from({ length: 5 }, (_, index) => (
-                        <StarIcon
-                            key={`${cardItem.id}-star-${index}`}
-                            className={cn(
-                                "size-3.5",
-                                index < roundedStars
-                                    ? "fill-amber-400 text-amber-400"
-                                    : "text-gray-300",
-                            )}
+            <Link href={cardItem.href} className="block">
+                <div className="relative overflow-hidden rounded-2xl bg-gray-50">
+                    <div className="relative aspect-square">
+                        <Image
+                            src={cardItem.imageSrc}
+                            alt={cardItem.name}
+                            fill
+                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
+                            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                         />
-                    ))}
+                    </div>
                 </div>
-                {cardItem.ratingCount > 0 ? (
-                    <span className="text-xs font-medium text-gray-600">
-                        {cardItem.ratingAverage.toFixed(1)} ({cardItem.ratingCount})
-                    </span>
-                ) : (
-                    <span className="text-xs text-gray-500">Chưa có đánh giá</span>
-                )}
-            </div>
 
-            <div className="mt-2 flex items-center justify-between gap-3">
-                <span className="text-base font-bold text-success">{cardItem.displayPrice}</span>
-                <span
-                    className={
-                        cardItem.availabilityLabel === "Còn hàng"
-                            ? "rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700"
-                            : "rounded-full bg-rose-50 px-2 py-1 text-[11px] font-semibold text-rose-700"
-                    }
-                >
-                    {cardItem.availabilityLabel}
-                </span>
-            </div>
+                <p className="mt-3 line-clamp-2 text-sm font-semibold text-gray-900">
+                    {cardItem.name}
+                </p>
+
+                <div className="mt-1.5 flex items-center gap-2">
+                    <div className="inline-flex items-center gap-0.5" aria-hidden>
+                        {Array.from({ length: 5 }, (_, index) => (
+                            <StarIcon
+                                key={`${cardItem.id}-star-${index}`}
+                                className={cn(
+                                    "size-3.5",
+                                    index < roundedStars
+                                        ? "fill-amber-400 text-amber-400"
+                                        : "text-gray-300",
+                                )}
+                            />
+                        ))}
+                    </div>
+                    {cardItem.ratingCount > 0 ? (
+                        <span className="text-xs font-medium text-gray-600">
+                            {cardItem.ratingAverage.toFixed(1)} ({cardItem.ratingCount})
+                        </span>
+                    ) : (
+                        <span className="text-xs text-gray-500">Chưa có đánh giá</span>
+                    )}
+                </div>
+
+                <div className="mt-2 flex items-center justify-between gap-3">
+                    <span className="text-base font-bold text-success">
+                        {cardItem.displayPrice}
+                    </span>
+                    <span
+                        className={
+                            cardItem.availabilityLabel === "Còn hàng"
+                                ? "rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700"
+                                : "rounded-full bg-rose-50 px-2 py-1 text-[11px] font-semibold text-rose-700"
+                        }
+                    >
+                        {cardItem.availabilityLabel}
+                    </span>
+                </div>
+            </Link>
         </article>
     );
 }

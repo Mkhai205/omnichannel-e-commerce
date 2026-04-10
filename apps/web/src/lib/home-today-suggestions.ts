@@ -93,6 +93,6 @@ export function mapProductToTodaySuggestionCardItem(product: ProductItem): Today
         availabilityLabel: totalStock > 0 ? "Còn hàng" : "Hết hàng",
         ratingAverage: normalizeRatingAverage(product.ratingAverage),
         ratingCount: normalizeRatingCount(product.ratingCount),
-        href: "/shop",
+        href: `/product/${product.id}`,
     };
 }

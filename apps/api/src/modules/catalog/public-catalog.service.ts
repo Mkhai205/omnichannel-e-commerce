@@ -9,7 +9,10 @@ import type {
   CategoriesListResponse,
   CategoryItem,
   ProductItem,
+  ProductReviewListItem,
   ProductReviewItem,
+  ProductReviewsFilterRequest,
+  ProductReviewsListResponse,
   PublicProductSuggestionsRequest,
   PublicProductSuggestionsResponse,
   ProductVariantItem,
@@ -22,6 +25,7 @@ import { resolveCatalogImageUrl } from '../../core/http/catalog-image-url.helper
 import { StorageService } from '../../infrastructure/storage/storage.service';
 import type {
   CategoryRecord,
+  ProductPublicReviewRecord,
   ProductRecord,
   ProductReviewRecord,
   ProductSuggestionCandidateRecord,
@@ -228,6 +232,39 @@ export class PublicCatalogService {
       review: this.toProductReviewItem(result.review),
       ratingAverage: result.ratingAverage,
       ratingCount: result.ratingCount,
+    };
+  }
+
+  async getProductReviews(
+    productId: string,
+    filters: ProductReviewsFilterRequest,
+  ): Promise<ProductReviewsListResponse> {
+    const page = this.resolvePage(filters.page);
+    const limit = this.resolveLimit(filters.limit);
+    const activeProduct =
+      await this.catalogRepository.findActiveProductId(productId);
+
+    if (!activeProduct) {
+      throw new NotFoundException('Product not found');
+    }
+
+    const [reviews, totalItems] = await Promise.all([
+      this.catalogRepository.findPublicProductReviews({
+        productId,
+        page,
+        limit,
+      }),
+      this.catalogRepository.countPublicProductReviews(productId),
+    ]);
+
+    return {
+      data: reviews.map((review) => this.toProductReviewListItem(review)),
+      meta: {
+        page,
+        limit,
+        totalItems,
+        totalPages: totalItems === 0 ? 0 : Math.ceil(totalItems / limit),
+      },
     };
   }
 
@@ -468,6 +505,21 @@ export class PublicCatalogService {
       userId: review.userId,
       rating: review.rating,
       comment: review.comment,
+      createdAt: review.createdAt.toISOString(),
+      updatedAt: review.updatedAt.toISOString(),
+    };
+  }
+
+  private toProductReviewListItem(
+    review: ProductPublicReviewRecord,
+  ): ProductReviewListItem {
+    return {
+      id: review.id,
+      productId: review.productId,
+      userId: review.userId,
+      rating: review.rating,
+      comment: review.comment,
+      reviewerName: review.user.fullName,
       createdAt: review.createdAt.toISOString(),
       updatedAt: review.updatedAt.toISOString(),
     };

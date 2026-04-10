@@ -13,6 +13,7 @@ import type {
   CategoriesListResponse,
   CategoryItem,
   ProductItem,
+  ProductReviewsListResponse,
   PublicProductSuggestionsResponse,
   PublicProductsListResponse,
   UpsertProductReviewResponse,
@@ -30,11 +31,13 @@ import {
   CategorySwaggerDto,
   CategoriesListDataSwaggerDto,
   ProductSuggestionsDataSwaggerDto,
+  ProductReviewsListDataSwaggerDto,
   ProductSwaggerDto,
   ProductsListDataSwaggerDto,
   UpsertProductReviewDataSwaggerDto,
 } from './dto/catalog-swagger.dto';
 import { PublicCategoriesFilterDto } from './dto/public-categories-filter.dto';
+import { PublicProductReviewsFilterDto } from './dto/public-product-reviews-filter.dto';
 import { PublicProductSuggestionsFilterDto } from './dto/public-product-suggestions-filter.dto';
 import { PublicProductsFilterDto } from './dto/public-products-filter.dto';
 import { UpsertProductReviewDto } from './dto/upsert-product-review.dto';
@@ -169,6 +172,35 @@ export class CatalogController {
 
     return createSuccessResponse(product, {
       message: 'Public product detail retrieved successfully',
+    });
+  }
+
+  @Public()
+  @Get('products/:id/reviews')
+  @ApiOperation({ summary: 'Get public product reviews list by product id' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiOkEnvelopeResponse(
+    ProductReviewsListDataSwaggerDto,
+    'Public product reviews retrieved successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid query parameters or product id',
+    unauthorized: false,
+    notFound: 'Product not found',
+  })
+  async getProductReviews(
+    @Param('id', new ParseUUIDPipe()) productId: string,
+    @Query() filters: PublicProductReviewsFilterDto,
+  ): Promise<ApiResponse<ProductReviewsListResponse>> {
+    const response = await this.publicCatalogService.getProductReviews(
+      productId,
+      filters,
+    );
+
+    return createSuccessResponse(response, {
+      message: 'Public product reviews retrieved successfully',
     });
   }
 

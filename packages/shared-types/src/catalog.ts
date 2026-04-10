@@ -58,6 +58,10 @@ export interface ProductReviewItem {
     updatedAt: string;
 }
 
+export interface ProductReviewListItem extends ProductReviewItem {
+    reviewerName: string;
+}
+
 export interface UpsertProductReviewRequest {
     rating: number;
     comment?: string;
@@ -67,6 +71,11 @@ export interface UpsertProductReviewResponse {
     review: ProductReviewItem;
     ratingAverage: number;
     ratingCount: number;
+}
+
+export interface ProductReviewsFilterRequest {
+    page?: number;
+    limit?: number;
 }
 
 export interface PublicCategoriesFilterRequest {
@@ -179,3 +188,5 @@ export type PublicProductsListResponse = PaginatedResponse<ProductItem>;
 export type SellerProductsListResponse = PaginatedResponse<ProductItem>;
 
 export type AdminProductsListResponse = PaginatedResponse<ProductItem>;
+
+export type ProductReviewsListResponse = PaginatedResponse<ProductReviewListItem>;
