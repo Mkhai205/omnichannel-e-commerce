@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type {
+  PublicShopDetailItem,
   PublicShopItem,
   PublicShopsFilterRequest,
   PublicShopsListResponse,
@@ -9,7 +10,11 @@ import {
   resolveShopCoverUrl,
 } from '../../core/http/shop-avatar-url.helper';
 import { StorageService } from '../../infrastructure/storage/storage.service';
-import type { PublicShopRecord } from './shops.repository';
+import type {
+  PublicShopDetailRecord,
+  PublicShopRecord,
+  PublicShopStatsRecord,
+} from './shops.repository';
 import { ShopsRepository } from './shops.repository';
 
 @Injectable()
@@ -44,7 +49,7 @@ export class PublicShopsService {
     };
   }
 
-  async getPublicShopBySlug(slug: string): Promise<PublicShopItem> {
+  async getPublicShopBySlug(slug: string): Promise<PublicShopDetailItem> {
     const normalizedSlug = slug.trim();
     const shop =
       await this.shopsRepository.findApprovedShopBySlug(normalizedSlug);
@@ -53,7 +58,23 @@ export class PublicShopsService {
       throw new NotFoundException('Shop not found');
     }
 
-    return this.toPublicShop(shop);
+    const stats = await this.shopsRepository.findPublicShopStatsById(shop.id);
+
+    return this.toPublicShopDetail(shop, stats);
+  }
+
+  async getPublicShopById(shopId: string): Promise<PublicShopDetailItem> {
+    const normalizedShopId = shopId.trim();
+    const shop =
+      await this.shopsRepository.findApprovedShopById(normalizedShopId);
+
+    if (!shop) {
+      throw new NotFoundException('Shop not found');
+    }
+
+    const stats = await this.shopsRepository.findPublicShopStatsById(shop.id);
+
+    return this.toPublicShopDetail(shop, stats);
   }
 
   private resolvePage(page?: number): number {
@@ -86,6 +107,19 @@ export class PublicShopsService {
       avatarUrl: resolveShopAvatarUrl(this.storageService, shop.avatarKey),
       coverKey: shop.coverKey,
       coverUrl: resolveShopCoverUrl(this.storageService, shop.coverKey),
+    };
+  }
+
+  private toPublicShopDetail(
+    shop: PublicShopDetailRecord,
+    stats: PublicShopStatsRecord,
+  ): PublicShopDetailItem {
+    return {
+      ...this.toPublicShop(shop),
+      createdAt: shop.createdAt.toISOString(),
+      productCount: stats.productCount,
+      ratingAverage: stats.ratingAverage,
+      ratingCount: stats.ratingCount,
     };
   }
 }

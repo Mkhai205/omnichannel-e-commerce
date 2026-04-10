@@ -13,6 +13,13 @@ export interface PublicShopItem {
     coverUrl?: string | null;
 }
 
+export interface PublicShopDetailItem extends PublicShopItem {
+    createdAt: string;
+    productCount: number;
+    ratingAverage: number;
+    ratingCount: number;
+}
+
 export interface ShopDetail {
     id: UUID;
     userId: UUID;

@@ -9,6 +9,7 @@ import {
     getCatalogProducts,
 } from "@/services/catalog-service";
 import { isApiRequestError } from "@/services/http-client";
+import { getPublicShopById } from "@/services/shop-service";
 import { ProductDetailClient } from "./_components/product-detail-client";
 
 type ProductPageProps = {
@@ -24,7 +25,8 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
     try {
         const product = await getCatalogProductById(productId);
-        const [reviewsResponse, relatedProductsResponse] = await Promise.all([
+        const [shop, reviewsResponse, relatedProductsResponse] = await Promise.all([
+            getPublicShopById(product.shopId),
             getCatalogProductReviews(product.id, {
                 page: 1,
                 limit: INITIAL_REVIEW_LIMIT,
@@ -42,11 +44,12 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
         return (
             <main>
-                <SiteBreadcrumb section="Sản phẩm" current={product.name} />
+                {/* <SiteBreadcrumb section="Sản phẩm" current={product.name} /> */}
 
                 <section className="mx-auto w-full max-w-7xl px-4 py-8 md:px-6">
                     <ProductDetailClient
                         product={product}
+                        shop={shop}
                         initialReviews={reviewsResponse.data}
                         initialReviewMeta={reviewsResponse.meta}
                     />

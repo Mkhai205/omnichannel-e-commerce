@@ -237,8 +237,8 @@ export default function ProfilePage() {
         );
     }
 
-    const coverImageUrl = shop.coverUrl ?? "/products/background.png";
-    const avatarImageUrl = shop.avatarUrl ?? "/products/avartar.png";
+    const coverImageUrl = shop.coverUrl ?? "/profile/store-cover.svg";
+    const avatarImageUrl = shop.avatarUrl ?? "/profile/store-avatar.svg";
 
     return (
         <section className="mx-auto grid w-full max-w-5xl gap-6 pb-10">

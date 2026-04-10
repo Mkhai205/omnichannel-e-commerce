@@ -5,7 +5,7 @@ import type { ProductItem } from "@repo/shared-types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui";
 import Image from "next/image";
 
-const PRODUCT_FALLBACK_IMAGE_SRC = "/products/product.jpg";
+const PRODUCT_FALLBACK_IMAGE_SRC = "/products/image.webp";
 
 type ProductsTableProps = {
     products: ProductItem[];

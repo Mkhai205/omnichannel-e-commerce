@@ -40,6 +40,20 @@ export class PublicShopSwaggerDto {
   coverUrl?: string | null;
 }
 
+export class PublicShopDetailSwaggerDto extends PublicShopSwaggerDto {
+  @ApiProperty({ example: '2026-03-28T00:00:00.000Z' })
+  createdAt!: string;
+
+  @ApiProperty({ example: 15 })
+  productCount!: number;
+
+  @ApiProperty({ example: 4.67 })
+  ratingAverage!: number;
+
+  @ApiProperty({ example: 120 })
+  ratingCount!: number;
+}
+
 export class ShopDetailSwaggerDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
