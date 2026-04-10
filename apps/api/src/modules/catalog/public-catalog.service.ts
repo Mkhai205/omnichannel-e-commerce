@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { createHash } from 'crypto';
+import { Prisma } from '@repo/database';
 import type {
   CategoriesListResponse,
   CategoryItem,
@@ -77,12 +78,38 @@ export class PublicCatalogService {
     };
   }
 
+  async getCategoryBySlug(slug: string): Promise<CategoryItem> {
+    const normalizedSlug = slug.trim();
+
+    if (normalizedSlug.length === 0) {
+      throw new BadRequestException('slug must not be empty');
+    }
+
+    const category =
+      await this.catalogRepository.findCategoryBySlug(normalizedSlug);
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    return this.toCategoryItem(category);
+  }
+
   async getProducts(
     filters: PublicProductsFilterRequest,
   ): Promise<PublicProductsListResponse> {
     const page = this.resolvePage(filters.page);
     const limit = this.resolveLimit(filters.limit);
     const search = filters.search?.trim();
+    const minPrice = this.normalizePriceFilter(filters.minPrice, 'minPrice');
+    const maxPrice = this.normalizePriceFilter(filters.maxPrice, 'maxPrice');
+    const minRating = this.normalizeRatingFilter(filters.minRating);
+
+    if (minPrice && maxPrice && minPrice.gt(maxPrice)) {
+      throw new BadRequestException(
+        'minPrice must be less than or equal maxPrice',
+      );
+    }
 
     const query = {
       page,
@@ -90,6 +117,9 @@ export class PublicCatalogService {
       search,
       categoryId: filters.categoryId,
       shopId: filters.shopId,
+      minPrice: minPrice?.toString(),
+      maxPrice: maxPrice?.toString(),
+      minRating,
     };
 
     const [products, totalItems] = await Promise.all([
@@ -219,6 +249,41 @@ export class PublicCatalogService {
     }
 
     return limit;
+  }
+
+  private normalizePriceFilter(
+    value: string | undefined,
+    fieldName: 'minPrice' | 'maxPrice',
+  ): Prisma.Decimal | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    try {
+      const decimalValue = new Prisma.Decimal(value);
+
+      if (decimalValue.isNegative()) {
+        throw new Error('Negative number is not allowed');
+      }
+
+      return decimalValue;
+    } catch {
+      throw new BadRequestException(
+        `${fieldName} must be a valid decimal string`,
+      );
+    }
+  }
+
+  private normalizeRatingFilter(value?: number): number | undefined {
+    if (typeof value !== 'number' || Number.isNaN(value)) {
+      return undefined;
+    }
+
+    if (value < 0 || value > 5) {
+      throw new BadRequestException('minRating must be between 0 and 5');
+    }
+
+    return value;
   }
 
   private resolveSuggestionsPoolSize(limit: number): number {

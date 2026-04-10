@@ -1,8 +1,9 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import type { PublicCategoriesFilterRequest } from '@repo/shared-types';
 
-export class PublicCategoriesFilterDto {
+export class PublicCategoriesFilterDto implements PublicCategoriesFilterRequest {
   @ApiPropertyOptional({ default: 1, minimum: 1 })
   @IsOptional()
   @Type(() => Number)

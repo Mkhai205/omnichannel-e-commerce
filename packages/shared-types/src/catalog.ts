@@ -69,12 +69,22 @@ export interface UpsertProductReviewResponse {
     ratingCount: number;
 }
 
+export interface PublicCategoriesFilterRequest {
+    page?: number;
+    limit?: number;
+    parentId?: UUID;
+    search?: string;
+}
+
 export interface PublicProductsFilterRequest {
     page?: number;
     limit?: number;
     search?: string;
     categoryId?: UUID;
     shopId?: UUID;
+    minPrice?: string;
+    maxPrice?: string;
+    minRating?: number;
 }
 
 export interface PublicProductSuggestionsRequest {

@@ -98,6 +98,9 @@ export interface ProductsQueryInput {
   categoryId?: string;
   shopId?: string;
   status?: ProductStatus;
+  minPrice?: string;
+  maxPrice?: string;
+  minRating?: number;
 }
 
 type ProductsWhereFilterInput = {
@@ -105,6 +108,9 @@ type ProductsWhereFilterInput = {
   categoryId?: string;
   shopId?: string;
   status?: ProductStatus;
+  minPrice?: string;
+  maxPrice?: string;
+  minRating?: number;
 };
 
 @Injectable()
@@ -465,6 +471,30 @@ export class CatalogRepository {
 
     if (input.shopId) {
       where.shopId = input.shopId;
+    }
+
+    if (typeof input.minRating === 'number') {
+      where.ratingAverage = {
+        gte: new Prisma.Decimal(input.minRating),
+      };
+    }
+
+    if (input.minPrice || input.maxPrice) {
+      const priceFilter: Prisma.DecimalFilter = {};
+
+      if (input.minPrice) {
+        priceFilter.gte = new Prisma.Decimal(input.minPrice);
+      }
+
+      if (input.maxPrice) {
+        priceFilter.lte = new Prisma.Decimal(input.maxPrice);
+      }
+
+      where.variants = {
+        some: {
+          price: priceFilter,
+        },
+      };
     }
 
     if (input.search) {
