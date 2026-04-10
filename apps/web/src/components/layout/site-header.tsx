@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button, Input } from "@/components/ui";
 import { BrandLogo } from "@/components/layout/brand-logo";
 import { useAuth } from "@/contexts/auth-context";
+import { useCart } from "@/contexts/cart-context";
 
 const NAV_ITEMS = [
     { href: "/", label: "Trang chủ" },
@@ -20,6 +21,7 @@ export function SiteHeader() {
     const router = useRouter();
     const [searchKeyword, setSearchKeyword] = useState("");
     const { user: currentUser, isInitializing } = useAuth();
+    const { totalItems, isInitializing: isCartInitializing } = useCart();
 
     const userInitials =
         currentUser?.fullName
@@ -77,13 +79,18 @@ export function SiteHeader() {
                             <HeartIcon className="size-5" />
                         </button>
                         <div className="h-6 w-px bg-gray-200" />
-                        <button
-                            type="button"
+                        <Link
+                            href="/cart"
                             aria-label="Giỏ hàng"
-                            className="inline-flex items-center gap-2 hover:text-success"
+                            className="relative inline-flex items-center gap-2 hover:text-success"
                         >
                             <ShoppingBagIcon className="size-5" />
-                        </button>
+                            {!isCartInitializing && totalItems > 0 ? (
+                                <span className="absolute -right-2 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-success px-1 text-[10px] font-semibold text-white">
+                                    {totalItems > 99 ? "99+" : totalItems}
+                                </span>
+                            ) : null}
+                        </Link>
 
                         {!isInitializing ? (
                             currentUser ? (

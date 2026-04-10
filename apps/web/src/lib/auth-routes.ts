@@ -3,7 +3,7 @@ export const REGISTER_ROUTE = "/register";
 
 const AUTH_PUBLIC_PREFIXES = [LOGIN_ROUTE, REGISTER_ROUTE];
 
-const PROTECTED_ROUTE_PREFIXES = ["/account", "/checkout", "/orders", "/wishlist"];
+const PROTECTED_ROUTE_PREFIXES = ["/account", "/cart", "/checkout", "/orders", "/wishlist"];
 
 export function isAuthPublicRoute(pathname: string): boolean {
     return AUTH_PUBLIC_PREFIXES.some(

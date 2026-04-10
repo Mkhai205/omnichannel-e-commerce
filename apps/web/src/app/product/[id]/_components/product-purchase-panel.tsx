@@ -40,7 +40,7 @@ export function ProductPurchasePanel({
 }: ProductPurchasePanelProps) {
     return (
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700">
+            <div className="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-success">
                 Sản phẩm chính hãng
             </div>
 
@@ -55,7 +55,7 @@ export function ProductPurchasePanel({
                 <span>{totalStock > 0 ? "Còn hàng" : "Hết hàng"}</span>
             </div>
 
-            <p className="mt-4 text-3xl font-bold text-sky-600">{selectedVariantPrice}</p>
+            <p className="mt-4 text-3xl font-bold text-success">{selectedVariantPrice}</p>
 
             {product.description ? (
                 <p className="mt-4 text-sm leading-6 text-gray-600">{product.description}</p>
@@ -126,6 +126,7 @@ export function ProductPurchasePanel({
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 <Button
+                    className="bg-success hover:bg-success/90 text-white cursor-pointer disabled:pointer-events-none disabled:opacity-50"
                     type="button"
                     size="lg"
                     onClick={onAddToCart}
@@ -134,6 +135,7 @@ export function ProductPurchasePanel({
                     Thêm vào giỏ
                 </Button>
                 <Button
+                    className="border-success cursor-pointer"
                     type="button"
                     size="lg"
                     variant="outline"
@@ -152,15 +154,15 @@ export function ProductPurchasePanel({
 
             <div className="mt-6 grid grid-cols-3 gap-3 border-t border-gray-100 pt-4 text-center text-xs text-gray-600">
                 <div className="inline-flex flex-col items-center gap-1">
-                    <ShieldCheckIcon className="size-4 text-sky-600" />
+                    <ShieldCheckIcon className="size-4 text-success" />
                     Bảo hành 12 tháng
                 </div>
                 <div className="inline-flex flex-col items-center gap-1">
-                    <TruckIcon className="size-4 text-sky-600" />
+                    <TruckIcon className="size-4 text-success" />
                     Giao nhanh 2h
                 </div>
                 <div className="inline-flex flex-col items-center gap-1">
-                    <CheckIcon className="size-4 text-sky-600" />
+                    <CheckIcon className="size-4 text-success" />
                     Đổi trả 7 ngày
                 </div>
             </div>

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ProductItem, ProductReviewListItem, PublicShopDetailItem } from "@repo/shared-types";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
     buildVariantAttributeOptions,
     findMatchingVariant,
@@ -11,7 +13,10 @@ import {
     resolveTotalStock,
 } from "@/lib/product-detail";
 import { PRODUCTS_IMAGE_FALLBACK_SRC } from "@/lib/home-today-suggestions";
+import { useAuth } from "@/contexts/auth-context";
+import { useCart } from "@/contexts/cart-context";
 import { getCatalogProductReviews } from "@/services/catalog-service";
+import { isApiRequestError } from "@/services/http-client";
 import { ProductImageGallery } from "./product-image-gallery";
 import { ProductPurchasePanel } from "./product-purchase-panel";
 import { ProductReviewsSection } from "./product-reviews-section";
@@ -35,6 +40,9 @@ export function ProductDetailClient({
     initialReviews,
     initialReviewMeta,
 }: ProductDetailClientProps) {
+    const router = useRouter();
+    const { isAuthenticated } = useAuth();
+    const { addItem } = useCart();
     const galleryImages = useMemo(() => resolveProductGalleryImages(product), [product]);
     const variantOptions = useMemo(
         () => buildVariantAttributeOptions(product.variants),
@@ -105,23 +113,78 @@ export function ProductDetailClient({
         [maxQuantity],
     );
 
-    const handleAddToCart = useCallback(() => {
-        if (!selectedVariant || selectedVariant.stockQuantity <= 0) {
-            setActionNotice("Biến thể đã hết hàng. Vui lòng chọn biến thể khác.");
-            return;
-        }
+    const redirectToLogin = useCallback(() => {
+        const nextPath = `/product/${product.id}`;
+        router.push(`/login?next=${encodeURIComponent(nextPath)}&reason=auth-required`);
+    }, [product.id, router]);
 
-        setActionNotice(`Đã thêm ${quantity} sản phẩm vào giỏ (UI demo).`);
-    }, [quantity, selectedVariant]);
+    const handleAddToCart = useCallback(() => {
+        void (async () => {
+            if (!selectedVariant || selectedVariant.stockQuantity <= 0) {
+                setActionNotice("Biến thể đã hết hàng. Vui lòng chọn biến thể khác.");
+                return;
+            }
+
+            if (!isAuthenticated) {
+                setActionNotice("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.");
+                toast.info("Vui lòng đăng nhập trước khi thêm vào giỏ hàng.");
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                await addItem({
+                    variantId: selectedVariant.id,
+                    quantity,
+                });
+                setActionNotice(`Đã thêm ${quantity} sản phẩm vào giỏ hàng.`);
+                toast.success("Đã thêm sản phẩm vào giỏ hàng.");
+            } catch (error) {
+                if (isApiRequestError(error)) {
+                    setActionNotice(error.message);
+                    toast.error(error.message);
+                    return;
+                }
+
+                setActionNotice("Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.");
+                toast.error("Không thể thêm sản phẩm vào giỏ hàng.");
+            }
+        })();
+    }, [addItem, isAuthenticated, quantity, redirectToLogin, selectedVariant]);
 
     const handleBuyNow = useCallback(() => {
-        if (!selectedVariant || selectedVariant.stockQuantity <= 0) {
-            setActionNotice("Biến thể đã hết hàng. Vui lòng chọn biến thể khác.");
-            return;
-        }
+        void (async () => {
+            if (!selectedVariant || selectedVariant.stockQuantity <= 0) {
+                setActionNotice("Biến thể đã hết hàng. Vui lòng chọn biến thể khác.");
+                return;
+            }
 
-        setActionNotice("Đang chuyển sang bước thanh toán (UI demo).");
-    }, [selectedVariant]);
+            if (!isAuthenticated) {
+                setActionNotice("Vui lòng đăng nhập để tiếp tục mua ngay.");
+                toast.info("Vui lòng đăng nhập để tiếp tục mua ngay.");
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                await addItem({
+                    variantId: selectedVariant.id,
+                    quantity,
+                });
+                toast.success("Đã thêm vào giỏ hàng. Đang chuyển tới trang giỏ hàng.");
+                router.push("/cart");
+            } catch (error) {
+                if (isApiRequestError(error)) {
+                    setActionNotice(error.message);
+                    toast.error(error.message);
+                    return;
+                }
+
+                setActionNotice("Không thể xử lý mua ngay. Vui lòng thử lại.");
+                toast.error("Không thể xử lý mua ngay.");
+            }
+        })();
+    }, [addItem, isAuthenticated, quantity, redirectToLogin, router, selectedVariant]);
 
     const handleLoadMoreReviews = useCallback(async () => {
         if (isLoadingMoreReviews || !canLoadMoreReviews) {

@@ -5,6 +5,7 @@ import { SiteNewsletter } from "@/components/layout/site-newsletter";
 import { RouteToastListener } from "@/components/layout/route-toast-listener";
 import { Toaster } from "@/components/ui";
 import { AuthProvider } from "@/contexts/auth-context";
+import { CartProvider } from "@/contexts/cart-context";
 
 type SiteShellProps = {
     children: ReactNode;
@@ -13,14 +14,16 @@ type SiteShellProps = {
 export function SiteShell({ children }: SiteShellProps) {
     return (
         <AuthProvider>
-            <div className="flex min-h-screen flex-col bg-white text-gray-900">
-                <SiteHeader />
-                <RouteToastListener />
-                <div className="flex-1">{children}</div>
-                <SiteNewsletter />
-                <SiteFooter />
-                <Toaster />
-            </div>
+            <CartProvider>
+                <div className="flex min-h-screen flex-col bg-white text-gray-900">
+                    <SiteHeader />
+                    <RouteToastListener />
+                    <div className="flex-1">{children}</div>
+                    <SiteNewsletter />
+                    <SiteFooter />
+                    <Toaster />
+                </div>
+            </CartProvider>
         </AuthProvider>
     );
 }
