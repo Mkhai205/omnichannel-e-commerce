@@ -11,8 +11,6 @@ import { useAuth } from "@/contexts/auth-context";
 
 const NAV_ITEMS = [
     { href: "/", label: "Trang chủ" },
-    { href: "/shop", label: "Cửa hàng" },
-    { href: "/pages", label: "Trang" },
     { href: "/blog", label: "Tin tức" },
     { href: "/about", label: "Giới thiệu" },
     { href: "/contact", label: "Liên hệ" },
@@ -119,7 +117,7 @@ export function SiteHeader() {
                 </div>
             </div>
 
-            <div className="border-b border-gray-100 bg-neutral-800 text-white">
+            <div className="border-b border-gray-100 bg-success text-white">
                 <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-6">
                     <nav className="hidden items-center gap-8 text-sm md:flex">
                         {NAV_ITEMS.map((item) => (

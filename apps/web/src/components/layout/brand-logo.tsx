@@ -8,7 +8,7 @@ type BrandLogoProps = {
 export function BrandLogo({ dark = false }: BrandLogoProps) {
     return (
         <Link href="/" className="inline-flex items-center gap-2">
-            <LeafIcon className={`size-7 ${dark ? "text-success" : "text-success-dark"}`} />
+            <LeafIcon className={`size-7 text-success`} />
             <span
                 className={`text-3xl font-semibold tracking-tight ${
                     dark ? "text-white" : "text-[#002603]"
