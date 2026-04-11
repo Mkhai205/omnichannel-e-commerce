@@ -27,6 +27,11 @@ services:
             - "${MINIO_UI_PORT}:9001"
         volumes:
             - minio_data:/data
+        healthcheck:
+            test: ["CMD", "mc", "ready", "local"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
         networks:
             - ecommerce-network
 
