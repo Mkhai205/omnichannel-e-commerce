@@ -49,6 +49,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import {
   AuthSessionDataSwaggerDto,
+  RegisterDataSwaggerDto,
   LogoutDataSwaggerDto,
 } from './dto/auth-swagger.dto';
 import {
@@ -75,8 +76,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Register a new account' })
   @ApiBody({ type: RegisterDto })
   @ApiCreatedEnvelopeResponse(
-    AuthSessionDataSwaggerDto,
-    'User registered successfully',
+    RegisterDataSwaggerDto,
+    'User registered successfully. Please verify email to continue',
   )
   @ApiCommonErrorResponses({
     badRequest: 'Invalid payload or validation failure',
@@ -85,24 +86,12 @@ export class AuthController {
   })
   async register(
     @Body() payload: RegisterDto,
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
   ): Promise<ApiResponse<RegisterResponse>> {
-    const result = await this.authService.register(payload, {
-      ipAddress: request.ip,
-      userAgent: request.headers['user-agent'],
-    });
-
-    applyAuthCookies(
-      response,
-      result.accessToken,
-      result.refreshToken,
-      this.getTokenCookieOptions(),
-    );
+    const result = await this.authService.register(payload);
 
     return createSuccessResponse(result, {
       statusCode: HttpStatus.CREATED,
-      message: 'Registered successfully',
+      message: 'Registered successfully. Please verify your email',
     });
   }
 

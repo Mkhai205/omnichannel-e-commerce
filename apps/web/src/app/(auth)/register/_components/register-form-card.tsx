@@ -6,8 +6,11 @@ import { useRouter } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button, Card, CardContent, CardHeader, CardTitle, Checkbox, Input } from "@/components/ui";
+import { VERIFY_EMAIL_ROUTE } from "@/lib/auth-routes";
 import { useAuth } from "@/contexts/auth-context";
 import { toFriendlyErrorMessage } from "@/lib/toast-messages";
+import Image from "next/image";
+import { buildCustomerGoogleLoginUrl } from "@/services/auth-service";
 
 function deriveFullNameFromEmail(email: string): string {
     const localPart = email.split("@")[0] ?? "";
@@ -47,6 +50,10 @@ export function RegisterFormCard() {
         [acceptedTerms, confirmPassword, email, password],
     );
 
+    const handleGoogleLogin = () => {
+        window.location.href = buildCustomerGoogleLoginUrl();
+    };
+
     const handleSubmit = async () => {
         if (!canSubmit || isSubmitting) {
             return;
@@ -66,9 +73,11 @@ export function RegisterFormCard() {
                 fullName: deriveFullNameFromEmail(email),
             });
 
-            toast.success("Tạo tài khoản thành công.");
+            toast.success("Tạo tài khoản thành công. Vui lòng xác minh email để tiếp tục.");
 
-            router.replace("/");
+            router.replace(
+                `${VERIFY_EMAIL_ROUTE}?email=${encodeURIComponent(email.trim().toLowerCase())}`,
+            );
         } catch (error) {
             toast.error(toFriendlyErrorMessage(error, "Tạo tài khoản thất bại. Vui lòng thử lại."));
         } finally {
@@ -156,6 +165,22 @@ export function RegisterFormCard() {
                     />
                     <span>Đồng ý tất cả điều khoản và điều kiện</span>
                 </label>
+
+                <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.08em] text-gray-400">
+                    <span className="h-px flex-1 bg-gray-200" />
+                    <span>Hoặc tiếp tục với</span>
+                    <span className="h-px flex-1 bg-gray-200" />
+                </div>
+
+                <Button
+                    type="button"
+                    variant="outline"
+                    className="h-12 rounded-full border-gray-200 text-sm font-semibold text-gray-700"
+                    onClick={handleGoogleLogin}
+                >
+                    <Image src="/icon/google.svg" alt="Google" width={18} height={18} />
+                    Đăng nhập với Google
+                </Button>
 
                 <Button
                     type="button"

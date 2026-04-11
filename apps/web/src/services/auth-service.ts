@@ -1,12 +1,15 @@
 import type {
     AuthUser,
+    ForgotPasswordRequest,
     LoginRequest,
     LoginResponse,
     LogoutRequest,
+    ResetPasswordRequest,
     RegisterRequest,
     RegisterResponse,
+    VerifyEmailRequest,
 } from "@repo/shared-types";
-import { requestApi } from "@/services/http-client";
+import { getApiBaseUrl, requestApi } from "@/services/http-client";
 
 function requireData<T>(response: { data?: T; message: string; statusCode: number }): T {
     if (!response.data) {
@@ -14,6 +17,10 @@ function requireData<T>(response: { data?: T; message: string; statusCode: numbe
     }
 
     return response.data;
+}
+
+export function buildCustomerGoogleLoginUrl(): string {
+    return `${getApiBaseUrl()}/auth/google/login`;
 }
 
 export async function loginCustomer(payload: LoginRequest): Promise<LoginResponse> {
@@ -40,6 +47,27 @@ export async function logoutCustomer(payload?: LogoutRequest): Promise<void> {
     await requestApi<{ success: boolean }>("/auth/logout", {
         method: "POST",
         body: JSON.stringify(payload ?? {}),
+    });
+}
+
+export async function forgotPassword(payload: ForgotPasswordRequest): Promise<void> {
+    await requestApi<{ success: boolean }>("/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify(payload),
+    });
+}
+
+export async function resetPassword(payload: ResetPasswordRequest): Promise<void> {
+    await requestApi<{ success: boolean }>("/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify(payload),
+    });
+}
+
+export async function verifyEmail(payload: VerifyEmailRequest): Promise<void> {
+    await requestApi<{ success: boolean }>("/auth/verify-email", {
+        method: "POST",
+        body: JSON.stringify(payload),
     });
 }
 

@@ -29,10 +29,10 @@ export const FRONTEND_REDIRECT_URI_CONFIG_KEY = {
     'http://localhost:3002/auth/callback/success',
   FRONTEND_SELLER_LOGIN_FAILURE_REDIRECT:
     'http://localhost:3002/auth/callback/error',
-  FRONTEND_RESET_PASSWORD_REDIRECT: 'http://localhost:3000/auth/reset-password',
+  FRONTEND_RESET_PASSWORD_REDIRECT: 'http://localhost:3000/reset-password',
   FRONTEND_SELLER_RESET_PASSWORD_REDIRECT:
     'http://localhost:3002/reset-password',
-  FRONTEND_VERIFY_EMAIL_REDIRECT: 'http://localhost:3000/auth/verify-email',
+  FRONTEND_VERIFY_EMAIL_REDIRECT: 'http://localhost:3000/verify-email',
   FRONTEND_SELLER_VERIFY_EMAIL_REDIRECT: 'http://localhost:3002/verify-email',
 } as const;
 

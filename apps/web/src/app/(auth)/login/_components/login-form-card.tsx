@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button, Card, CardContent, CardHeader, CardTitle, Checkbox, Input } from "@/components/ui";
+import { FORGOT_PASSWORD_ROUTE } from "@/lib/auth-routes";
 import { useAuth } from "@/contexts/auth-context";
+import { buildCustomerGoogleLoginUrl } from "@/services/auth-service";
 import { toFriendlyErrorMessage } from "@/lib/toast-messages";
 
 function resolveSafeNextPath(candidate: string | null): string | null {
@@ -36,6 +39,10 @@ export function LoginFormCard() {
         () => email.trim().length > 0 && password.trim().length > 0,
         [email, password],
     );
+
+    const handleGoogleLogin = () => {
+        window.location.href = buildCustomerGoogleLoginUrl();
+    };
 
     const handleSubmit = async () => {
         if (!canSubmit || isSubmitting) {
@@ -112,7 +119,7 @@ export function LoginFormCard() {
                         />
                         <span>Ghi nhớ đăng nhập</span>
                     </label>
-                    <Link href="#" className="hover:text-gray-900">
+                    <Link href={FORGOT_PASSWORD_ROUTE} className="hover:text-gray-900">
                         Quên mật khẩu
                     </Link>
                 </div>
@@ -124,6 +131,22 @@ export function LoginFormCard() {
                     onClick={handleSubmit}
                 >
                     {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
+                </Button>
+
+                <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.08em] text-gray-400">
+                    <span className="h-px flex-1 bg-gray-200" />
+                    <span>Hoặc tiếp tục với</span>
+                    <span className="h-px flex-1 bg-gray-200" />
+                </div>
+
+                <Button
+                    type="button"
+                    variant="outline"
+                    className="h-12 rounded-full border-gray-200 text-sm font-semibold text-gray-700"
+                    onClick={handleGoogleLogin}
+                >
+                    <Image src="/icon/google.svg" alt="Google" width={18} height={18} />
+                    Đăng nhập với Google
                 </Button>
 
                 <p className="pt-1 text-center text-sm text-gray-600">
