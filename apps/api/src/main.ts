@@ -121,7 +121,7 @@ async function bootstrap() {
     });
   }
 
-  const port = 8000;
+  const port = 8080;
   await app.listen(port);
   logger.log(`🚀 API listening on http://localhost:${port}`);
 

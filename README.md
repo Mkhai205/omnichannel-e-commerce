@@ -86,7 +86,7 @@ See seeding details in [docs/seed-data-guide.md](docs/seed-data-guide.md).
 
 ## Default Dev Ports
 
-- API: `8000` (`apps/api`)
+- API: `8080` (`apps/api`)
 - Web: `3000` (`apps/web`)
 - Admin: `3001` (`apps/admin`)
 - Seller: `3002` (`apps/seller`)

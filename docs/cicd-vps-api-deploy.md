@@ -54,14 +54,14 @@ Lưu ý:
 
 Stack đang map:
 
-- API: host `8000` -> container `8000`
+- API: host `8080` -> container `8080`
 - Web: host `3000` -> container `3000`
 - Admin: host `3001` -> container `3000`
 - Seller: host `3002` -> container `3000`
 
 Nginx reverse proxy tương ứng:
 
-- `api-omnichannel-ecommerce.kakadev.xyz` -> `http://localhost:8000`
+- `api-omnichannel-ecommerce.kakadev.xyz` -> `http://localhost:8080`
 - `omnichannel-ecommerce.kakadev.xyz` -> `http://localhost:3000`
 - `admin-omnichannel-ecommerce.kakadev.xyz` -> `http://localhost:3001`
 - `seller-omnichannel-ecommerce.kakadev.xyz` -> `http://localhost:3002`
