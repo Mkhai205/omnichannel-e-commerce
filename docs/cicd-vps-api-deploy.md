@@ -30,9 +30,9 @@ Cài Docker và Docker Compose plugin, sau đó clone repository vào:
 
 Nếu bạn dùng đường dẫn khác, cập nhật `APP_DIR` trong `.github/workflows/deploy.yml`.
 
-## 4. Tạo Tệp `.env.prod` Trên VPS
+## 4. Tạo Tệp `.env` Trên VPS
 
-Tại thư mục gốc project (cùng cấp với `docker-compose.yml`), tạo file `.env.prod`.
+Tại thư mục gốc project (cùng cấp với `docker-compose.yml`), tạo file `.env`.
 
 Các biến quan trọng cần đúng theo production:
 
@@ -83,19 +83,19 @@ Khi push vào `main`:
 
 ```bash
 cd ~/omnichannel-e-commerce
-docker compose --env-file .env.prod up -d postgres minio
-docker compose --env-file .env.prod up -d api web admin seller
+docker compose --env-file .env up -d postgres minio
+docker compose --env-file .env up -d api web admin seller
 ```
 
 ## 8. Kiểm Tra Sau Deploy
 
 ```bash
 cd ~/omnichannel-e-commerce
-docker compose --env-file .env.prod ps
-docker compose --env-file .env.prod logs -f api
-docker compose --env-file .env.prod logs -f web
-docker compose --env-file .env.prod logs -f admin
-docker compose --env-file .env.prod logs -f seller
+docker compose --env-file .env ps
+docker compose --env-file .env logs -f api
+docker compose --env-file .env logs -f web
+docker compose --env-file .env logs -f admin
+docker compose --env-file .env logs -f seller
 ```
 
 Kiểm tra endpoint nhanh:
@@ -117,5 +117,5 @@ Rollback thủ công:
 cd ~/omnichannel-e-commerce
 export DOCKERHUB_USERNAME=<your_dockerhub_username>
 export IMAGE_TAG=<old_commit_sha>
-docker compose --env-file .env.prod up -d --no-deps api web admin seller
+docker compose --env-file .env up -d --no-deps api web admin seller
 ```

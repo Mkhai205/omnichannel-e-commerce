@@ -94,9 +94,9 @@ jobs:
 
                       compose() {
                         if command -v docker-compose >/dev/null 2>&1; then
-                          docker-compose --env-file .env.prod "$@"
+                          docker-compose --env-file .env "$@"
                         else
-                          docker compose --env-file .env.prod "$@"
+                          docker compose --env-file .env "$@"
                         fi
                       }
 
