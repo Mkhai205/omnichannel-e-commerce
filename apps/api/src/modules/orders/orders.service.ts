@@ -4,6 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type {
+  AdminOrderDetailResponse,
+  AdminOrderListItem,
+  AdminOrdersFilterRequest,
+  AdminOrdersListResponse,
   CheckoutOrder,
   CheckoutOrderItem,
   CheckoutOrdersRequest,
@@ -23,6 +27,7 @@ import { resolveCatalogImageUrl } from '../../core/http/catalog-image-url.helper
 import { StorageService } from '../../infrastructure/storage/storage.service';
 import { PaymentsService } from '../payments/payments.service';
 import {
+  type AdminOrderRecord,
   type CheckoutCartItemRecord,
   type CustomerOrderDetailRecord,
   type CustomerOrderRecord,
@@ -303,6 +308,61 @@ export class OrdersService {
     return this.toSellerOrderDetailResponse(order);
   }
 
+  async getAdminOrders(
+    filters: AdminOrdersFilterRequest,
+  ): Promise<AdminOrdersListResponse> {
+    const page = this.resolvePage(filters.page);
+    const limit = this.resolveLimit(filters.limit);
+    const search = this.normalizeSearch(filters.search);
+    const placedFrom = this.resolveStartOfDate(filters.placedFrom);
+    const placedToExclusive = this.resolveEndExclusiveOfDate(filters.placedTo);
+
+    if (placedFrom && placedToExclusive && placedFrom >= placedToExclusive) {
+      throw new BadRequestException('placedFrom must not be after placedTo');
+    }
+
+    const [orders, totalItems] = await Promise.all([
+      this.ordersRepository.findAdminOrders({
+        page,
+        limit,
+        status: filters.status,
+        settlementStatus: filters.settlementStatus,
+        search,
+        placedFrom,
+        placedToExclusive,
+      }),
+      this.ordersRepository.countAdminOrders({
+        status: filters.status,
+        settlementStatus: filters.settlementStatus,
+        search,
+        placedFrom,
+        placedToExclusive,
+      }),
+    ]);
+
+    return {
+      data: orders.map((order) => this.toAdminOrderListItem(order)),
+      meta: {
+        page,
+        limit,
+        totalItems,
+        totalPages: totalItems === 0 ? 0 : Math.ceil(totalItems / limit),
+      },
+    };
+  }
+
+  async getAdminOrderDetail(
+    orderId: string,
+  ): Promise<AdminOrderDetailResponse> {
+    const order = await this.ordersRepository.findAdminOrderDetailById(orderId);
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return this.toSellerOrderDetailResponse(order);
+  }
+
   private groupItemsByShop(
     items: CheckoutCartItemRecord[],
   ): CheckoutOrderGroup[] {
@@ -411,6 +471,29 @@ export class OrdersService {
       id: order.id,
       orderNumber: order.orderNumber,
       customerName: order.user.fullName,
+      userId: order.userId,
+      shopId: order.shopId,
+      shippingAddressId: order.shippingAddressId,
+      status: order.status,
+      subtotal: this.normalizeMoney(order.subtotal.toString()),
+      totalAmount: this.normalizeMoney(order.totalAmount.toString()),
+      note: order.note,
+      shippedAt: order.shippedAt?.toISOString() ?? null,
+      deliveredAt: order.deliveredAt?.toISOString() ?? null,
+      settlementStatus: order.settlementStatus,
+      settledAt: order.settledAt?.toISOString() ?? null,
+      createdAt: order.createdAt.toISOString(),
+      updatedAt: order.updatedAt.toISOString(),
+    };
+  }
+
+  private toAdminOrderListItem(order: AdminOrderRecord): AdminOrderListItem {
+    return {
+      id: order.id,
+      orderNumber: order.orderNumber,
+      customerName: order.user.fullName,
+      customerEmail: order.user.email,
+      shopName: order.shop.shopName,
       userId: order.userId,
       shopId: order.shopId,
       shippingAddressId: order.shippingAddressId,

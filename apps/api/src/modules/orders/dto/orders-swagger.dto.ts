@@ -191,6 +191,14 @@ export class SellerOrderSwaggerDto {
   updatedAt!: string;
 }
 
+export class AdminOrderSwaggerDto extends SellerOrderSwaggerDto {
+  @ApiProperty({ example: 'customer@example.com' })
+  customerEmail!: string;
+
+  @ApiProperty({ example: 'Sport Mega Shop' })
+  shopName!: string;
+}
+
 export class SellerOrderDetailItemSwaggerDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -294,6 +302,14 @@ export class SellerOrderDetailSwaggerDto extends SellerOrderSwaggerDto {
 export class SellerOrdersListDataSwaggerDto {
   @ApiProperty({ type: [SellerOrderSwaggerDto] })
   data!: SellerOrderSwaggerDto[];
+
+  @ApiProperty({ type: PaginationMetaSwaggerDto })
+  meta!: PaginationMetaSwaggerDto;
+}
+
+export class AdminOrdersListDataSwaggerDto {
+  @ApiProperty({ type: [AdminOrderSwaggerDto] })
+  data!: AdminOrderSwaggerDto[];
 
   @ApiProperty({ type: PaginationMetaSwaggerDto })
   meta!: PaginationMetaSwaggerDto;

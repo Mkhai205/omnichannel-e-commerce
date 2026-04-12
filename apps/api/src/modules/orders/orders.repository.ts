@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@repo/database';
-import type { OrderStatus } from '@repo/shared-types';
+import type { OrderStatus, SettlementStatus } from '@repo/shared-types';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
 
 const CHECKOUT_CART_ITEM_SELECT = {
@@ -51,6 +51,35 @@ const SELLER_ORDER_SELECT = {
   user: {
     select: {
       fullName: true,
+    },
+  },
+  userId: true,
+  shopId: true,
+  shippingAddressId: true,
+  status: true,
+  shippedAt: true,
+  deliveredAt: true,
+  settlementStatus: true,
+  settledAt: true,
+  subtotal: true,
+  totalAmount: true,
+  note: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.OrderSelect;
+
+const ADMIN_ORDER_SELECT = {
+  id: true,
+  orderNumber: true,
+  user: {
+    select: {
+      fullName: true,
+      email: true,
+    },
+  },
+  shop: {
+    select: {
+      shopName: true,
     },
   },
   userId: true,
@@ -195,6 +224,10 @@ export type SellerOrderRecord = Prisma.OrderGetPayload<{
   select: typeof SELLER_ORDER_SELECT;
 }>;
 
+export type AdminOrderRecord = Prisma.OrderGetPayload<{
+  select: typeof ADMIN_ORDER_SELECT;
+}>;
+
 export type SellerOrderDetailRecord = Prisma.OrderGetPayload<{
   select: typeof SELLER_ORDER_DETAIL_SELECT;
 }>;
@@ -326,6 +359,59 @@ export class OrdersRepository {
         },
       },
       select: SELLER_ORDER_SELECT,
+    });
+  }
+
+  findAdminOrders(
+    input: {
+      page: number;
+      limit: number;
+      status?: OrderStatus;
+      settlementStatus?: SettlementStatus;
+      search?: string;
+      placedFrom?: Date;
+      placedToExclusive?: Date;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.findMany({
+      where: this.buildAdminOrdersWhere(input),
+      skip: (input.page - 1) * input.limit,
+      take: input.limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: ADMIN_ORDER_SELECT,
+    });
+  }
+
+  countAdminOrders(
+    input: {
+      status?: OrderStatus;
+      settlementStatus?: SettlementStatus;
+      search?: string;
+      placedFrom?: Date;
+      placedToExclusive?: Date;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.count({
+      where: this.buildAdminOrdersWhere(input),
+    });
+  }
+
+  findAdminOrderDetailById(orderId: string, tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.order.findUnique({
+      where: {
+        id: orderId,
+      },
+      select: SELLER_ORDER_DETAIL_SELECT,
     });
   }
 
@@ -531,6 +617,65 @@ export class OrdersRepository {
       where.orderNumber = {
         contains: input.search,
         mode: 'insensitive',
+      };
+    }
+
+    return where;
+  }
+
+  private buildAdminOrdersWhere(input: {
+    status?: OrderStatus;
+    settlementStatus?: SettlementStatus;
+    search?: string;
+    placedFrom?: Date;
+    placedToExclusive?: Date;
+  }): Prisma.OrderWhereInput {
+    const where: Prisma.OrderWhereInput = {
+      ...(input.status ? { status: input.status } : {}),
+      ...(input.settlementStatus
+        ? { settlementStatus: input.settlementStatus }
+        : {}),
+    };
+
+    if (input.search) {
+      where.OR = [
+        {
+          orderNumber: {
+            contains: input.search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          user: {
+            fullName: {
+              contains: input.search,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          user: {
+            email: {
+              contains: input.search,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          shop: {
+            shopName: {
+              contains: input.search,
+              mode: 'insensitive',
+            },
+          },
+        },
+      ];
+    }
+
+    if (input.placedFrom || input.placedToExclusive) {
+      where.createdAt = {
+        ...(input.placedFrom ? { gte: input.placedFrom } : {}),
+        ...(input.placedToExclusive ? { lt: input.placedToExclusive } : {}),
       };
     }
 

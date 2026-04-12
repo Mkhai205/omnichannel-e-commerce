@@ -70,6 +70,16 @@ export interface CustomerOrdersFilterRequest {
     status?: OrderStatus;
 }
 
+export interface AdminOrdersFilterRequest {
+    page?: number;
+    limit?: number;
+    search?: string;
+    placedFrom?: string;
+    placedTo?: string;
+    status?: OrderStatus;
+    settlementStatus?: SettlementStatus;
+}
+
 export interface CustomerOrderListItem {
     id: UUID;
     orderNumber: string;
@@ -192,5 +202,30 @@ export interface SellerOrderDetailResponse extends SellerOrderItem {
     shippingAddress: SellerOrderShippingAddressInfo;
     items: SellerOrderDetailItem[];
 }
+
+export interface AdminOrderListItem {
+    id: UUID;
+    orderNumber: string;
+    customerName: string;
+    customerEmail: string;
+    shopName: string;
+    userId: UUID;
+    shopId: UUID;
+    shippingAddressId: UUID;
+    status: OrderStatus;
+    subtotal: string;
+    totalAmount: string;
+    note?: string | null;
+    shippedAt?: string | null;
+    deliveredAt?: string | null;
+    settlementStatus: SettlementStatus;
+    settledAt?: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export type AdminOrderDetailResponse = SellerOrderDetailResponse;
+
+export type AdminOrdersListResponse = PaginatedResponse<AdminOrderListItem>;
 
 export type SellerOrdersListResponse = PaginatedResponse<SellerOrderItem>;
