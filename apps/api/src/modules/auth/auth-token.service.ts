@@ -38,6 +38,17 @@ export class AuthTokenService {
     );
   }
 
+  getCookieDomain(): string | undefined {
+    const configuredDomain = this.configService
+      .get<string>(
+        'AUTH_COOKIE_DOMAIN',
+        AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_DOMAIN,
+      )
+      ?.trim();
+
+    return configuredDomain ? configuredDomain : undefined;
+  }
+
   getAccessCookieMaxAgeMs(): number {
     return this.getAccessExpiresInSeconds() * 1000;
   }

@@ -233,6 +233,7 @@ export class AuthController {
       stateCookieName,
       state,
       this.authTokenService.isSecureCookie(),
+      this.authTokenService.getCookieDomain(),
     );
 
     setOAuthSourceCookie(
@@ -240,6 +241,7 @@ export class AuthController {
       sourceCookieName,
       source,
       this.authTokenService.isSecureCookie(),
+      this.authTokenService.getCookieDomain(),
     );
 
     response.redirect(redirectUrl);
@@ -276,8 +278,16 @@ export class AuthController {
     const stateCookieName = this.authGoogleService.getOAuthStateCookieName();
 
     if (query.error) {
-      clearOAuthStateCookie(response, stateCookieName);
-      clearOAuthSourceCookie(response, sourceCookieName);
+      clearOAuthStateCookie(
+        response,
+        stateCookieName,
+        this.authTokenService.getCookieDomain(),
+      );
+      clearOAuthSourceCookie(
+        response,
+        sourceCookieName,
+        this.authTokenService.getCookieDomain(),
+      );
       response.redirect(
         `${failureRedirect}?message=${encodeURIComponent(query.error)}`,
       );
@@ -289,8 +299,16 @@ export class AuthController {
       | undefined;
 
     if (!expectedState || expectedState !== query.state) {
-      clearOAuthStateCookie(response, stateCookieName);
-      clearOAuthSourceCookie(response, sourceCookieName);
+      clearOAuthStateCookie(
+        response,
+        stateCookieName,
+        this.authTokenService.getCookieDomain(),
+      );
+      clearOAuthSourceCookie(
+        response,
+        sourceCookieName,
+        this.authTokenService.getCookieDomain(),
+      );
       response.redirect(
         `${failureRedirect}?message=${encodeURIComponent('Invalid OAuth state')}`,
       );
@@ -307,8 +325,16 @@ export class AuthController {
         source,
       );
 
-      clearOAuthStateCookie(response, stateCookieName);
-      clearOAuthSourceCookie(response, sourceCookieName);
+      clearOAuthStateCookie(
+        response,
+        stateCookieName,
+        this.authTokenService.getCookieDomain(),
+      );
+      clearOAuthSourceCookie(
+        response,
+        sourceCookieName,
+        this.authTokenService.getCookieDomain(),
+      );
       applyAuthCookies(
         response,
         result.accessToken,
@@ -319,8 +345,16 @@ export class AuthController {
         this.authGoogleService.getLoginSuccessRedirectByRole(result.user.role),
       );
     } catch {
-      clearOAuthStateCookie(response, stateCookieName);
-      clearOAuthSourceCookie(response, sourceCookieName);
+      clearOAuthStateCookie(
+        response,
+        stateCookieName,
+        this.authTokenService.getCookieDomain(),
+      );
+      clearOAuthSourceCookie(
+        response,
+        sourceCookieName,
+        this.authTokenService.getCookieDomain(),
+      );
       response.redirect(
         `${failureRedirect}?message=${encodeURIComponent('Google login failed')}`,
       );
@@ -407,6 +441,7 @@ export class AuthController {
       secure: this.authTokenService.isSecureCookie(),
       accessCookieName: this.authTokenService.getAccessTokenCookieName(),
       refreshCookieName: this.authTokenService.getRefreshTokenCookieName(),
+      cookieDomain: this.authTokenService.getCookieDomain(),
       accessMaxAgeMs: this.authTokenService.getAccessCookieMaxAgeMs(),
       refreshMaxAgeMs: this.authTokenService.getRefreshCookieMaxAgeMs(),
     };

@@ -5,6 +5,7 @@ interface TokenCookieOptions {
   secure: boolean;
   accessCookieName: string;
   refreshCookieName: string;
+  cookieDomain?: string;
   accessMaxAgeMs: number;
   refreshMaxAgeMs: number;
 }
@@ -35,6 +36,7 @@ export function applyAuthCookies(
     httpOnly: true,
     sameSite: AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_SAME_SITE,
     secure: options.secure,
+    domain: options.cookieDomain,
     maxAge: options.accessMaxAgeMs,
     path: '/',
   });
@@ -43,6 +45,7 @@ export function applyAuthCookies(
     httpOnly: true,
     sameSite: AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_SAME_SITE,
     secure: options.secure,
+    domain: options.cookieDomain,
     maxAge: options.refreshMaxAgeMs,
     path: '/',
   });
@@ -52,13 +55,14 @@ export function clearAuthCookies(
   response: Response,
   options: Pick<
     TokenCookieOptions,
-    'secure' | 'accessCookieName' | 'refreshCookieName'
+    'secure' | 'accessCookieName' | 'refreshCookieName' | 'cookieDomain'
   >,
 ): void {
   response.clearCookie(options.accessCookieName, {
     httpOnly: true,
     sameSite: AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_SAME_SITE,
     secure: options.secure,
+    domain: options.cookieDomain,
     path: '/',
   });
 
@@ -66,6 +70,7 @@ export function clearAuthCookies(
     httpOnly: true,
     sameSite: AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_SAME_SITE,
     secure: options.secure,
+    domain: options.cookieDomain,
     path: '/',
   });
 }
@@ -75,11 +80,13 @@ export function setOAuthStateCookie(
   cookieName: string,
   state: string,
   secure: boolean,
+  cookieDomain?: string,
 ): void {
   response.cookie(cookieName, state, {
     httpOnly: true,
     sameSite: AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_SAME_SITE,
     secure,
+    domain: cookieDomain,
     maxAge: AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_STATE_MAX_AGE_SECONDS * 1000,
     path: '/',
   });
@@ -88,8 +95,12 @@ export function setOAuthStateCookie(
 export function clearOAuthStateCookie(
   response: Response,
   cookieName: string,
+  cookieDomain?: string,
 ): void {
-  response.clearCookie(cookieName, { path: '/' });
+  response.clearCookie(cookieName, {
+    domain: cookieDomain,
+    path: '/',
+  });
 }
 
 export function setOAuthSourceCookie(
@@ -97,11 +108,13 @@ export function setOAuthSourceCookie(
   cookieName: string,
   source: string,
   secure: boolean,
+  cookieDomain?: string,
 ): void {
   response.cookie(cookieName, source, {
     httpOnly: true,
     sameSite: AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_SAME_SITE,
     secure,
+    domain: cookieDomain,
     maxAge: AUTH_COOKIE_CONFIG_KEY.AUTH_COOKIE_STATE_MAX_AGE_SECONDS * 1000,
     path: '/',
   });
@@ -110,6 +123,10 @@ export function setOAuthSourceCookie(
 export function clearOAuthSourceCookie(
   response: Response,
   cookieName: string,
+  cookieDomain?: string,
 ): void {
-  response.clearCookie(cookieName, { path: '/' });
+  response.clearCookie(cookieName, {
+    domain: cookieDomain,
+    path: '/',
+  });
 }

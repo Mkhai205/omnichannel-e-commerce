@@ -14,6 +14,7 @@ export const JWT_CONFIG_KEY = {
 export const AUTH_COOKIE_CONFIG_KEY = {
   AUTH_COOKIE_ACCESS_NAME: 'ecommerce_access_token',
   AUTH_COOKIE_REFRESH_NAME: 'ecommerce_refresh_token',
+  AUTH_COOKIE_DOMAIN: '',
   AUTH_COOKIE_OAUTH_STATE_NAME: 'ecommerce_oauth_state',
   AUTH_COOKIE_OAUTH_SOURCE_NAME: 'ecommerce_oauth_source',
   AUTH_COOKIE_STATE_MAX_AGE_SECONDS: 300,
