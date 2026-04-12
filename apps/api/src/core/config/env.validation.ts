@@ -146,7 +146,6 @@ export function validateEnv(config: RawEnv): RawEnv {
   return {
     ...config,
     // Application configuration
-    APP_PORT: parseNumber(config.APP_PORT, APP_CONFIG_KEY.APP_PORT, 'APP_PORT'),
     NODE_ENV: String(config.NODE_ENV ?? APP_CONFIG_KEY.NODE_ENV),
     CORS_ORIGIN: String(config.CORS_ORIGIN ?? APP_CONFIG_KEY.CORS_ORIGIN),
     // JWT configuration

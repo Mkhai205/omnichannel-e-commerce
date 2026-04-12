@@ -37,6 +37,6 @@ ENV NODE_ENV=production
 COPY --from=builder /workspace/apps/api/dist ./dist
 COPY --from=builder /workspace/deploy/api/node_modules ./node_modules
 
-EXPOSE 8008
+EXPOSE 8000
 
 CMD ["node", "dist/main"]

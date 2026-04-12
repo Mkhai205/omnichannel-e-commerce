@@ -1,5 +1,4 @@
 export const APP_CONFIG_KEY = {
-  APP_PORT: 8000,
   NODE_ENV: 'development',
   CORS_ORIGIN:
     '["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"]',
