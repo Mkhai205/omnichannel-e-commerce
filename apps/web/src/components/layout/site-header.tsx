@@ -128,7 +128,11 @@ export function SiteHeader() {
                 <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-6">
                     <nav className="hidden items-center gap-8 text-sm md:flex">
                         {NAV_ITEMS.map((item) => (
-                            <Link key={item.label} href={item.href} className="hover:text-success">
+                            <Link
+                                key={item.label}
+                                href={item.href}
+                                className="cursor-pointer hover:text-white/80"
+                            >
                                 {item.label}
                             </Link>
                         ))}
