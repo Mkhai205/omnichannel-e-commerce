@@ -1,37 +1,43 @@
 import type { NextConfig } from "next";
 
-const remotePatterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
-    {
-        protocol: "http",
-        hostname: "101.96.66.225",
-        port: "8006",
-        pathname: "/products/**",
-    },
-];
+function parseRemotePattern(rawUrl?: string): {
+    protocol: "http" | "https";
+    hostname: string;
+    port?: string;
+    pathname: string;
+} | null {
+    if (!rawUrl || rawUrl.trim().length === 0) {
+        return null;
+    }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-if (apiUrl) {
     try {
-        const parsedApiUrl = new URL(apiUrl);
-        const protocol = parsedApiUrl.protocol.replace(":", "");
+        const parsed = new URL(rawUrl);
+        const protocol = parsed.protocol.replace(":", "");
 
-        if (protocol === "http" || protocol === "https") {
-            remotePatterns.push({
-                protocol,
-                hostname: parsedApiUrl.hostname,
-                port: parsedApiUrl.port,
-                pathname: "/products/**",
-            });
+        if (protocol !== "http" && protocol !== "https") {
+            return null;
         }
+
+        return {
+            protocol,
+            hostname: parsed.hostname,
+            port: parsed.port || undefined,
+            pathname: "/**",
+        };
     } catch {
-        // Ignore invalid NEXT_PUBLIC_API_URL and keep default remote patterns.
+        return null;
     }
 }
 
+const apiRemotePattern = parseRemotePattern(process.env.NEXT_PUBLIC_API_URL);
+
 const nextConfig: NextConfig = {
     images: {
-        remotePatterns,
+        remotePatterns: [
+            { protocol: "http", hostname: "101.96.66.225", port: "8006", pathname: "/**" },
+            { protocol: "http", hostname: "localhost", port: "9000", pathname: "/**" },
+            ...(apiRemotePattern ? [apiRemotePattern] : []),
+        ],
     },
 };
 

@@ -3,9 +3,9 @@ services:
         image: postgres:15-alpine
         restart: always
         env_file:
-            - .env
+            - .env.prod
         ports:
-            - "${POSTGRES_DB_PORT}:5432"
+            - "${POSTGRES_DB_PORT:5432}:5432"
         volumes:
             - pgdata:/var/lib/postgresql/data
         healthcheck:
@@ -21,10 +21,10 @@ services:
         restart: always
         command: server /data --console-address ":9001"
         env_file:
-            - .env
+            - .env.prod
         ports:
-            - "${MINIO_API_PORT}:9000"
-            - "${MINIO_UI_PORT}:9001"
+            - "${MINIO_API_PORT:9000}:9000"
+            - "${MINIO_UI_PORT:9001}:9001"
         volumes:
             - minio_data:/data
         healthcheck:
@@ -39,9 +39,9 @@ services:
         image: ${DOCKERHUB_USERNAME}/ecommerce-api:latest
         restart: always
         env_file:
-            - .env
+            - .env.prod
         ports:
-            - "${API_PORT}:${APP_PORT}"
+            - "${API_PORT}:${API_PORT}"
         depends_on:
             - postgres
             - minio

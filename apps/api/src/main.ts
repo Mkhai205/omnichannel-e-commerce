@@ -65,11 +65,13 @@ async function bootstrap() {
     origin: corsOrigin,
   });
 
-  const appEnv = configService.get<string>('APP_ENV', APP_CONFIG_KEY.APP_ENV);
+  const nodeEnv = configService.get<string>(
+    'NODE_ENV',
+    APP_CONFIG_KEY.NODE_ENV,
+  );
   const swaggerEnabled =
     configService.get<string>('SWAGGER_ENABLED') ??
-    (appEnv === 'production' ? 'false' : 'true');
-  const port = configService.get<number>('APP_PORT', APP_CONFIG_KEY.APP_PORT);
+    (nodeEnv === 'production' ? 'false' : 'true');
 
   if (swaggerEnabled === 'true') {
     const swaggerConfig = new DocumentBuilder()
@@ -102,6 +104,7 @@ async function bootstrap() {
     });
   }
 
+  const port = configService.get<number>('APP_PORT', APP_CONFIG_KEY.APP_PORT);
   await app.listen(port);
   logger.log(`🚀 API listening on http://localhost:${port}`);
 
