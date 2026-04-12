@@ -21,7 +21,7 @@ export default function BlogPage() {
             <main className="bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_52%,#ffffff_100%)] py-8 md:py-10">
                 <div className="mx-auto w-full max-w-7xl px-4 md:px-6">
                     <section className="mb-7 rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
-                        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.1em] text-primary">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-primary">
                             <PenSquareIcon className="size-3.5" />
                             Trung tâm kiến thức
                         </div>

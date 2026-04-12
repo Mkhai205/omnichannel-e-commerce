@@ -43,7 +43,7 @@ export function BlogListClient({ posts, featuredPost }: BlogListClientProps) {
         <div className="space-y-7">
             {featuredPost ? (
                 <article className="rounded-2xl border border-primary/15 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_48%,#f0fdf4_100%)] p-6 md:p-8">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-success/30 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.1em] text-success-dark">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-success/30 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-success-dark">
                         <SparklesIcon className="size-3.5" />
                         Bài viết nổi bật
                     </div>
