@@ -45,10 +45,7 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async register(
-    input: RegisterRequest,
-    meta: RequestMeta,
-  ): Promise<RegisterResponse> {
+  async register(input: RegisterRequest): Promise<RegisterResponse> {
     const role = input.role ?? REGISTRATION_ROLES.CUSTOMER;
     const normalizedEmail = input.email.toLowerCase();
 
@@ -70,13 +67,11 @@ export class AuthService {
       status: 'UNVERIFIED',
     });
 
-    const tokens = await this.authTokenService.issueTokenPair(user, meta);
-
     await this.sendVerifyEmail(user.id, user.email, user.fullName, user.role);
 
     return {
-      ...tokens,
-      user: this.toAuthUser(user),
+      success: true,
+      requiresEmailVerification: true,
     };
   }
 

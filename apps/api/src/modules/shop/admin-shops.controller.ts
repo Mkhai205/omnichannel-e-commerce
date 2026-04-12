@@ -19,13 +19,14 @@ import type {
   ApiResponse,
   ShopDetail,
 } from '@repo/shared-types';
-import { Roles } from '../../core/decorators';
+import { CurrentUser, Roles } from '../../core/decorators';
 import { createSuccessResponse } from '../../core/http/api-response.util';
 import {
   ApiAuthSchemes,
   ApiCommonErrorResponses,
   ApiOkEnvelopeResponse,
 } from '../../core/http/swagger-response.decorator';
+import type { JwtPayload } from '../auth/types/jwt-payload.type';
 import { AdminShopsService } from './admin-shops.service';
 import { AdminShopsFilterDto } from './dto/admin-shops-filter.dto';
 import { AdminUpdateShopStatusDto } from './dto/admin-update-shop-status.dto';
@@ -108,10 +109,12 @@ export class AdminShopsController {
     notFound: 'Shop not found',
   })
   async updateShopStatus(
+    @CurrentUser() currentUser: JwtPayload,
     @Param('id', new ParseUUIDPipe()) shopId: string,
     @Body() payload: AdminUpdateShopStatusDto,
   ): Promise<ApiResponse<ShopDetail>> {
     const shop = await this.adminShopsService.updateAdminShopStatus(
+      currentUser.sub,
       shopId,
       payload,
     );

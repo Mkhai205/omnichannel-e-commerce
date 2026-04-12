@@ -106,7 +106,8 @@ export class PaymentsController {
   @Get('vnpay/return')
   @Public()
   @ApiOperation({
-    summary: 'Verify VNPay return URL payload (no state update)',
+    summary:
+      'Verify VNPay return URL payload and sync payment status as IPN fallback',
   })
   @ApiOkEnvelopeResponse(
     VnpayReturnResponseSwaggerDto,
@@ -117,10 +118,18 @@ export class PaymentsController {
     unauthorized: false,
     notFound: false,
   })
-  verifyVnpayReturn(@Req() request: Request): ApiResponse<VnpayReturnResponse> {
+  async verifyVnpayReturn(
+    @Req() request: Request,
+  ): Promise<ApiResponse<VnpayReturnResponse>> {
     const response = this.paymentsService.verifyVnpayReturn(
       request.query as Record<string, unknown>,
     );
+
+    if (response.isVerified && response.txnRef) {
+      await this.paymentsService.processVnpayIpn(
+        request.query as Record<string, unknown>,
+      );
+    }
 
     return createSuccessResponse(response, {
       message: 'VNPay return payload verified',

@@ -74,7 +74,7 @@ export async function seedOrders(
     const orders: Prisma.OrderCreateManyInput[] = [
         {
             id: SEED_IDS.orders.pendingPayment,
-            orderNumber: "ORD-20260401-0001",
+            orderNumber: "SEED-ORD-20260401-0001",
             userId: SEED_IDS.users.customerA,
             shopId: SEED_IDS.shops.approved,
             shippingAddressId: SEED_IDS.addresses.customerA,
@@ -86,7 +86,7 @@ export async function seedOrders(
         },
         {
             id: SEED_IDS.orders.paidA,
-            orderNumber: "ORD-20260401-0002",
+            orderNumber: "SEED-ORD-20260401-0002",
             userId: SEED_IDS.users.customerB,
             shopId: SEED_IDS.shops.approved,
             shippingAddressId: SEED_IDS.addresses.customerB,
@@ -98,7 +98,7 @@ export async function seedOrders(
         },
         {
             id: SEED_IDS.orders.paidB,
-            orderNumber: "ORD-20260401-0003",
+            orderNumber: "SEED-ORD-20260401-0003",
             userId: SEED_IDS.users.customerC,
             shopId: SEED_IDS.shops.approved,
             shippingAddressId: SEED_IDS.addresses.customerC,

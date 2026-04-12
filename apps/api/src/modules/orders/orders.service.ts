@@ -4,10 +4,19 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type {
+  AdminOrderDetailResponse,
+  AdminOrderListItem,
+  AdminOrdersFilterRequest,
+  AdminOrdersListResponse,
   CheckoutOrder,
   CheckoutOrderItem,
   CheckoutOrdersRequest,
   CheckoutOrdersResponse,
+  CustomerOrderDetailResponse,
+  CustomerOrderListItem,
+  CustomerOrderListResponse,
+  CustomerOrdersFilterRequest,
+  OrderTrackingEvent,
   SellerOrderDetailItem,
   SellerOrderDetailResponse,
   SellerOrderItem,
@@ -18,7 +27,10 @@ import { resolveCatalogImageUrl } from '../../core/http/catalog-image-url.helper
 import { StorageService } from '../../infrastructure/storage/storage.service';
 import { PaymentsService } from '../payments/payments.service';
 import {
+  type AdminOrderRecord,
   type CheckoutCartItemRecord,
+  type CustomerOrderDetailRecord,
+  type CustomerOrderRecord,
   type OrderItemRecord,
   type OrderRecord,
   type SellerOrderDetailRecord,
@@ -159,6 +171,55 @@ export class OrdersService {
     });
   }
 
+  async getMyCustomerOrders(
+    userId: string,
+    filters: CustomerOrdersFilterRequest,
+  ): Promise<CustomerOrderListResponse> {
+    const page = this.resolvePage(filters.page);
+    const limit = this.resolveLimit(filters.limit);
+    const search = this.normalizeSearch(filters.search);
+
+    const [orders, totalItems] = await Promise.all([
+      this.ordersRepository.findCustomerOrdersByUserId(userId, {
+        page,
+        limit,
+        status: filters.status,
+        search,
+      }),
+      this.ordersRepository.countCustomerOrdersByUserId(userId, {
+        status: filters.status,
+        search,
+      }),
+    ]);
+
+    return {
+      data: orders.map((order) => this.toCustomerOrderListItem(order)),
+      meta: {
+        page,
+        limit,
+        totalItems,
+        totalPages: totalItems === 0 ? 0 : Math.ceil(totalItems / limit),
+      },
+    };
+  }
+
+  async getMyCustomerOrderDetail(
+    userId: string,
+    orderId: string,
+  ): Promise<CustomerOrderDetailResponse> {
+    const order =
+      await this.ordersRepository.findCustomerOrderDetailByIdForUser(
+        userId,
+        orderId,
+      );
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return this.toCustomerOrderDetailResponse(order);
+  }
+
   async getMyOrders(
     sellerUserId: string,
     filters: SellerOrdersFilterRequest,
@@ -239,6 +300,61 @@ export class OrdersService {
       sellerUserId,
       orderId,
     );
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return this.toSellerOrderDetailResponse(order);
+  }
+
+  async getAdminOrders(
+    filters: AdminOrdersFilterRequest,
+  ): Promise<AdminOrdersListResponse> {
+    const page = this.resolvePage(filters.page);
+    const limit = this.resolveLimit(filters.limit);
+    const search = this.normalizeSearch(filters.search);
+    const placedFrom = this.resolveStartOfDate(filters.placedFrom);
+    const placedToExclusive = this.resolveEndExclusiveOfDate(filters.placedTo);
+
+    if (placedFrom && placedToExclusive && placedFrom >= placedToExclusive) {
+      throw new BadRequestException('placedFrom must not be after placedTo');
+    }
+
+    const [orders, totalItems] = await Promise.all([
+      this.ordersRepository.findAdminOrders({
+        page,
+        limit,
+        status: filters.status,
+        settlementStatus: filters.settlementStatus,
+        search,
+        placedFrom,
+        placedToExclusive,
+      }),
+      this.ordersRepository.countAdminOrders({
+        status: filters.status,
+        settlementStatus: filters.settlementStatus,
+        search,
+        placedFrom,
+        placedToExclusive,
+      }),
+    ]);
+
+    return {
+      data: orders.map((order) => this.toAdminOrderListItem(order)),
+      meta: {
+        page,
+        limit,
+        totalItems,
+        totalPages: totalItems === 0 ? 0 : Math.ceil(totalItems / limit),
+      },
+    };
+  }
+
+  async getAdminOrderDetail(
+    orderId: string,
+  ): Promise<AdminOrderDetailResponse> {
+    const order = await this.ordersRepository.findAdminOrderDetailById(orderId);
 
     if (!order) {
       throw new NotFoundException('Order not found');
@@ -371,6 +487,163 @@ export class OrdersService {
     };
   }
 
+  private toAdminOrderListItem(order: AdminOrderRecord): AdminOrderListItem {
+    return {
+      id: order.id,
+      orderNumber: order.orderNumber,
+      customerName: order.user.fullName,
+      customerEmail: order.user.email,
+      shopName: order.shop.shopName,
+      userId: order.userId,
+      shopId: order.shopId,
+      shippingAddressId: order.shippingAddressId,
+      status: order.status,
+      subtotal: this.normalizeMoney(order.subtotal.toString()),
+      totalAmount: this.normalizeMoney(order.totalAmount.toString()),
+      note: order.note,
+      shippedAt: order.shippedAt?.toISOString() ?? null,
+      deliveredAt: order.deliveredAt?.toISOString() ?? null,
+      settlementStatus: order.settlementStatus,
+      settledAt: order.settledAt?.toISOString() ?? null,
+      createdAt: order.createdAt.toISOString(),
+      updatedAt: order.updatedAt.toISOString(),
+    };
+  }
+
+  private toCustomerOrderListItem(
+    order: CustomerOrderRecord,
+  ): CustomerOrderListItem {
+    return {
+      id: order.id,
+      orderNumber: order.orderNumber,
+      userId: order.userId,
+      shopId: order.shopId,
+      shippingAddressId: order.shippingAddressId,
+      status: order.status,
+      subtotal: this.normalizeMoney(order.subtotal.toString()),
+      totalAmount: this.normalizeMoney(order.totalAmount.toString()),
+      note: order.note,
+      itemCount: order._count.items,
+      shippedAt: order.shippedAt?.toISOString() ?? null,
+      deliveredAt: order.deliveredAt?.toISOString() ?? null,
+      createdAt: order.createdAt.toISOString(),
+      updatedAt: order.updatedAt.toISOString(),
+    };
+  }
+
+  private toCustomerOrderDetailResponse(
+    order: CustomerOrderDetailRecord,
+  ): CustomerOrderDetailResponse {
+    const latestPayment = order.paymentOrders.at(0)?.payment;
+
+    return {
+      ...this.toCustomerOrderListItem(order),
+      shopName: order.shop.shopName,
+      shippingAddress: {
+        id: order.shippingAddress.id,
+        recipientName: order.shippingAddress.recipientName,
+        recipientPhone: order.shippingAddress.recipientPhone,
+        streetAddress: order.shippingAddress.streetAddress,
+        wardDistrict: order.shippingAddress.wardDistrict,
+        city: order.shippingAddress.city,
+        state: order.shippingAddress.state,
+        postalCode: order.shippingAddress.postalCode,
+        country: order.shippingAddress.country,
+      },
+      items: order.items.map((item) => this.toSellerOrderDetailItem(item)),
+      payment: {
+        paymentId: latestPayment?.id,
+        paymentProvider: latestPayment?.provider,
+        paymentStatus: latestPayment?.status,
+        txnRef: latestPayment?.txnRef,
+        paidAt: latestPayment?.paidAt?.toISOString() ?? null,
+        updatedAt: latestPayment?.updatedAt?.toISOString(),
+      },
+      trackingTimeline: this.buildTrackingTimeline(order),
+    };
+  }
+
+  private buildTrackingTimeline(
+    order: CustomerOrderDetailRecord,
+  ): OrderTrackingEvent[] {
+    const timeline: OrderTrackingEvent[] = [];
+    const latestPayment = order.paymentOrders.at(0)?.payment;
+
+    timeline.push({
+      eventType: 'ORDER_CREATED',
+      status: 'PENDING_PAYMENT',
+      title: 'Đơn hàng đã được tạo',
+      description: 'Đơn hàng của bạn đã được ghi nhận trong hệ thống.',
+      timestamp: order.createdAt.toISOString(),
+    });
+
+    if (latestPayment?.paidAt) {
+      timeline.push({
+        eventType: 'PAYMENT_CONFIRMED',
+        status: 'PAID',
+        title: 'Thanh toán thành công',
+        description: 'Hệ thống đã xác nhận thanh toán cho đơn hàng.',
+        timestamp: latestPayment.paidAt.toISOString(),
+      });
+    }
+
+    if (
+      order.status === 'PROCESSING' ||
+      order.status === 'SHIPPED' ||
+      order.status === 'DELIVERED'
+    ) {
+      timeline.push({
+        eventType: 'ORDER_PROCESSING',
+        status: 'PROCESSING',
+        title: 'Đơn hàng đang được xử lý',
+        description: 'Shop đang chuẩn bị và đóng gói sản phẩm.',
+        timestamp: (
+          latestPayment?.paidAt ??
+          order.shippedAt ??
+          order.deliveredAt ??
+          order.updatedAt
+        ).toISOString(),
+      });
+    }
+
+    if (order.shippedAt) {
+      timeline.push({
+        eventType: 'ORDER_SHIPPED',
+        status: 'SHIPPED',
+        title: 'Đơn hàng đang trên đường giao',
+        description: 'Đơn vị vận chuyển đã nhận hàng và bắt đầu giao.',
+        timestamp: order.shippedAt.toISOString(),
+      });
+    }
+
+    if (order.deliveredAt) {
+      timeline.push({
+        eventType: 'ORDER_DELIVERED',
+        status: 'DELIVERED',
+        title: 'Đơn hàng đã giao thành công',
+        description: 'Bạn đã nhận được hàng. Cảm ơn bạn đã mua sắm.',
+        timestamp: order.deliveredAt.toISOString(),
+      });
+    }
+
+    if (order.status === 'CANCELLED') {
+      timeline.push({
+        eventType: 'ORDER_CANCELLED',
+        status: 'CANCELLED',
+        title: 'Đơn hàng đã bị hủy',
+        description: 'Đơn hàng không tiếp tục xử lý.',
+        timestamp: order.updatedAt.toISOString(),
+      });
+    }
+
+    return timeline.sort((a, b) => {
+      const left = new Date(a.timestamp).getTime();
+      const right = new Date(b.timestamp).getTime();
+
+      return left - right;
+    });
+  }
+
   private toSellerOrderDetailResponse(
     order: SellerOrderDetailRecord,
   ): SellerOrderDetailResponse {
@@ -496,7 +769,23 @@ export class OrdersService {
   }
 
   private normalizeMoney(value: string): string {
-    return this.formatCents(this.parseMoneyToCents(value));
+    return this.formatCents(
+      this.normalizeToWholeVndCents(this.parseMoneyToCents(value)),
+    );
+  }
+
+  private normalizeToWholeVndCents(cents: bigint): bigint {
+    const remainder = cents % 100n;
+
+    if (remainder === 0n) {
+      return cents;
+    }
+
+    if (remainder >= 50n) {
+      return cents + (100n - remainder);
+    }
+
+    return cents - remainder;
   }
 
   private parseMoneyToCents(value: string): bigint {

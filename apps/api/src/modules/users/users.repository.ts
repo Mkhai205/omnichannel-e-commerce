@@ -124,6 +124,20 @@ export class UsersRepository {
     });
   }
 
+  updateAddressById(
+    id: string,
+    data: Prisma.AddressUpdateInput,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.address.update({
+      where: { id },
+      data,
+      select: ADDRESS_SELECT,
+    });
+  }
+
   findAddressByIdForUser(
     id: string,
     userId: string,
@@ -149,11 +163,24 @@ export class UsersRepository {
     });
   }
 
-  findLatestAddressForUser(userId: string, tx?: Prisma.TransactionClient) {
+  findLatestAddressForUser(
+    userId: string,
+    tx?: Prisma.TransactionClient,
+    options?: { excludeAddressId?: string },
+  ) {
     const client = tx ?? this.prisma;
 
     return client.address.findFirst({
-      where: { userId },
+      where: {
+        userId,
+        ...(options?.excludeAddressId
+          ? {
+              id: {
+                not: options.excludeAddressId,
+              },
+            }
+          : {}),
+      },
       orderBy: { createdAt: 'desc' },
       select: ADDRESS_SELECT,
     });

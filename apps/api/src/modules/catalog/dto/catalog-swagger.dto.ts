@@ -109,6 +109,12 @@ export class ProductSwaggerDto {
   @ApiProperty({ enum: ['DRAFT', 'ACTIVE', 'HIDDEN'] })
   status!: 'DRAFT' | 'ACTIVE' | 'HIDDEN';
 
+  @ApiProperty({ example: 4.67 })
+  ratingAverage!: number;
+
+  @ApiProperty({ example: 128 })
+  ratingCount!: number;
+
   @ApiProperty({ type: [ProductVariantSwaggerDto] })
   variants!: ProductVariantSwaggerDto[];
 
@@ -117,6 +123,45 @@ export class ProductSwaggerDto {
 
   @ApiProperty({ example: '2026-03-28T00:00:00.000Z' })
   updatedAt!: string;
+}
+
+export class ProductReviewSwaggerDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  productId!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  userId!: string;
+
+  @ApiProperty({ minimum: 1, maximum: 5, example: 5 })
+  rating!: number;
+
+  @ApiPropertyOptional({ nullable: true, example: 'San pham rat tot' })
+  comment?: string | null;
+
+  @ApiProperty({ example: '2026-03-28T00:00:00.000Z' })
+  createdAt!: string;
+
+  @ApiProperty({ example: '2026-03-28T00:00:00.000Z' })
+  updatedAt!: string;
+}
+
+export class ProductReviewListItemSwaggerDto extends ProductReviewSwaggerDto {
+  @ApiProperty({ example: 'Nguyen Van A' })
+  reviewerName!: string;
+}
+
+export class UpsertProductReviewDataSwaggerDto {
+  @ApiProperty({ type: ProductReviewSwaggerDto })
+  review!: ProductReviewSwaggerDto;
+
+  @ApiProperty({ example: 4.67 })
+  ratingAverage!: number;
+
+  @ApiProperty({ example: 128 })
+  ratingCount!: number;
 }
 
 export class PaginationMetaSwaggerDto {
@@ -133,6 +178,14 @@ export class PaginationMetaSwaggerDto {
   totalPages!: number;
 }
 
+export class ProductReviewsListDataSwaggerDto {
+  @ApiProperty({ type: [ProductReviewListItemSwaggerDto] })
+  data!: ProductReviewListItemSwaggerDto[];
+
+  @ApiProperty({ type: PaginationMetaSwaggerDto })
+  meta!: PaginationMetaSwaggerDto;
+}
+
 export class CategoriesListDataSwaggerDto {
   @ApiProperty({ type: [CategorySwaggerDto] })
   data!: CategorySwaggerDto[];
@@ -147,6 +200,17 @@ export class ProductsListDataSwaggerDto {
 
   @ApiProperty({ type: PaginationMetaSwaggerDto })
   meta!: PaginationMetaSwaggerDto;
+}
+
+export class ProductSuggestionsDataSwaggerDto {
+  @ApiProperty({ type: [ProductSwaggerDto] })
+  items!: ProductSwaggerDto[];
+
+  @ApiPropertyOptional({ nullable: true })
+  nextCursor?: string | null;
+
+  @ApiProperty({ example: true })
+  hasMore!: boolean;
 }
 
 export class UploadCatalogImageResultSwaggerDto {

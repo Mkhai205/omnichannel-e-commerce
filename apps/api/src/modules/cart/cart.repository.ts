@@ -33,9 +33,14 @@ const CART_SELECT = {
   createdAt: true,
   updatedAt: true,
   items: {
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy: [
+      {
+        createdAt: 'desc',
+      },
+      {
+        id: 'desc',
+      },
+    ],
     select: CART_ITEM_SELECT,
   },
 } satisfies Prisma.CartSelect;

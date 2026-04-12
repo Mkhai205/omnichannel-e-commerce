@@ -39,7 +39,7 @@ const DEFAULT_VARIANT: VariantDraft = {
     imageUrl: null,
 };
 
-const VARIANT_IMAGE_FALLBACK_URL = "/products/product.jpg";
+const VARIANT_IMAGE_FALLBACK_URL = "/products/image.webp";
 
 type VariantImageUploadProps = {
     variant: VariantDraft;

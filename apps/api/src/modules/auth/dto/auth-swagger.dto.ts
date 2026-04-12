@@ -64,6 +64,14 @@ export class AuthSessionDataSwaggerDto {
   user!: AuthUserSwaggerDto;
 }
 
+export class RegisterDataSwaggerDto {
+  @ApiProperty({ example: true })
+  success!: boolean;
+
+  @ApiProperty({ example: true })
+  requiresEmailVerification!: boolean;
+}
+
 export class LogoutDataSwaggerDto {
   @ApiProperty({ example: true })
   success!: boolean;

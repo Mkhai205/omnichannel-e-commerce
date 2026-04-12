@@ -21,7 +21,13 @@
         "db:push": "prisma db push",
         "db:migrate:dev": "prisma migrate dev && prisma generate",
         "db:studio": "prisma studio",
-        "db:seed": "tsx src/seed.ts"
+        "db:seed": "tsx src/seed.ts --profile core",
+        "db:seed:core": "tsx src/seed.ts --profile core",
+        "db:seed:qa": "tsx src/seed.ts --profile qa",
+        "db:seed:catalog": "tsx src/seed.ts --profile core --mode catalog --cleanup-mode none",
+        "db:seed:catalog:load": "tsx src/seed.ts --profile catalog-load",
+        "db:seed:catalog:heavy": "tsx src/seed.ts --profile catalog-load --products-per-category 300 --variants-min 2 --variants-max 4 --active-ratio 0.9",
+        "db:seed:dry-run": "tsx src/seed.ts --profile core --dry-run"
     },
     "dependencies": {
         "@prisma/adapter-pg": "^7.5.0",

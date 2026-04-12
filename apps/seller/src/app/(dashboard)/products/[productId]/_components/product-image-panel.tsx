@@ -13,7 +13,7 @@ type ProductImagePanelProps = {
     onUpload: (file: File) => Promise<void>;
 };
 
-const PRODUCT_IMAGE_FALLBACK_URL = "/products/product.jpg";
+const PRODUCT_IMAGE_FALLBACK_URL = "/products/image.webp";
 
 export function ProductImagePanel({
     imageUrl,

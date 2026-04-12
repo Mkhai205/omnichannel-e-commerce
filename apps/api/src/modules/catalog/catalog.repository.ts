@@ -33,12 +33,45 @@ const PRODUCT_SELECT = {
   description: true,
   imageKey: true,
   status: true,
+  ratingAverage: true,
+  ratingCount: true,
   createdAt: true,
   updatedAt: true,
   variants: {
     orderBy: { createdAt: 'asc' },
     select: PRODUCT_VARIANT_SELECT,
   },
+} satisfies Prisma.ProductSelect;
+
+const PRODUCT_REVIEW_SELECT = {
+  id: true,
+  productId: true,
+  userId: true,
+  rating: true,
+  comment: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.ProductReviewSelect;
+
+const PRODUCT_PUBLIC_REVIEW_SELECT = {
+  id: true,
+  productId: true,
+  userId: true,
+  rating: true,
+  comment: true,
+  createdAt: true,
+  updatedAt: true,
+  user: {
+    select: {
+      fullName: true,
+    },
+  },
+} satisfies Prisma.ProductReviewSelect;
+
+const PRODUCT_SUGGESTION_CANDIDATE_SELECT = {
+  id: true,
+  categoryId: true,
+  createdAt: true,
 } satisfies Prisma.ProductSelect;
 
 const SELLER_SHOP_SELECT = {
@@ -58,6 +91,18 @@ export type ProductVariantRecord = Prisma.ProductVariantGetPayload<{
   select: typeof PRODUCT_VARIANT_SELECT;
 }>;
 
+export type ProductSuggestionCandidateRecord = Prisma.ProductGetPayload<{
+  select: typeof PRODUCT_SUGGESTION_CANDIDATE_SELECT;
+}>;
+
+export type ProductReviewRecord = Prisma.ProductReviewGetPayload<{
+  select: typeof PRODUCT_REVIEW_SELECT;
+}>;
+
+export type ProductPublicReviewRecord = Prisma.ProductReviewGetPayload<{
+  select: typeof PRODUCT_PUBLIC_REVIEW_SELECT;
+}>;
+
 export interface CategoriesQueryInput {
   page: number;
   limit: number;
@@ -72,7 +117,20 @@ export interface ProductsQueryInput {
   categoryId?: string;
   shopId?: string;
   status?: ProductStatus;
+  minPrice?: string;
+  maxPrice?: string;
+  minRating?: number;
 }
+
+type ProductsWhereFilterInput = {
+  search?: string;
+  categoryId?: string;
+  shopId?: string;
+  status?: ProductStatus;
+  minPrice?: string;
+  maxPrice?: string;
+  minRating?: number;
+};
 
 @Injectable()
 export class CatalogRepository {
@@ -121,6 +179,38 @@ export class CatalogRepository {
     });
   }
 
+  findPublicProductSuggestionCandidates(
+    input: Omit<ProductsQueryInput, 'page' | 'limit'> & {
+      take: number;
+    },
+  ) {
+    return this.prisma.product.findMany({
+      where: this.buildProductsWhere({
+        ...input,
+        status: 'ACTIVE',
+      }),
+      take: input.take,
+      orderBy: { createdAt: 'desc' },
+      select: PRODUCT_SUGGESTION_CANDIDATE_SELECT,
+    });
+  }
+
+  async findPublicProductsByIds(productIds: string[]) {
+    if (productIds.length === 0) {
+      return [];
+    }
+
+    return this.prisma.product.findMany({
+      where: {
+        id: {
+          in: productIds,
+        },
+        status: 'ACTIVE',
+      },
+      select: PRODUCT_SELECT,
+    });
+  }
+
   countPublicProducts(input: ProductsQueryInput) {
     return this.prisma.product.count({
       where: this.buildProductsWhere({
@@ -137,6 +227,48 @@ export class CatalogRepository {
         status: 'ACTIVE',
       },
       select: PRODUCT_SELECT,
+    });
+  }
+
+  findPublicProductReviews(input: {
+    productId: string;
+    page: number;
+    limit: number;
+  }) {
+    return this.prisma.productReview.findMany({
+      where: {
+        productId: input.productId,
+        product: {
+          status: 'ACTIVE',
+        },
+      },
+      skip: (input.page - 1) * input.limit,
+      take: input.limit,
+      orderBy: { createdAt: 'desc' },
+      select: PRODUCT_PUBLIC_REVIEW_SELECT,
+    });
+  }
+
+  countPublicProductReviews(productId: string) {
+    return this.prisma.productReview.count({
+      where: {
+        productId,
+        product: {
+          status: 'ACTIVE',
+        },
+      },
+    });
+  }
+
+  findActiveProductId(productId: string) {
+    return this.prisma.product.findFirst({
+      where: {
+        id: productId,
+        status: 'ACTIVE',
+      },
+      select: {
+        id: true,
+      },
     });
   }
 
@@ -277,6 +409,73 @@ export class CatalogRepository {
     });
   }
 
+  async upsertProductReviewAndRefreshRating(input: {
+    productId: string;
+    userId: string;
+    rating: number;
+    comment?: string | null;
+  }): Promise<{
+    review: ProductReviewRecord;
+    ratingAverage: number;
+    ratingCount: number;
+  }> {
+    return this.prisma.$transaction(async (tx) => {
+      const review = await tx.productReview.upsert({
+        where: {
+          productId_userId: {
+            productId: input.productId,
+            userId: input.userId,
+          },
+        },
+        create: {
+          productId: input.productId,
+          userId: input.userId,
+          rating: input.rating,
+          comment: input.comment,
+        },
+        update: {
+          rating: input.rating,
+          comment: input.comment,
+        },
+        select: PRODUCT_REVIEW_SELECT,
+      });
+
+      const aggregate = await tx.productReview.aggregate({
+        where: {
+          productId: input.productId,
+        },
+        _avg: {
+          rating: true,
+        },
+        _count: {
+          _all: true,
+        },
+      });
+
+      const averageRating = Number(aggregate._avg.rating ?? 0);
+      const normalizedAverageRating = Number.isFinite(averageRating)
+        ? Number(averageRating.toFixed(2))
+        : 0;
+      const ratingCount = aggregate._count._all;
+
+      await tx.product.update({
+        where: {
+          id: input.productId,
+        },
+        data: {
+          ratingAverage: new Prisma.Decimal(normalizedAverageRating),
+          ratingCount,
+        },
+      });
+
+      return {
+        review,
+        ratingAverage: normalizedAverageRating,
+        ratingCount,
+      };
+    });
+  }
+
   private buildCategoriesWhere(
     input: CategoriesQueryInput,
   ): Prisma.CategoryWhereInput {
@@ -307,7 +506,7 @@ export class CatalogRepository {
   }
 
   private buildProductsWhere(
-    input: ProductsQueryInput,
+    input: ProductsWhereFilterInput,
   ): Prisma.ProductWhereInput {
     const where: Prisma.ProductWhereInput = {};
 
@@ -321,6 +520,30 @@ export class CatalogRepository {
 
     if (input.shopId) {
       where.shopId = input.shopId;
+    }
+
+    if (typeof input.minRating === 'number') {
+      where.ratingAverage = {
+        gte: new Prisma.Decimal(input.minRating),
+      };
+    }
+
+    if (input.minPrice || input.maxPrice) {
+      const priceFilter: Prisma.DecimalFilter = {};
+
+      if (input.minPrice) {
+        priceFilter.gte = new Prisma.Decimal(input.minPrice);
+      }
+
+      if (input.maxPrice) {
+        priceFilter.lte = new Prisma.Decimal(input.maxPrice);
+      }
+
+      where.variants = {
+        some: {
+          price: priceFilter,
+        },
+      };
     }
 
     if (input.search) {

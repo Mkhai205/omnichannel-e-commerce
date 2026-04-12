@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import type {
   AdminUserListItem,
   AdminUserListResponse,
@@ -12,6 +12,8 @@ import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class AdminUsersService {
+  private readonly logger = new Logger(AdminUsersService.name);
+
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async getAdminUsers(
@@ -58,6 +60,7 @@ export class AdminUsersService {
   }
 
   async updateAdminUserStatus(
+    adminUserId: string,
     userId: string,
     payload: UpdateUserStatusRequest,
   ): Promise<AuthUser> {
@@ -71,10 +74,15 @@ export class AdminUsersService {
       status: payload.status,
     });
 
+    this.logger.log(
+      `[ADMIN_AUDIT] action=UPDATE_USER_STATUS actor=${adminUserId} targetUser=${userId} from=${user.status} to=${payload.status}`,
+    );
+
     return this.toAuthUser(updatedUser);
   }
 
   async updateAdminUserRole(
+    adminUserId: string,
     userId: string,
     payload: UpdateUserRoleRequest,
   ): Promise<AuthUser> {
@@ -87,6 +95,10 @@ export class AdminUsersService {
     const updatedUser = await this.usersRepository.updateUserById(userId, {
       role: payload.role,
     });
+
+    this.logger.log(
+      `[ADMIN_AUDIT] action=UPDATE_USER_ROLE actor=${adminUserId} targetUser=${userId} from=${user.role} to=${payload.role}`,
+    );
 
     return this.toAuthUser(updatedUser);
   }

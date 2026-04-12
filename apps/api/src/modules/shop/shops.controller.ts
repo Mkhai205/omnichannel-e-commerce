@@ -1,8 +1,8 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import type {
   ApiResponse,
-  PublicShopItem,
+  PublicShopDetailItem,
   PublicShopsListResponse,
 } from '@repo/shared-types';
 import { Public } from '../../core/decorators';
@@ -13,7 +13,7 @@ import {
 } from '../../core/http/swagger-response.decorator';
 import { PublicShopsFilterDto } from './dto/public-shops-filter.dto';
 import {
-  PublicShopSwaggerDto,
+  PublicShopDetailSwaggerDto,
   PublicShopsListDataSwaggerDto,
 } from './dto/shops-swagger.dto';
 import { PublicShopsService } from './public-shops.service';
@@ -49,11 +49,34 @@ export class ShopsController {
   }
 
   @Public()
+  @Get('by-id/:id')
+  @ApiOperation({ summary: 'Get public shop details by id' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOkEnvelopeResponse(
+    PublicShopDetailSwaggerDto,
+    'Public shop details retrieved successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid shop id',
+    unauthorized: false,
+    notFound: 'Shop not found',
+  })
+  async getShopById(
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Promise<ApiResponse<PublicShopDetailItem>> {
+    const shop = await this.publicShopsService.getPublicShopById(id);
+
+    return createSuccessResponse(shop, {
+      message: 'Public shop details retrieved successfully',
+    });
+  }
+
+  @Public()
   @Get(':slug')
   @ApiOperation({ summary: 'Get public shop details by slug' })
   @ApiParam({ name: 'slug', type: String })
   @ApiOkEnvelopeResponse(
-    PublicShopSwaggerDto,
+    PublicShopDetailSwaggerDto,
     'Public shop details retrieved successfully',
   )
   @ApiCommonErrorResponses({
@@ -63,7 +86,7 @@ export class ShopsController {
   })
   async getShopBySlug(
     @Param('slug') slug: string,
-  ): Promise<ApiResponse<PublicShopItem>> {
+  ): Promise<ApiResponse<PublicShopDetailItem>> {
     const shop = await this.publicShopsService.getPublicShopBySlug(slug);
 
     return createSuccessResponse(shop, {

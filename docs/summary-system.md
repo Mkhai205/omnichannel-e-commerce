@@ -24,7 +24,6 @@
 ### Admin hệ thống:
 
 - Quản lý người dùng và bảo mật: phân quyền người dùng;
-- Giám sát hệ thống
 - Content & cấu hình hệ thống
 - Quản lý tích hợp:
 - Kiểm soát tài chính:

@@ -33,6 +33,7 @@ import {
   UserAddressSwaggerDto,
 } from './dto/users-swagger.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
 import { UserProfileService } from './user-profile.service';
 
 @ApiTags('Users')
@@ -134,6 +135,33 @@ export class UsersController {
     return createSuccessResponse(address, {
       statusCode: HttpStatus.CREATED,
       message: 'Address created successfully',
+    });
+  }
+
+  @Patch('me/addresses/:id')
+  @ApiOperation({ summary: 'Update one address in current user address book' })
+  @ApiAuthSchemes()
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiBody({ type: UpdateAddressDto })
+  @ApiOkEnvelopeResponse(UserAddressSwaggerDto, 'Address updated successfully')
+  @ApiCommonErrorResponses({
+    badRequest: 'At least one valid field is required',
+    unauthorized: 'Authentication required',
+    notFound: 'Address not found',
+  })
+  async updateMyAddress(
+    @CurrentUser() currentUser: JwtPayload,
+    @Param('id', new ParseUUIDPipe()) addressId: string,
+    @Body() payload: UpdateAddressDto,
+  ): Promise<ApiResponse<UserAddress>> {
+    const address = await this.userProfileService.updateMyAddress(
+      currentUser.sub,
+      addressId,
+      payload,
+    );
+
+    return createSuccessResponse(address, {
+      message: 'Address updated successfully',
     });
   }
 

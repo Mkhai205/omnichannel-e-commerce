@@ -1,91 +1,98 @@
-# Seed Data Guide
+# Hướng Dẫn Seed Dữ Liệu
 
-## Scope
+## Mục tiêu
 
-Current seed implementation targets **Core domain data** only:
+Tài liệu này giúp bạn chọn đúng lệnh seed theo mục đích, hiểu rõ option, và tránh thao tác rủi ro.
 
-- users
-- shops
-- categories
-- products
-- product variants
-- inventory logs
-- addresses
-- carts
-- cart items
-- orders
-- order items
+## Lệnh nào dùng để làm gì
 
-Product catalog is seeded with a larger dataset:
+Dùng các lệnh từ root monorepo:
 
-- 6 fixed baseline products (used by carts/orders fixtures)
-- 30 additional generated products
-- 2-3 variants per additional product
+| Lệnh                         | Mục đích                                               | Khi dùng                              |
+| ---------------------------- | ------------------------------------------------------ | ------------------------------------- |
+| `pnpm db:seed`               | Alias mặc định (tương đương `core`)                    | Seed nhanh cho local dev              |
+| `pnpm db:seed:core`          | Seed dữ liệu nền (user/shop/catalog/cart/order cơ bản) | Dev UI/API hằng ngày                  |
+| `pnpm db:seed:qa`            | Seed `core` + payment/wallet/settlement                | Test nghiệp vụ order-payment-đối soát |
+| `pnpm db:seed:catalog`       | Append catalog nhẹ, không clean                        | Bổ sung dữ liệu demo nhanh            |
+| `pnpm db:seed:catalog:load`  | Seed catalog số lượng lớn                              | Benchmark listing/search/paging       |
+| `pnpm db:seed:catalog:heavy` | Seed catalog cực lớn                                   | Stress test                           |
+| `pnpm db:seed:dry-run`       | Chỉ preview cleanup, không ghi DB                      | Kiểm tra tác động trước khi chạy thật |
 
-It intentionally does **not** seed payment/webhook/finance settlement records in this phase.
+## Profile và mode
 
-## File Structure
+- `core`: dữ liệu nền cho dev, cleanup mặc định `reset-seed-only`.
+- `qa`: `core` + dữ liệu tài chính.
+- `catalog-load`: ưu tiên volume catalog lớn, cleanup mặc định `prune-catalog-generated`.
 
-Seed logic is split by responsibility under [packages/database/src/seed](packages/database/src/seed):
+- `full`: seed đầy đủ luồng core (có thể kèm finance nếu bật).
+- `catalog`: chỉ xử lý category/product/variant theo hướng append.
 
-- [packages/database/src/seed/core.ts](packages/database/src/seed/core.ts): orchestrates seeding flow
-- [packages/database/src/seed/cleanup.ts](packages/database/src/seed/cleanup.ts): clean phase
-- [packages/database/src/seed/modules](packages/database/src/seed/modules): domain modules
-- [packages/database/src/seed/utils.ts](packages/database/src/seed/utils.ts): money/slug/helpers
-- [packages/database/src/seed/constants.ts](packages/database/src/seed/constants.ts): deterministic IDs and seed constants
+## Cách dùng option
 
-## Commands
-
-From repository root:
+Lệnh mẫu:
 
 ```bash
-pnpm db:seed
+pnpm --filter @repo/database db:seed -- --profile qa --cleanup-mode reset-seed-only --seed-value 20270001
 ```
 
-Directly in database package:
+| Option                                                                       | Ý nghĩa                                       | Khi nên dùng                                               |
+| ---------------------------------------------------------------------------- | --------------------------------------------- | ---------------------------------------------------------- |
+| `--profile <core, qa, catalog-load>`                                         | Chọn preset seed                              | Luôn đặt rõ profile để tránh chạy sai mục đích             |
+| `--mode <full, catalog>`                                                     | Ghi đè mode của profile                       | Khi cần ép profile chạy theo mode khác mặc định            |
+| `--cleanup-mode <none, reset-all, reset-seed-only, prune-catalog-generated>` | Chọn chiến lược dọn dữ liệu trước seed        | Khi DB có dữ liệu quan trọng cần kiểm soát phạm vi cleanup |
+| `--dry-run`                                                                  | Chỉ in preview cleanup, không xóa/tạo dữ liệu | Nên chạy trước với cleanup mode mới                        |
+| `--include-finance <true, false>`                                            | Bật/tắt seed payment-wallet trong mode `full` | Bật khi test tài chính; tắt để seed nhanh                  |
+| `--seed-value <number>`                                                      | Cố định dữ liệu faker để tái lập              | QA, debug, bug reproduction                                |
+| `--products-per-category <n>`                                                | Số product tạo thêm mỗi category              | Scale catalog theo nhu cầu test                            |
+| `--variants-min <n>`                                                         | Số variant tối thiểu mỗi product              | Tăng độ đa dạng dữ liệu                                    |
+| `--variants-max <n>`                                                         | Số variant tối đa mỗi product                 | Dùng cùng `variants-min`                                   |
+| `--active-ratio <0..1>`                                                      | Tỉ lệ product `ACTIVE`                        | Test hành vi filter/listing theo status                    |
+
+## Cleanup mode (chọn nhanh)
+
+- `none`: không xóa gì trước seed.
+- `reset-seed-only`: chỉ xóa dữ liệu có marker seed (an toàn nhất cho DB dev trộn dữ liệu).
+- `prune-catalog-generated`: chỉ xóa catalog sinh tự động (`SEED-EXT-*`) và dữ liệu phụ thuộc.
+- `reset-all`: xóa toàn bộ dữ liệu nghiệp vụ trong phạm vi cleanup, cần rất thận trọng.
+
+## Quy tắc an toàn
+
+- Local-only guard bật mặc định.
+- Seed bị chặn nếu `DATABASE_URL` không thuộc host local allowlist.
+- Chỉ tắt guard khi thực sự cần:
 
 ```bash
-pnpm --filter @repo/database db:seed
+SEED_LOCAL_ONLY=false pnpm db:seed:core
 ```
 
-## Safety Guard
+## Kịch bản chạy nhanh
 
-The local-only guard exists and can be enabled in the seed entrypoint.
-
-When enabled, seed stops if `DATABASE_URL` host is not one of:
-
-- `localhost`
-- `127.0.0.1`
-- `0.0.0.0`
-- `postgres`
-- `db`
-- `host.docker.internal`
-
-This prevents accidental writes to non-local databases.
-
-## Deterministic Fake Data
-
-Seed uses `@faker-js/faker` with a deterministic seed value.
-
-- Default seed value: `20260401`
-- Override: `SEED_RANDOM_SEED=<number>`
-
-Example:
+### 1) Setup local dev
 
 ```bash
-SEED_RANDOM_SEED=20270001 pnpm db:seed
+pnpm db:seed:core
 ```
 
-## Data Reset Strategy
+### 2) Test full flow đơn hàng + thanh toán
 
-The script uses **Clean Then Seed**:
+```bash
+pnpm db:seed:qa -- --seed-value 20270001
+```
 
-1. delete domain data in FK-safe order
-2. insert seeded fixtures in dependency order
+### 3) Bơm lớn dữ liệu catalog
 
-Run this only when you accept replacing existing local data.
+```bash
+pnpm db:seed:catalog:load
+```
 
-## Notes
+### 4) Xem trước cleanup
 
-- Demo account raw password is defined in [packages/database/src/seed/constants.ts](packages/database/src/seed/constants.ts) and bcrypt hash is generated at seed runtime.
-- Order money fields are calculated via cents-based helpers to keep decimal precision stable.
+```bash
+pnpm db:seed:dry-run
+```
+
+## Lưu ý
+
+- Category seed idempotent theo slug.
+- Tiền được tính theo cents-based để tránh sai số dấu phẩy động.
+- Muốn kết quả lặp lại giữa nhiều lần seed, luôn khóa `--seed-value`.

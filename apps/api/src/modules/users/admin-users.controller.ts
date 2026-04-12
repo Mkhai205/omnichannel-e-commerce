@@ -19,13 +19,14 @@ import type {
   ApiResponse,
   AuthUser,
 } from '@repo/shared-types';
-import { Roles } from '../../core/decorators';
+import { CurrentUser, Roles } from '../../core/decorators';
 import { createSuccessResponse } from '../../core/http/api-response.util';
 import {
   ApiAuthSchemes,
   ApiCommonErrorResponses,
   ApiOkEnvelopeResponse,
 } from '../../core/http/swagger-response.decorator';
+import type { JwtPayload } from '../auth/types/jwt-payload.type';
 import { AuthUserSwaggerDto } from '../auth/dto/auth-swagger.dto';
 import { AdminUsersFilterDto } from './dto/admin-users-filter.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
@@ -109,10 +110,12 @@ export class AdminUsersController {
     notFound: 'User not found',
   })
   async updateUserStatus(
+    @CurrentUser() currentUser: JwtPayload,
     @Param('id', new ParseUUIDPipe()) userId: string,
     @Body() payload: UpdateUserStatusDto,
   ): Promise<ApiResponse<AuthUser>> {
     const user = await this.adminUsersService.updateAdminUserStatus(
+      currentUser.sub,
       userId,
       payload,
     );
@@ -134,10 +137,12 @@ export class AdminUsersController {
     notFound: 'User not found',
   })
   async updateUserRole(
+    @CurrentUser() currentUser: JwtPayload,
     @Param('id', new ParseUUIDPipe()) userId: string,
     @Body() payload: UpdateUserRoleDto,
   ): Promise<ApiResponse<AuthUser>> {
     const user = await this.adminUsersService.updateAdminUserRole(
+      currentUser.sub,
       userId,
       payload,
     );

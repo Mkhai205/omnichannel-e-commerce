@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import type {
@@ -20,6 +21,8 @@ import { ShopsRepository } from './shops.repository';
 
 @Injectable()
 export class AdminShopsService {
+  private readonly logger = new Logger(AdminShopsService.name);
+
   constructor(
     private readonly shopsRepository: ShopsRepository,
     private readonly storageService: StorageService,
@@ -68,6 +71,7 @@ export class AdminShopsService {
   }
 
   async updateAdminShopStatus(
+    adminUserId: string,
     shopId: string,
     payload: AdminUpdateShopStatusRequest,
   ): Promise<ShopDetail> {
@@ -89,6 +93,10 @@ export class AdminShopsService {
       status: payload.status,
       rejectionReason: payload.status === 'REJECTED' ? rejectionReason : null,
     });
+
+    this.logger.log(
+      `[ADMIN_AUDIT] action=UPDATE_SHOP_STATUS actor=${adminUserId} shop=${shopId} from=${shop.status} to=${payload.status} reason=${rejectionReason ?? '-'}`,
+    );
 
     return this.toShopDetail(updatedShop);
   }

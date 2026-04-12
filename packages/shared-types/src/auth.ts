@@ -38,10 +38,8 @@ export interface RegisterRequest {
 }
 
 export interface RegisterResponse {
-    accessToken: string;
-    refreshToken: string;
-    expiresInSeconds: number;
-    user: AuthUser;
+    success: boolean;
+    requiresEmailVerification: boolean;
 }
 
 export interface LoginRequest {
@@ -70,6 +68,19 @@ export interface RefreshTokenResponse {
 export interface LogoutRequest {
     refreshToken?: string;
     logoutAll?: boolean;
+}
+
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface ResetPasswordRequest {
+    token: string;
+    newPassword: string;
+}
+
+export interface VerifyEmailRequest {
+    token: string;
 }
 
 export interface AuthTokens {

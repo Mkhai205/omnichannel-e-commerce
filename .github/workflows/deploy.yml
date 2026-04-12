@@ -1,63 +1,150 @@
-# name: Deploy API To VPS
+name: Deploy Full Stack To VPS
+on:
+    push:
+        branches:
+            - main
 
-# on:
-#     push:
-#         branches:
-#             - main
+jobs:
+    build-api:
+        name: Build And Push API Image
+        runs-on: ubuntu-latest
 
-# jobs:
-#     build-and-push:
-#         name: Build And Push Docker Image
-#         runs-on: ubuntu-latest
+        steps:
+            - name: Checkout source code
+              uses: actions/checkout@v4
 
-#         steps:
-#             - name: Checkout source code
-#               uses: actions/checkout@v4
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
 
-#             - name: Set up Docker Buildx
-#               uses: docker/setup-buildx-action@v3
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-#             - name: Log in to Docker Hub
-#               uses: docker/login-action@v3
-#               with:
-#                   username: ${{ secrets.DOCKERHUB_USERNAME }}
-#                   password: ${{ secrets.DOCKERHUB_TOKEN }}
+            - name: Build and push API image
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: apps/api/Dockerfile
+                  push: true
+                  tags: |
+                      ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-api:latest
+                      ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-api:${{ github.sha }}
 
-#             - name: Build and push API image
-#               uses: docker/build-push-action@v6
-#               with:
-#                   context: .
-#                   file: apps/api/Dockerfile
-#                   push: true
-#                   tags: |
-#                       ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-api:latest
-#                       ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-api:${{ github.sha }}
+    build-frontends:
+        name: Build And Push Frontend Images
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                app:
+                    - web
+                    - admin
+                    - seller
 
-#     deploy:
-#         name: Deploy To VPS
-#         runs-on: ubuntu-latest
-#         needs: build-and-push
+        steps:
+            - name: Checkout source code
+              uses: actions/checkout@v4
 
-#         steps:
-#             - name: Deploy API container on VPS
-#               uses: appleboy/ssh-action@v1.2.0
-#               with:
-#                   host: ${{ secrets.VPS_IP }}
-#                   port: ${{ secrets.VPS_SSH_PORT }}
-#                   username: ${{ secrets.VPS_USER }}
-#                   key: ${{ secrets.SSH_PRIVATE_KEY }}
-#                   script: |
-#                       set -e
-#                       APP_DIR=~/omnichannel-e-commerce
-#                       cd "$APP_DIR"
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
 
-#                       echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-#                       docker pull "${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-api:latest"
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-#                       if command -v docker-compose >/dev/null 2>&1; then
-#                         docker-compose up -d --no-deps api
-#                       else
-#                         docker compose up -d --no-deps api
-#                       fi
+            - name: Build and push ${{ matrix.app }} image
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: apps/${{ matrix.app }}/Dockerfile
+                  push: true
+                  build-args: |
+                      NEXT_PUBLIC_API_URL=https://api-omnichannel-ecommerce.kakadev.xyz
+                      NEXT_PUBLIC_API_BASE_PATH=/api/v1
+                  tags: |
+                      ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-${{ matrix.app }}:latest
+                      ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-${{ matrix.app }}:${{ github.sha }}
 
-#                       docker image prune -f
+    deploy:
+        name: Deploy To VPS
+        runs-on: ubuntu-latest
+        needs:
+            - build-api
+            - build-frontends
+
+        steps:
+            - name: Deploy services on VPS
+              uses: appleboy/ssh-action@v1.2.0
+              with:
+                  host: ${{ secrets.VPS_IP }}
+                  port: ${{ secrets.VPS_SSH_PORT }}
+                  username: ${{ secrets.VPS_USER }}
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  script: |
+                      set -euo pipefail
+                      APP_DIR=~/omnichannel-e-commerce
+                      cd "$APP_DIR"
+
+                      REGISTRY_USER="${{ secrets.DOCKERHUB_USERNAME }}"
+                      NEW_TAG="${{ github.sha }}"
+                      OLD_TAG="$(cat .image-tag 2>/dev/null || echo latest)"
+
+                      compose() {
+                        if command -v docker-compose >/dev/null 2>&1; then
+                          docker-compose --env-file .env.prod "$@"
+                        else
+                          docker compose --env-file .env.prod "$@"
+                        fi
+                      }
+
+                      echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "$REGISTRY_USER" --password-stdin
+
+                      docker pull "$REGISTRY_USER/ecommerce-api:$NEW_TAG"
+                      docker pull "$REGISTRY_USER/ecommerce-web:$NEW_TAG"
+                      docker pull "$REGISTRY_USER/ecommerce-admin:$NEW_TAG"
+                      docker pull "$REGISTRY_USER/ecommerce-seller:$NEW_TAG"
+
+                      export DOCKERHUB_USERNAME="$REGISTRY_USER"
+                      export IMAGE_TAG="$NEW_TAG"
+
+                      compose up -d --no-deps api web admin seller
+
+                      check_endpoint() {
+                        service_name="$1"
+                        url="$2"
+                        max_attempts=30
+                        attempt=1
+
+                        while [ "$attempt" -le "$max_attempts" ]; do
+                          status_code="$(curl -k -sS -o /dev/null -w "%{http_code}" "$url" || true)"
+
+                          if [ "$status_code" != "000" ] && [ "$status_code" -lt 500 ]; then
+                            echo "[healthy] $service_name ($url) status=$status_code"
+                            return 0
+                          fi
+
+                          echo "[retry $attempt/$max_attempts] $service_name ($url) status=$status_code"
+                          attempt=$((attempt + 1))
+                          sleep 3
+                        done
+
+                        echo "[failed] $service_name ($url)"
+                        return 1
+                      }
+
+                      if ! check_endpoint "api" "https://api-omnichannel-ecommerce.kakadev.xyz/api/v1" || \
+                         ! check_endpoint "web" "https://omnichannel-ecommerce.kakadev.xyz" || \
+                         ! check_endpoint "admin" "https://admin-omnichannel-ecommerce.kakadev.xyz" || \
+                         ! check_endpoint "seller" "https://seller-omnichannel-ecommerce.kakadev.xyz"; then
+                        echo "Deployment health check failed. Rolling back to tag $OLD_TAG"
+                        export IMAGE_TAG="$OLD_TAG"
+                        compose up -d --no-deps api web admin seller
+                        exit 1
+                      fi
+
+                      echo "$NEW_TAG" > .image-tag
+
+                      docker image prune -f

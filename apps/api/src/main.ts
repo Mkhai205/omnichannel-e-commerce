@@ -32,17 +32,29 @@ async function bootstrap() {
   app.use(cookieParser());
 
   const configService = app.get(ConfigService);
+  const nodeEnv = configService.get<string>(
+    'NODE_ENV',
+    APP_CONFIG_KEY.NODE_ENV,
+  );
   const corsOriginRaw = configService.get<string>(
     'CORS_ORIGIN',
     APP_CONFIG_KEY.CORS_ORIGIN,
   );
 
-  let corsOrigin: true | string[] = true;
+  let corsOrigin: true | string[] = nodeEnv === 'production' ? [] : true;
 
   if (corsOriginRaw && corsOriginRaw.trim()) {
     const normalizedOrigin = corsOriginRaw.trim();
 
-    if (normalizedOrigin !== '*') {
+    if (normalizedOrigin === '*') {
+      if (nodeEnv === 'production') {
+        throw new Error(
+          'CORS_ORIGIN must explicitly list allowed origins in production',
+        );
+      }
+
+      corsOrigin = true;
+    } else {
       try {
         const parsedOrigins = JSON.parse(normalizedOrigin) as unknown;
 
@@ -60,16 +72,23 @@ async function bootstrap() {
     }
   }
 
+  if (Array.isArray(corsOrigin) && corsOrigin.length === 0) {
+    if (nodeEnv === 'production') {
+      throw new Error(
+        'CORS_ORIGIN must include at least one allowed origin in production',
+      );
+    }
+
+    corsOrigin = true;
+  }
+
   app.enableCors({
     credentials: true,
     origin: corsOrigin,
   });
-
-  const appEnv = configService.get<string>('APP_ENV', APP_CONFIG_KEY.APP_ENV);
   const swaggerEnabled =
     configService.get<string>('SWAGGER_ENABLED') ??
-    (appEnv === 'production' ? 'false' : 'true');
-  const port = configService.get<number>('APP_PORT', APP_CONFIG_KEY.APP_PORT);
+    (nodeEnv === 'production' ? 'false' : 'true');
 
   if (swaggerEnabled === 'true') {
     const swaggerConfig = new DocumentBuilder()
@@ -102,11 +121,12 @@ async function bootstrap() {
     });
   }
 
+  const port = 8080;
   await app.listen(port);
   logger.log(`🚀 API listening on http://localhost:${port}`);
 
   if (swaggerEnabled === 'true') {
-    logger.log(`📘 Swagger UI: http://$localhost:${port}/${docsPath}`);
+    logger.log(`📘 Swagger UI: http://localhost:${port}/${docsPath}`);
   }
 }
 void bootstrap();

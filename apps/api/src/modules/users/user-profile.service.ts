@@ -8,6 +8,7 @@ import type {
   AddressType,
   AuthUser,
   CreateAddressRequest,
+  UpdateAddressRequest,
   UpdateProfileRequest,
   UserAddress,
   UserAddressListResponse,
@@ -121,6 +122,94 @@ export class UserProfileService {
     );
 
     return this.toUserAddress(createdAddress);
+  }
+
+  async updateMyAddress(
+    userId: string,
+    addressId: string,
+    payload: UpdateAddressRequest,
+  ): Promise<UserAddress> {
+    const hasAnyField = Object.values(payload).some(
+      (value) => value !== undefined,
+    );
+
+    if (!hasAnyField) {
+      throw new BadRequestException('At least one field must be provided');
+    }
+
+    const updatedAddress = await this.usersRepository.runInTransaction(
+      async (tx) => {
+        const address = await this.usersRepository.findAddressByIdForUser(
+          addressId,
+          userId,
+          tx,
+        );
+
+        if (!address) {
+          throw new NotFoundException('Address not found');
+        }
+
+        const shouldSetDefault = payload.isDefault === true;
+        const shouldUnsetDefault =
+          payload.isDefault === false && address.isDefault;
+
+        if (shouldSetDefault) {
+          await this.usersRepository.clearDefaultAddresses(userId, tx);
+        }
+
+        const nextAddress = await this.usersRepository.updateAddressById(
+          addressId,
+          {
+            ...(payload.type ? { type: payload.type } : {}),
+            ...(payload.recipientName
+              ? { recipientName: payload.recipientName.trim() }
+              : {}),
+            ...(payload.recipientPhone
+              ? { recipientPhone: payload.recipientPhone.trim() }
+              : {}),
+            ...(payload.streetAddress
+              ? { streetAddress: payload.streetAddress.trim() }
+              : {}),
+            ...(payload.wardDistrict !== undefined
+              ? { wardDistrict: payload.wardDistrict.trim() || null }
+              : {}),
+            ...(payload.city ? { city: payload.city.trim() } : {}),
+            ...(payload.state ? { state: payload.state.trim() } : {}),
+            ...(payload.postalCode
+              ? { postalCode: payload.postalCode.trim() }
+              : {}),
+            ...(payload.country ? { country: payload.country.trim() } : {}),
+            ...(payload.isDefault !== undefined
+              ? { isDefault: payload.isDefault }
+              : {}),
+          },
+          tx,
+        );
+
+        if (shouldUnsetDefault) {
+          const replacementAddress =
+            await this.usersRepository.findLatestAddressForUser(userId, tx, {
+              excludeAddressId: addressId,
+            });
+
+          if (!replacementAddress) {
+            throw new BadRequestException(
+              'At least one default address is required',
+            );
+          }
+
+          await this.usersRepository.setAddressDefault(
+            replacementAddress.id,
+            true,
+            tx,
+          );
+        }
+
+        return nextAddress;
+      },
+    );
+
+    return this.toUserAddress(updatedAddress);
   }
 
   async deleteMyAddress(

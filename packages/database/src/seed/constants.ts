@@ -1,7 +1,11 @@
 export const DEFAULT_SEED_PASSWORD = "password";
+export const DEFAULT_SEED_ADMIN_WALLET_CODE = "SEED-MAIN";
 
 export const DEFAULT_SEED_VALUE = 20260401;
-export const EXTRA_PRODUCT_COUNT = 30;
+export const DEFAULT_PRODUCTS_PER_CATEGORY = 2;
+export const DEFAULT_VARIANTS_MIN = 2;
+export const DEFAULT_VARIANTS_MAX = 3;
+export const DEFAULT_ACTIVE_RATIO = 0.8;
 
 export const SEED_IDS = {
     users: {
@@ -28,6 +32,19 @@ export const SEED_IDS = {
         laptops: "00000000-0000-4000-8000-000000002012",
         menFashion: "00000000-0000-4000-8000-000000002013",
         kitchen: "00000000-0000-4000-8000-000000002014",
+        womenFashion: "00000000-0000-4000-8000-000000002015",
+        menShoes: "00000000-0000-4000-8000-000000002016",
+        womenShoes: "00000000-0000-4000-8000-000000002017",
+        beautyHealth: "00000000-0000-4000-8000-000000002018",
+        carMoto: "00000000-0000-4000-8000-000000002019",
+        householdAppliances: "00000000-0000-4000-8000-000000002020",
+        jewelryAccessories: "00000000-0000-4000-8000-000000002021",
+        mobilePhones: "00000000-0000-4000-8000-000000002022",
+        pets: "00000000-0000-4000-8000-000000002023",
+        sports: "00000000-0000-4000-8000-000000002024",
+        toys: "00000000-0000-4000-8000-000000002025",
+        books: "00000000-0000-4000-8000-000000002026",
+        vouchers: "00000000-0000-4000-8000-000000002027",
     },
     products: {
         smartphoneA: "00000000-0000-4000-8000-000000003001",
@@ -67,5 +84,28 @@ export const SEED_IDS = {
         pendingPayment: "00000000-0000-4000-8000-000000007001",
         paidA: "00000000-0000-4000-8000-000000007002",
         paidB: "00000000-0000-4000-8000-000000007003",
+    },
+    payments: {
+        pendingOrder: "00000000-0000-4000-8000-000000008001",
+        paidA: "00000000-0000-4000-8000-000000008002",
+        paidB: "00000000-0000-4000-8000-000000008003",
+    },
+    adminWallets: {
+        main: "00000000-0000-4000-8000-000000009001",
+    },
+    sellerWallets: {
+        approved: "00000000-0000-4000-8000-000000010001",
+        pending: "00000000-0000-4000-8000-000000010002",
+        rejected: "00000000-0000-4000-8000-000000010003",
+    },
+    adminWalletLedgers: {
+        paymentInflowA: "00000000-0000-4000-8000-000000011001",
+        paymentInflowB: "00000000-0000-4000-8000-000000011002",
+        sellerSettlementA: "00000000-0000-4000-8000-000000011003",
+        sellerSettlementB: "00000000-0000-4000-8000-000000011004",
+    },
+    sellerSettlements: {
+        paidA: "00000000-0000-4000-8000-000000012001",
+        paidB: "00000000-0000-4000-8000-000000012002",
     },
 } as const;

@@ -337,6 +337,8 @@ export class SellerCatalogService {
   }
 
   private toProductItem(product: ProductRecord): ProductItem {
+    const ratingAverage = Number(product.ratingAverage.toString());
+
     return {
       id: product.id,
       shopId: product.shopId,
@@ -346,6 +348,8 @@ export class SellerCatalogService {
       imageKey: product.imageKey,
       imageUrl: resolveCatalogImageUrl(this.storageService, product.imageKey),
       status: product.status,
+      ratingAverage: Number.isFinite(ratingAverage) ? ratingAverage : 0,
+      ratingCount: product.ratingCount,
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
       variants: product.variants.map((variant) =>

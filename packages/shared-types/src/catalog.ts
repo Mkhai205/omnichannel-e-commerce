@@ -41,9 +41,48 @@ export interface ProductItem {
     imageKey?: string | null;
     imageUrl?: string | null;
     status: ProductStatus;
+    ratingAverage: number;
+    ratingCount: number;
     createdAt: string;
     updatedAt: string;
     variants: ProductVariantItem[];
+}
+
+export interface ProductReviewItem {
+    id: UUID;
+    productId: UUID;
+    userId: UUID;
+    rating: number;
+    comment?: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface ProductReviewListItem extends ProductReviewItem {
+    reviewerName: string;
+}
+
+export interface UpsertProductReviewRequest {
+    rating: number;
+    comment?: string;
+}
+
+export interface UpsertProductReviewResponse {
+    review: ProductReviewItem;
+    ratingAverage: number;
+    ratingCount: number;
+}
+
+export interface ProductReviewsFilterRequest {
+    page?: number;
+    limit?: number;
+}
+
+export interface PublicCategoriesFilterRequest {
+    page?: number;
+    limit?: number;
+    parentId?: UUID;
+    search?: string;
 }
 
 export interface PublicProductsFilterRequest {
@@ -52,6 +91,24 @@ export interface PublicProductsFilterRequest {
     search?: string;
     categoryId?: UUID;
     shopId?: UUID;
+    minPrice?: string;
+    maxPrice?: string;
+    minRating?: number;
+}
+
+export interface PublicProductSuggestionsRequest {
+    limit?: number;
+    cursor?: string;
+    sessionKey: string;
+    search?: string;
+    categoryId?: UUID;
+    shopId?: UUID;
+}
+
+export interface PublicProductSuggestionsResponse {
+    items: ProductItem[];
+    nextCursor?: string | null;
+    hasMore: boolean;
 }
 
 export interface SellerProductsFilterRequest {
@@ -131,3 +188,5 @@ export type PublicProductsListResponse = PaginatedResponse<ProductItem>;
 export type SellerProductsListResponse = PaginatedResponse<ProductItem>;
 
 export type AdminProductsListResponse = PaginatedResponse<ProductItem>;
+
+export type ProductReviewsListResponse = PaginatedResponse<ProductReviewListItem>;

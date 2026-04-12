@@ -12,6 +12,11 @@ const PUBLIC_SHOP_SELECT = {
   coverKey: true,
 } satisfies Prisma.ShopSelect;
 
+const PUBLIC_SHOP_DETAIL_SELECT = {
+  ...PUBLIC_SHOP_SELECT,
+  createdAt: true,
+} satisfies Prisma.ShopSelect;
+
 const SHOP_DETAIL_SELECT = {
   id: true,
   userId: true,
@@ -52,6 +57,10 @@ export type PublicShopRecord = Prisma.ShopGetPayload<{
   select: typeof PUBLIC_SHOP_SELECT;
 }>;
 
+export type PublicShopDetailRecord = Prisma.ShopGetPayload<{
+  select: typeof PUBLIC_SHOP_DETAIL_SELECT;
+}>;
+
 export type ShopDetailRecord = Prisma.ShopGetPayload<{
   select: typeof SHOP_DETAIL_SELECT;
 }>;
@@ -71,6 +80,12 @@ export interface AdminShopsQueryInput {
   limit: number;
   search?: string;
   status?: ShopStatus;
+}
+
+export interface PublicShopStatsRecord {
+  productCount: number;
+  ratingAverage: number;
+  ratingCount: number;
 }
 
 @Injectable()
@@ -99,8 +114,65 @@ export class ShopsRepository {
         slug,
         status: 'APPROVED',
       },
-      select: PUBLIC_SHOP_SELECT,
+      select: PUBLIC_SHOP_DETAIL_SELECT,
     });
+  }
+
+  findApprovedShopById(id: string) {
+    return this.prisma.shop.findFirst({
+      where: {
+        id,
+        status: 'APPROVED',
+      },
+      select: PUBLIC_SHOP_DETAIL_SELECT,
+    });
+  }
+
+  async findPublicShopStatsById(
+    shopId: string,
+  ): Promise<PublicShopStatsRecord> {
+    const products = await this.prisma.product.findMany({
+      where: {
+        shopId,
+        status: 'ACTIVE',
+      },
+      select: {
+        ratingAverage: true,
+        ratingCount: true,
+      },
+    });
+
+    let totalRatingCount = 0;
+    let weightedRatingSum = new Prisma.Decimal(0);
+
+    for (const product of products) {
+      if (product.ratingCount <= 0) {
+        continue;
+      }
+
+      totalRatingCount += product.ratingCount;
+      weightedRatingSum = weightedRatingSum.add(
+        product.ratingAverage.mul(product.ratingCount),
+      );
+    }
+
+    const computedRatingAverage =
+      totalRatingCount > 0
+        ? Number(
+            weightedRatingSum
+              .div(totalRatingCount)
+              .toDecimalPlaces(2)
+              .toString(),
+          )
+        : 0;
+
+    return {
+      productCount: products.length,
+      ratingCount: totalRatingCount,
+      ratingAverage: Number.isFinite(computedRatingAverage)
+        ? computedRatingAverage
+        : 0,
+    };
   }
 
   findShopByUserId(userId: string) {

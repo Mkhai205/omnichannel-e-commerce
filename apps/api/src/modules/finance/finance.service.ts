@@ -1,7 +1,20 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Prisma } from '@repo/database';
 import type {
+  AdminDashboardKpiResponse,
+  AdminDashboardTrendPoint,
+  AdminPaymentListItem,
+  AdminPaymentsFilterRequest,
+  AdminPaymentsListResponse,
+  AdminSettlementListItem,
+  AdminSettlementsFilterRequest,
+  AdminSettlementsListResponse,
   SellerPaymentCashflowPoint,
   SellerPaymentTransactionItem,
   SellerPaymentsFilterRequest,
@@ -12,6 +25,9 @@ import type {
 import { FinanceRepository } from './finance.repository';
 import { SETTLEMENT_CONFIG_KEY } from '../../core/config/env.constant';
 import type {
+  AdminPaymentRecord,
+  AdminSettlementRecord,
+  KpiTrendOrderRecord,
   SellerPaymentOrderRecord,
   SellerSettlementCashflowRecord,
 } from './finance.repository';
@@ -286,6 +302,168 @@ export class FinanceService {
     };
   }
 
+  async getAdminPayments(
+    filters: AdminPaymentsFilterRequest,
+  ): Promise<AdminPaymentsListResponse> {
+    const page = this.resolvePage(filters.page);
+    const limit = this.resolveLimit(filters.limit);
+    const search = this.normalizeSearch(filters.search);
+    const createdFrom = this.resolveStartOfDate(filters.createdFrom);
+    const createdToExclusive = this.resolveEndExclusiveOfDate(
+      filters.createdTo,
+    );
+
+    if (
+      createdFrom &&
+      createdToExclusive &&
+      createdFrom >= createdToExclusive
+    ) {
+      throw new BadRequestException('createdFrom must not be after createdTo');
+    }
+
+    const [payments, totalItems] = await Promise.all([
+      this.financeRepository.findAdminPayments({
+        page,
+        limit,
+        status: filters.status,
+        provider: filters.provider,
+        search,
+        createdFrom,
+        createdToExclusive,
+      }),
+      this.financeRepository.countAdminPayments({
+        status: filters.status,
+        provider: filters.provider,
+        search,
+        createdFrom,
+        createdToExclusive,
+      }),
+    ]);
+
+    this.logger.log(
+      `[ADMIN_FINANCE] payments page=${page} limit=${limit} total=${totalItems} status=${filters.status ?? 'ALL'} provider=${filters.provider ?? 'ALL'}`,
+    );
+
+    return {
+      data: payments.map((payment) => this.toAdminPaymentItem(payment)),
+      meta: {
+        page,
+        limit,
+        totalItems,
+        totalPages: totalItems === 0 ? 0 : Math.ceil(totalItems / limit),
+      },
+    };
+  }
+
+  async getAdminSettlements(
+    filters: AdminSettlementsFilterRequest,
+  ): Promise<AdminSettlementsListResponse> {
+    const page = this.resolvePage(filters.page);
+    const limit = this.resolveLimit(filters.limit);
+    const search = this.normalizeSearch(filters.search);
+    const settledFrom = this.resolveStartOfDate(filters.settledFrom);
+    const settledToExclusive = this.resolveEndExclusiveOfDate(
+      filters.settledTo,
+    );
+
+    if (
+      settledFrom &&
+      settledToExclusive &&
+      settledFrom >= settledToExclusive
+    ) {
+      throw new BadRequestException('settledFrom must not be after settledTo');
+    }
+
+    const [settlements, totalItems] = await Promise.all([
+      this.financeRepository.findAdminSettlements({
+        page,
+        limit,
+        status: filters.status,
+        search,
+        settledFrom,
+        settledToExclusive,
+      }),
+      this.financeRepository.countAdminSettlements({
+        status: filters.status,
+        search,
+        settledFrom,
+        settledToExclusive,
+      }),
+    ]);
+
+    this.logger.log(
+      `[ADMIN_FINANCE] settlements page=${page} limit=${limit} total=${totalItems} status=${filters.status ?? 'ALL'}`,
+    );
+
+    return {
+      data: settlements.map((settlement) =>
+        this.toAdminSettlementItem(settlement),
+      ),
+      meta: {
+        page,
+        limit,
+        totalItems,
+        totalPages: totalItems === 0 ? 0 : Math.ceil(totalItems / limit),
+      },
+    };
+  }
+
+  async getAdminDashboardKpi(): Promise<AdminDashboardKpiResponse> {
+    const todayStart = this.startOfDayFromOffset(0);
+    const trendStart = this.startOfDayFromOffset(6);
+
+    const [
+      totalUsers,
+      totalShops,
+      pendingShops,
+      totalOrders,
+      todayOrders,
+      gmv,
+      totalPayments,
+      successfulPayments,
+      pendingPayments,
+      pendingSettlements,
+      trendOrders,
+    ] = await Promise.all([
+      this.financeRepository.countTotalUsers(),
+      this.financeRepository.countTotalShops(),
+      this.financeRepository.countPendingShops(),
+      this.financeRepository.countTotalOrders(),
+      this.financeRepository.countOrdersCreatedAfterOrAt(todayStart),
+      this.financeRepository.aggregateGrossMerchandiseValue(),
+      this.financeRepository.countTotalPayments(),
+      this.financeRepository.countSuccessfulPayments(),
+      this.financeRepository.countPendingPayments(),
+      this.financeRepository.countPendingSettlements(),
+      this.financeRepository.findKpiTrendOrders(trendStart),
+    ]);
+
+    const paymentSuccessRate =
+      totalPayments === 0
+        ? 0
+        : Number(((successfulPayments / totalPayments) * 100).toFixed(1));
+
+    this.logger.log(
+      `[ADMIN_FINANCE] dashboard_kpi users=${totalUsers} shops=${totalShops} orders=${totalOrders} totalPayments=${totalPayments}`,
+    );
+
+    return {
+      totalUsers,
+      totalShops,
+      pendingShops,
+      totalOrders,
+      todayOrders,
+      totalGmv: this.normalizeMoney(gmv._sum.totalAmount?.toString()),
+      paymentSuccessRate,
+      successfulPayments,
+      totalPayments,
+      pendingPayments,
+      pendingSettlements,
+      trend: this.buildAdminKpiTrend(trendOrders),
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
   private toBasisPoints(percent: number): bigint {
     if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
       throw new Error(
@@ -354,6 +532,132 @@ export class FinanceService {
     }
 
     return Math.min(100, Math.floor(limit));
+  }
+
+  private normalizeSearch(value?: string): string | undefined {
+    const normalized = value?.trim();
+
+    if (!normalized) {
+      return undefined;
+    }
+
+    return normalized;
+  }
+
+  private resolveStartOfDate(value?: string): Date | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    const date = this.parseIsoDate(value);
+
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  private resolveEndExclusiveOfDate(value?: string): Date | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    const date = this.parseIsoDate(value);
+
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + 1);
+
+    return date;
+  }
+
+  private parseIsoDate(value: string): Date {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      throw new BadRequestException(`Invalid date: ${value}`);
+    }
+
+    return date;
+  }
+
+  private toAdminPaymentItem(
+    payment: AdminPaymentRecord,
+  ): AdminPaymentListItem {
+    return {
+      id: payment.id,
+      userId: payment.userId,
+      customerName: payment.user.fullName,
+      customerEmail: payment.user.email,
+      provider: payment.provider,
+      status: payment.status,
+      txnRef: payment.txnRef,
+      gatewayTransactionNo: payment.gatewayTransactionNo,
+      amount: this.normalizeMoney(payment.amount.toString()),
+      currency: payment.currency,
+      bankCode: payment.bankCode,
+      orderCount: payment.orders.length,
+      paidAt: payment.paidAt?.toISOString() ?? null,
+      createdAt: payment.createdAt.toISOString(),
+      updatedAt: payment.updatedAt.toISOString(),
+    };
+  }
+
+  private toAdminSettlementItem(
+    settlement: AdminSettlementRecord,
+  ): AdminSettlementListItem {
+    return {
+      id: settlement.id,
+      orderId: settlement.orderId,
+      orderNumber: settlement.order.orderNumber,
+      shopId: settlement.shopId,
+      shopName: settlement.shop.shopName,
+      sellerName: settlement.shop.user.fullName,
+      sellerWalletId: settlement.sellerWalletId,
+      status: settlement.status,
+      grossAmount: this.normalizeMoney(settlement.grossAmount.toString()),
+      commissionAmount: this.normalizeMoney(
+        settlement.commissionAmount.toString(),
+      ),
+      netAmount: this.normalizeMoney(settlement.netAmount.toString()),
+      settledAt: settlement.settledAt.toISOString(),
+      createdAt: settlement.createdAt.toISOString(),
+      updatedAt: settlement.updatedAt.toISOString(),
+    };
+  }
+
+  private buildAdminKpiTrend(
+    orders: KpiTrendOrderRecord[],
+  ): AdminDashboardTrendPoint[] {
+    const days = Array.from({ length: 7 }, (_, index) =>
+      this.startOfDayFromOffset(6 - index),
+    );
+
+    const buckets = new Map<string, { orderCount: number; gmv: number }>();
+
+    for (const day of days) {
+      buckets.set(this.toDateKey(day), { orderCount: 0, gmv: 0 });
+    }
+
+    for (const order of orders) {
+      const key = this.toDateKey(order.createdAt);
+      const bucket = buckets.get(key);
+
+      if (!bucket) {
+        continue;
+      }
+
+      bucket.orderCount += 1;
+      bucket.gmv += Number(order.totalAmount);
+    }
+
+    return days.map((day) => {
+      const key = this.toDateKey(day);
+      const bucket = buckets.get(key) ?? { orderCount: 0, gmv: 0 };
+
+      return {
+        label: this.toCashflowLabel(day),
+        orderCount: bucket.orderCount,
+        gmv: Math.round(bucket.gmv),
+      };
+    });
   }
 
   private toSellerPaymentTransactionItem(
