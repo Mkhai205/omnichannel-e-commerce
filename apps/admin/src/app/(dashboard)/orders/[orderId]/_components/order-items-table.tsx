@@ -20,27 +20,27 @@ function formatCurrency(value: string): string {
     const amount = Number(value);
 
     if (Number.isNaN(amount)) {
-        return "0d";
+        return "0đ";
     }
 
-    return `${amount.toLocaleString("vi-VN")}d`;
+    return `${amount.toLocaleString("vi-VN")}đ`;
 }
 
 export function OrderItemsTable({ items }: OrderItemsTableProps) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Order items</CardTitle>
+                <CardTitle>Sản phẩm trong đơn</CardTitle>
             </CardHeader>
             <CardContent>
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-slate-100">
-                            <TableHead>Product</TableHead>
+                            <TableHead>Sản phẩm</TableHead>
                             <TableHead>SKU</TableHead>
-                            <TableHead className="text-right">Qty</TableHead>
-                            <TableHead className="text-right">Unit</TableHead>
-                            <TableHead className="text-right">Line total</TableHead>
+                            <TableHead className="text-right">SL</TableHead>
+                            <TableHead className="text-right">Đơn giá</TableHead>
+                            <TableHead className="text-right">Thành tiền</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -50,7 +50,7 @@ export function OrderItemsTable({ items }: OrderItemsTableProps) {
                                     colSpan={5}
                                     className="py-10 text-center text-sm text-slate-500"
                                 >
-                                    No items found.
+                                    Không có sản phẩm nào.
                                 </TableCell>
                             </TableRow>
                         ) : (

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Omnichannel Admin",
-    description: "Admin console for monitoring and operating the e-commerce system",
+    title: "Quản trị Omnichannel",
+    description: "Bảng điều khiển giám sát và vận hành hệ thống thương mại điện tử",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="vi">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <AdminPageFrame>{children}</AdminPageFrame>
             </body>

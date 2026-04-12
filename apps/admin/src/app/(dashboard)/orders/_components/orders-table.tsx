@@ -26,14 +26,28 @@ function getSettlementClassName(status: SettlementStatus) {
     return "border-slate-200 bg-slate-100 text-slate-700";
 }
 
+function getStatusLabel(status: OrderStatus): string {
+    if (status === "PENDING_PAYMENT") return "Chờ thanh toán";
+    if (status === "PAID") return "Đã thanh toán";
+    if (status === "PROCESSING") return "Đang xử lý";
+    if (status === "SHIPPED") return "Đang giao";
+    if (status === "DELIVERED") return "Đã giao";
+    return "Đã hủy";
+}
+
+function getSettlementLabel(status: SettlementStatus): string {
+    if (status === "SETTLED") return "Đã đối soát";
+    return "Chờ đối soát";
+}
+
 function formatCurrency(value: string) {
     const amount = Number(value);
 
     if (Number.isNaN(amount)) {
-        return "0d";
+        return "0đ";
     }
 
-    return `${amount.toLocaleString("vi-VN")}d`;
+    return `${amount.toLocaleString("vi-VN")}đ`;
 }
 
 function formatDate(value: string) {
@@ -52,13 +66,13 @@ export function OrdersTable({ rows, isLoading = false, onRowClick }: OrdersTable
             <Table>
                 <TableHeader>
                     <TableRow className="bg-slate-100">
-                        <TableHead className="font-semibold">Order</TableHead>
-                        <TableHead className="font-semibold">Customer</TableHead>
-                        <TableHead className="font-semibold">Shop</TableHead>
-                        <TableHead className="font-semibold">Placed</TableHead>
-                        <TableHead className="text-right font-semibold">Total</TableHead>
-                        <TableHead className="text-center font-semibold">Status</TableHead>
-                        <TableHead className="text-center font-semibold">Settlement</TableHead>
+                        <TableHead className="font-semibold">Đơn hàng</TableHead>
+                        <TableHead className="font-semibold">Khách hàng</TableHead>
+                        <TableHead className="font-semibold">Cửa hàng</TableHead>
+                        <TableHead className="font-semibold">Ngày đặt</TableHead>
+                        <TableHead className="text-right font-semibold">Tổng tiền</TableHead>
+                        <TableHead className="text-center font-semibold">Trạng thái</TableHead>
+                        <TableHead className="text-center font-semibold">Đối soát</TableHead>
                     </TableRow>
                 </TableHeader>
 
@@ -69,7 +83,7 @@ export function OrdersTable({ rows, isLoading = false, onRowClick }: OrdersTable
                                 colSpan={7}
                                 className="py-10 text-center text-sm text-slate-500"
                             >
-                                Loading orders...
+                                Đang tải đơn hàng...
                             </TableCell>
                         </TableRow>
                     ) : null}
@@ -80,7 +94,7 @@ export function OrdersTable({ rows, isLoading = false, onRowClick }: OrdersTable
                                 colSpan={7}
                                 className="py-10 text-center text-sm text-slate-500"
                             >
-                                No matching orders found.
+                                Không tìm thấy đơn hàng phù hợp.
                             </TableCell>
                         </TableRow>
                     ) : null}
@@ -126,14 +140,14 @@ export function OrdersTable({ rows, isLoading = false, onRowClick }: OrdersTable
                                       <span
                                           className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${getStatusClassName(row.status)}`}
                                       >
-                                          {row.status}
+                                          {getStatusLabel(row.status)}
                                       </span>
                                   </TableCell>
                                   <TableCell className="text-center">
                                       <span
                                           className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${getSettlementClassName(row.settlementStatus)}`}
                                       >
-                                          {row.settlementStatus}
+                                          {getSettlementLabel(row.settlementStatus)}
                                       </span>
                                   </TableCell>
                               </TableRow>

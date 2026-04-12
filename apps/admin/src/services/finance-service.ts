@@ -9,7 +9,7 @@ import { requestApi } from "@/services/http-client";
 
 function requireData<T>(response: { data?: T; message: string; statusCode: number }): T {
     if (!response.data) {
-        throw new Error(`Missing response data: ${response.message} (${response.statusCode})`);
+        throw new Error(`Thiếu dữ liệu phản hồi: ${response.message} (${response.statusCode})`);
     }
 
     return response.data;

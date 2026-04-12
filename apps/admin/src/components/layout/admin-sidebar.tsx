@@ -11,12 +11,12 @@ type AdminSidebarProps = {
 };
 
 const mainNav = [
-    { label: "Dashboard", icon: House, href: "/dashboard" },
-    { label: "Users", icon: Users, href: "/users" },
-    { label: "Shops", icon: Store, href: "/shops" },
-    { label: "Products", icon: ClipboardCheck, href: "/products" },
-    { label: "Orders", icon: ShoppingBag, href: "/orders" },
-    { label: "Payments", icon: CreditCard, href: "/payments" },
+    { label: "Tổng quan", icon: House, href: "/dashboard" },
+    { label: "Người dùng", icon: Users, href: "/users" },
+    { label: "Cửa hàng", icon: Store, href: "/shops" },
+    { label: "Sản phẩm", icon: ClipboardCheck, href: "/products" },
+    { label: "Đơn hàng", icon: ShoppingBag, href: "/orders" },
+    { label: "Thanh toán", icon: CreditCard, href: "/payments" },
 ];
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
@@ -26,7 +26,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         <>
             <button
                 type="button"
-                aria-label="Close sidebar overlay"
+                aria-label="Đóng lớp phủ thanh bên"
                 className={cn(
                     "fixed inset-0 top-16 z-30 bg-black/30 transition-opacity md:hidden",
                     isOpen ? "opacity-100" : "pointer-events-none opacity-0",

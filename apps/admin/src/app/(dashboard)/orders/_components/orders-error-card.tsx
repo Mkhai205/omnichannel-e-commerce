@@ -12,7 +12,7 @@ export function OrdersErrorCard({ message, onRetry }: OrdersErrorCardProps) {
                 <p>{message}</p>
                 {onRetry ? (
                     <Button type="button" variant="outline" onClick={onRetry}>
-                        Retry
+                        Thử lại
                     </Button>
                 ) : null}
             </div>

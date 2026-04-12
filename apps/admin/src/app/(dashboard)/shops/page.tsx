@@ -23,6 +23,13 @@ const PAGE_SIZE = 20;
 
 const STATUS_OPTIONS: Array<ShopStatus | "ALL"> = ["ALL", "PENDING", "APPROVED", "REJECTED"];
 
+function getShopStatusLabel(status: ShopStatus | "ALL"): string {
+    if (status === "ALL") return "Tất cả";
+    if (status === "PENDING") return "Chờ duyệt";
+    if (status === "APPROVED") return "Đã duyệt";
+    return "Từ chối";
+}
+
 export default function ShopsPage() {
     const [shops, setShops] = useState<AdminShopItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +58,7 @@ export default function ShopsPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to load shops");
+                setErrorMessage("Không thể tải danh sách cửa hàng");
             }
         } finally {
             setIsLoading(false);
@@ -71,7 +78,7 @@ export default function ShopsPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to approve this shop");
+                setErrorMessage("Không thể duyệt cửa hàng này");
             }
         } finally {
             setMutatingShopId(null);
@@ -79,7 +86,7 @@ export default function ShopsPage() {
     };
 
     const handleReject = async (shopId: string) => {
-        const reason = window.prompt("Provide rejection reason");
+        const reason = window.prompt("Nhập lý do từ chối");
         if (!reason || !reason.trim()) {
             return;
         }
@@ -95,7 +102,7 @@ export default function ShopsPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to reject this shop");
+                setErrorMessage("Không thể từ chối cửa hàng này");
             }
         } finally {
             setMutatingShopId(null);
@@ -106,12 +113,12 @@ export default function ShopsPage() {
         <section className="mx-auto grid w-full max-w-7xl gap-4 pb-10">
             <Card className="border-slate-200 bg-white">
                 <CardHeader>
-                    <CardTitle>Shops moderation</CardTitle>
+                    <CardTitle>Kiểm duyệt cửa hàng</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-4">
                     <div className="grid gap-3 md:grid-cols-[1fr_220px_auto]">
                         <Input
-                            placeholder="Search by shop name, owner, slug"
+                            placeholder="Tìm theo tên cửa hàng, chủ shop, slug"
                             value={search}
                             onChange={(event) => {
                                 setSearch(event.target.value);
@@ -128,12 +135,12 @@ export default function ShopsPage() {
                         >
                             {STATUS_OPTIONS.map((option) => (
                                 <option key={option} value={option}>
-                                    Status: {option}
+                                    Trạng thái: {getShopStatusLabel(option)}
                                 </option>
                             ))}
                         </select>
                         <Button type="button" variant="outline" onClick={() => void loadShops()}>
-                            Reload
+                            Tải lại
                         </Button>
                     </div>
 
@@ -146,21 +153,21 @@ export default function ShopsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Shop</TableHead>
-                                <TableHead>Owner</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Created</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead>Cửa hàng</TableHead>
+                                <TableHead>Chủ sở hữu</TableHead>
+                                <TableHead>Trạng thái</TableHead>
+                                <TableHead>Ngày tạo</TableHead>
+                                <TableHead className="text-right">Thao tác</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
                                 <TableRow>
-                                    <TableCell colSpan={5}>Loading shops...</TableCell>
+                                    <TableCell colSpan={5}>Đang tải cửa hàng...</TableCell>
                                 </TableRow>
                             ) : shops.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5}>No shops found</TableCell>
+                                    <TableCell colSpan={5}>Không có cửa hàng phù hợp</TableCell>
                                 </TableRow>
                             ) : (
                                 shops.map((shop) => {
@@ -187,7 +194,7 @@ export default function ShopsPage() {
                                                     </span>
                                                 </div>
                                             </TableCell>
-                                            <TableCell>{shop.status}</TableCell>
+                                            <TableCell>{getShopStatusLabel(shop.status)}</TableCell>
                                             <TableCell>
                                                 {new Date(shop.createdAt).toLocaleDateString()}
                                             </TableCell>
@@ -201,7 +208,7 @@ export default function ShopsPage() {
                                                         }
                                                         onClick={() => void handleApprove(shop.id)}
                                                     >
-                                                        Approve
+                                                        Duyệt
                                                     </Button>
                                                     <Button
                                                         type="button"
@@ -209,7 +216,7 @@ export default function ShopsPage() {
                                                         disabled={isMutating}
                                                         onClick={() => void handleReject(shop.id)}
                                                     >
-                                                        Reject
+                                                        Từ chối
                                                     </Button>
                                                 </div>
                                             </TableCell>
@@ -229,10 +236,10 @@ export default function ShopsPage() {
                                 setPage((prev) => Math.max(1, prev - 1));
                             }}
                         >
-                            Previous
+                            Trước
                         </Button>
                         <span className="text-sm text-slate-600">
-                            Page {page}/{totalPages}
+                            Trang {page}/{totalPages}
                         </span>
                         <Button
                             type="button"
@@ -242,7 +249,7 @@ export default function ShopsPage() {
                                 setPage((prev) => Math.min(totalPages, prev + 1));
                             }}
                         >
-                            Next
+                            Sau
                         </Button>
                     </div>
                 </CardContent>

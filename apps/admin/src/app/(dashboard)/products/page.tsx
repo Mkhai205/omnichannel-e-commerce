@@ -23,6 +23,13 @@ const PAGE_SIZE = 20;
 
 const STATUS_OPTIONS: Array<ProductStatus | "ALL"> = ["ALL", "DRAFT", "ACTIVE", "HIDDEN"];
 
+function getProductStatusLabel(status: ProductStatus | "ALL"): string {
+    if (status === "ALL") return "Tất cả";
+    if (status === "DRAFT") return "Bản nháp";
+    if (status === "ACTIVE") return "Đang hiển thị";
+    return "Đang ẩn";
+}
+
 export default function ProductsPage() {
     const [products, setProducts] = useState<ProductItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +59,7 @@ export default function ProductsPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to load products");
+                setErrorMessage("Không thể tải danh sách sản phẩm");
             }
         } finally {
             setIsLoading(false);
@@ -96,7 +103,7 @@ export default function ProductsPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to update product status");
+                setErrorMessage("Không thể cập nhật trạng thái sản phẩm");
             }
         } finally {
             setMutatingProductId(null);
@@ -109,7 +116,7 @@ export default function ProductsPage() {
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-1">
                         <CardTitle className="text-sm font-medium text-slate-600">
-                            Variants in page
+                            Biến thể trên trang
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -119,7 +126,7 @@ export default function ProductsPage() {
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-1">
                         <CardTitle className="text-sm font-medium text-slate-600">
-                            Stock in page
+                            Tồn kho trên trang
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -130,12 +137,12 @@ export default function ProductsPage() {
 
             <Card className="border-slate-200 bg-white">
                 <CardHeader>
-                    <CardTitle>Products moderation</CardTitle>
+                    <CardTitle>Kiểm duyệt sản phẩm</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-4">
                     <div className="grid gap-3 md:grid-cols-[1fr_220px_auto]">
                         <Input
-                            placeholder="Search by product name"
+                            placeholder="Tìm theo tên sản phẩm"
                             value={search}
                             onChange={(event) => {
                                 setSearch(event.target.value);
@@ -152,12 +159,12 @@ export default function ProductsPage() {
                         >
                             {STATUS_OPTIONS.map((option) => (
                                 <option key={option} value={option}>
-                                    Status: {option}
+                                    Trạng thái: {getProductStatusLabel(option)}
                                 </option>
                             ))}
                         </select>
                         <Button type="button" variant="outline" onClick={() => void loadProducts()}>
-                            Reload
+                            Tải lại
                         </Button>
                     </div>
 
@@ -170,21 +177,21 @@ export default function ProductsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Product</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Variants</TableHead>
-                                <TableHead>Stock</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead>Sản phẩm</TableHead>
+                                <TableHead>Trạng thái</TableHead>
+                                <TableHead>Biến thể</TableHead>
+                                <TableHead>Tồn kho</TableHead>
+                                <TableHead className="text-right">Thao tác</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
                                 <TableRow>
-                                    <TableCell colSpan={5}>Loading products...</TableCell>
+                                    <TableCell colSpan={5}>Đang tải sản phẩm...</TableCell>
                                 </TableRow>
                             ) : products.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5}>No products found</TableCell>
+                                    <TableCell colSpan={5}>Không có sản phẩm phù hợp</TableCell>
                                 </TableRow>
                             ) : (
                                 products.map((product) => {
@@ -220,9 +227,9 @@ export default function ProductsPage() {
                                                         }));
                                                     }}
                                                 >
-                                                    <option value="DRAFT">DRAFT</option>
-                                                    <option value="ACTIVE">ACTIVE</option>
-                                                    <option value="HIDDEN">HIDDEN</option>
+                                                    <option value="DRAFT">Bản nháp</option>
+                                                    <option value="ACTIVE">Đang hiển thị</option>
+                                                    <option value="HIDDEN">Đang ẩn</option>
                                                 </select>
                                             </TableCell>
                                             <TableCell>{product.variants.length}</TableCell>
@@ -236,7 +243,7 @@ export default function ProductsPage() {
                                                     }
                                                     onClick={() => void handleSaveStatus(product)}
                                                 >
-                                                    Save status
+                                                    Lưu trạng thái
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
@@ -255,10 +262,10 @@ export default function ProductsPage() {
                                 setPage((prev) => Math.max(1, prev - 1));
                             }}
                         >
-                            Previous
+                            Trước
                         </Button>
                         <span className="text-sm text-slate-600">
-                            Page {page}/{totalPages}
+                            Trang {page}/{totalPages}
                         </span>
                         <Button
                             type="button"
@@ -268,7 +275,7 @@ export default function ProductsPage() {
                                 setPage((prev) => Math.min(totalPages, prev + 1));
                             }}
                         >
-                            Next
+                            Sau
                         </Button>
                     </div>
                 </CardContent>

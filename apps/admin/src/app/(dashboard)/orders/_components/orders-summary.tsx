@@ -13,23 +13,23 @@ export function OrdersSummary({
         <section className="grid gap-3 md:grid-cols-3">
             <div className="rounded-lg border border-slate-200 bg-white p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Total orders
+                    Tổng đơn hàng
                 </p>
                 <p className="mt-2 text-3xl font-semibold text-slate-900">{totalItems}</p>
             </div>
 
             <div className="rounded-lg border border-slate-200 bg-white p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Current page amount
+                    Giá trị trang hiện tại
                 </p>
                 <p className="mt-2 text-3xl font-semibold text-slate-900">
-                    {currentPageTotalAmount.toLocaleString("vi-VN")}d
+                    {currentPageTotalAmount.toLocaleString("vi-VN")}đ
                 </p>
             </div>
 
             <div className="rounded-lg border border-slate-200 bg-white p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Pending settlement (page)
+                    Chờ đối soát (trang)
                 </p>
                 <p className="mt-2 text-3xl font-semibold text-slate-900">
                     {pendingSettlementCount}

@@ -14,22 +14,24 @@ export default async function VerifyEmailPage({ searchParams }: VerifyEmailPageP
         <main className="grid min-h-dvh place-items-center bg-slate-100 p-4">
             <Card className="w-full max-w-xl border-slate-200 bg-white">
                 <CardHeader>
-                    <CardTitle>Verify your email</CardTitle>
+                    <CardTitle>Xác minh email của bạn</CardTitle>
                     <CardDescription>
-                        Your account is not verified yet. Complete email verification before using
-                        the admin dashboard.
+                        Tài khoản của bạn chưa được xác minh. Vui lòng xác minh email trước khi sử
+                        dụng trang quản trị.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <p className="text-sm text-slate-600">
-                        Account:{" "}
-                        <span className="font-medium text-slate-900">{email || "Unknown"}</span>
+                        Tài khoản:{" "}
+                        <span className="font-medium text-slate-900">
+                            {email || "Không xác định"}
+                        </span>
                     </p>
                     <p className="text-sm text-slate-600">
-                        If you already verified the account, sign in again.
+                        Nếu bạn đã xác minh tài khoản, hãy đăng nhập lại.
                     </p>
                     <Button asChild>
-                        <Link href="/login">Back to login</Link>
+                        <Link href="/login">Quay lại đăng nhập</Link>
                     </Button>
                 </CardContent>
             </Card>

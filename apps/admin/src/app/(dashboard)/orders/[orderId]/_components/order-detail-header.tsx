@@ -12,7 +12,7 @@ export function OrderDetailHeader({ detail, onBack }: OrderDetailHeaderProps) {
         <header className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Admin order detail
+                    Chi tiết đơn hàng quản trị
                 </p>
                 <h1 className="text-2xl font-semibold text-slate-900">{detail.orderNumber}</h1>
                 <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -27,7 +27,7 @@ export function OrderDetailHeader({ detail, onBack }: OrderDetailHeaderProps) {
 
             <Button type="button" variant="outline" onClick={onBack}>
                 <ArrowLeft className="mr-2 size-4" aria-hidden="true" />
-                Back to orders
+                Quay lại danh sách đơn
             </Button>
         </header>
     );

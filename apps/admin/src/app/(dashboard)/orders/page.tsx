@@ -71,7 +71,7 @@ export default function OrdersPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to load orders. Please try again.");
+                setErrorMessage("Không thể tải danh sách đơn hàng. Vui lòng thử lại.");
             }
         } finally {
             setIsLoading(false);
@@ -155,10 +155,10 @@ export default function OrdersPage() {
                     disabled={currentPage <= 1 || isLoading}
                     onClick={() => setCurrentPage((previous) => Math.max(1, previous - 1))}
                 >
-                    Previous
+                    Trước
                 </Button>
                 <span className="text-sm text-slate-600">
-                    Page {currentPage}/{totalPages}
+                    Trang {currentPage}/{totalPages}
                 </span>
                 <Button
                     type="button"
@@ -166,7 +166,7 @@ export default function OrdersPage() {
                     disabled={currentPage >= totalPages || isLoading}
                     onClick={() => setCurrentPage((previous) => Math.min(totalPages, previous + 1))}
                 >
-                    Next
+                    Sau
                 </Button>
             </section>
         </section>

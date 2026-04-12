@@ -34,7 +34,7 @@ export default function AdminOrderDetailPage() {
 
     const fetchOrderDetail = useCallback(async () => {
         if (orderId.length === 0) {
-            setErrorMessage("Invalid order id");
+            setErrorMessage("Mã đơn hàng không hợp lệ");
             setIsLoading(false);
             return;
         }
@@ -49,7 +49,7 @@ export default function AdminOrderDetailPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to load order detail");
+                setErrorMessage("Không thể tải chi tiết đơn hàng");
             }
         } finally {
             setIsLoading(false);
@@ -73,9 +73,9 @@ export default function AdminOrderDetailPage() {
                 <header className="flex flex-wrap items-center justify-between gap-3">
                     <div className="space-y-1">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Admin order detail
+                            Chi tiết đơn hàng quản trị
                         </p>
-                        <h1 className="text-2xl font-semibold text-slate-900">Order detail</h1>
+                        <h1 className="text-2xl font-semibold text-slate-900">Chi tiết đơn hàng</h1>
                     </div>
                 </header>
             )}
@@ -91,7 +91,7 @@ export default function AdminOrderDetailPage() {
             {isLoading ? (
                 <Card className="border-slate-200">
                     <CardContent className="px-6 py-10 text-center text-sm text-slate-500">
-                        Loading order detail...
+                        Đang tải chi tiết đơn hàng...
                     </CardContent>
                 </Card>
             ) : null}

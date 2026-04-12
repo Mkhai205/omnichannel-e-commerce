@@ -42,7 +42,7 @@ export function OrdersFilters({
             <Input
                 value={keyword}
                 onChange={(event) => onKeywordChange(event.target.value)}
-                placeholder="Search order/customer/shop..."
+                placeholder="Tìm đơn hàng/khách hàng/cửa hàng..."
                 className="h-10"
                 disabled={isDisabled}
             />
@@ -53,16 +53,16 @@ export function OrdersFilters({
                 disabled={isDisabled}
             >
                 <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Status" />
+                    <SelectValue placeholder="Trạng thái" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="ALL">All status</SelectItem>
-                    <SelectItem value="PENDING_PAYMENT">PENDING_PAYMENT</SelectItem>
-                    <SelectItem value="PAID">PAID</SelectItem>
-                    <SelectItem value="PROCESSING">PROCESSING</SelectItem>
-                    <SelectItem value="SHIPPED">SHIPPED</SelectItem>
-                    <SelectItem value="DELIVERED">DELIVERED</SelectItem>
-                    <SelectItem value="CANCELLED">CANCELLED</SelectItem>
+                    <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
+                    <SelectItem value="PENDING_PAYMENT">Chờ thanh toán</SelectItem>
+                    <SelectItem value="PAID">Đã thanh toán</SelectItem>
+                    <SelectItem value="PROCESSING">Đang xử lý</SelectItem>
+                    <SelectItem value="SHIPPED">Đang giao</SelectItem>
+                    <SelectItem value="DELIVERED">Đã giao</SelectItem>
+                    <SelectItem value="CANCELLED">Đã hủy</SelectItem>
                 </SelectContent>
             </Select>
 
@@ -74,12 +74,12 @@ export function OrdersFilters({
                 disabled={isDisabled}
             >
                 <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Settlement" />
+                    <SelectValue placeholder="Đối soát" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="ALL">All settlement</SelectItem>
-                    <SelectItem value="PENDING">PENDING</SelectItem>
-                    <SelectItem value="SETTLED">SETTLED</SelectItem>
+                    <SelectItem value="ALL">Tất cả đối soát</SelectItem>
+                    <SelectItem value="PENDING">Chờ đối soát</SelectItem>
+                    <SelectItem value="SETTLED">Đã đối soát</SelectItem>
                 </SelectContent>
             </Select>
 
@@ -89,7 +89,7 @@ export function OrdersFilters({
                 onChange={(event) => onPlacedFromChange(event.target.value)}
                 className="h-10"
                 disabled={isDisabled}
-                aria-label="Placed from"
+                aria-label="Ngày đặt từ"
             />
 
             <Input
@@ -98,7 +98,7 @@ export function OrdersFilters({
                 onChange={(event) => onPlacedToChange(event.target.value)}
                 className="h-10"
                 disabled={isDisabled}
-                aria-label="Placed to"
+                aria-label="Ngày đặt đến"
             />
         </section>
     );

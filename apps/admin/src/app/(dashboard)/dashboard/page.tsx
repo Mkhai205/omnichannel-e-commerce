@@ -8,21 +8,21 @@ import { isApiRequestError } from "@/services/http-client";
 import { getAdminDashboardKpi } from "@/services/finance-service";
 
 const quickLinks = [
-    { label: "Manage users", href: "/users" },
-    { label: "Review shops", href: "/shops" },
-    { label: "Moderate products", href: "/products" },
-    { label: "Track orders", href: "/orders" },
-    { label: "Review payments", href: "/payments" },
+    { label: "Quản lý người dùng", href: "/users" },
+    { label: "Duyệt cửa hàng", href: "/shops" },
+    { label: "Kiểm duyệt sản phẩm", href: "/products" },
+    { label: "Theo dõi đơn hàng", href: "/orders" },
+    { label: "Theo dõi thanh toán", href: "/payments" },
 ];
 
 function formatCurrency(value: string): string {
     const amount = Number(value);
 
     if (Number.isNaN(amount)) {
-        return "0d";
+        return "0đ";
     }
 
-    return `${amount.toLocaleString("vi-VN")}d`;
+    return `${amount.toLocaleString("vi-VN")}đ`;
 }
 
 function formatPercent(value: number): string {
@@ -56,7 +56,7 @@ export default function DashboardPage() {
                 if (isApiRequestError(error)) {
                     setErrorMessage(error.message);
                 } else {
-                    setErrorMessage("Unable to load dashboard KPI");
+                    setErrorMessage("Không thể tải KPI tổng quan");
                 }
             } finally {
                 if (isMounted) {
@@ -83,9 +83,10 @@ export default function DashboardPage() {
     return (
         <section className="mx-auto grid w-full max-w-7xl gap-6 pb-10">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold text-slate-900">Operations dashboard</h1>
+                <h1 className="text-2xl font-semibold text-slate-900">Bảng điều khiển vận hành</h1>
                 <p className="text-sm text-slate-600">
-                    Real-time snapshot for users, shops, orders, payments and settlements.
+                    Ảnh chụp thời gian thực về người dùng, cửa hàng, đơn hàng, thanh toán và đối
+                    soát.
                 </p>
             </header>
 
@@ -100,7 +101,7 @@ export default function DashboardPage() {
             <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-2">
-                        <CardDescription>Total users</CardDescription>
+                        <CardDescription>Tổng người dùng</CardDescription>
                         <CardTitle className="text-3xl">
                             {isLoading || !kpi ? "..." : kpi.totalUsers.toLocaleString("vi-VN")}
                         </CardTitle>
@@ -108,15 +109,15 @@ export default function DashboardPage() {
                     <CardContent>
                         <p className="text-xs text-slate-500">
                             {isLoading || !kpi
-                                ? "Loading..."
-                                : `${kpi.totalShops.toLocaleString("vi-VN")} shops (${kpi.pendingShops} pending)`}
+                                ? "Đang tải..."
+                                : `${kpi.totalShops.toLocaleString("vi-VN")} cửa hàng (${kpi.pendingShops} chờ duyệt)`}
                         </p>
                     </CardContent>
                 </Card>
 
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-2">
-                        <CardDescription>Total orders</CardDescription>
+                        <CardDescription>Tổng đơn hàng</CardDescription>
                         <CardTitle className="text-3xl">
                             {isLoading || !kpi ? "..." : kpi.totalOrders.toLocaleString("vi-VN")}
                         </CardTitle>
@@ -124,27 +125,27 @@ export default function DashboardPage() {
                     <CardContent>
                         <p className="text-xs text-slate-500">
                             {isLoading || !kpi
-                                ? "Loading..."
-                                : `${kpi.todayOrders.toLocaleString("vi-VN")} new orders today`}
+                                ? "Đang tải..."
+                                : `${kpi.todayOrders.toLocaleString("vi-VN")} đơn mới hôm nay`}
                         </p>
                     </CardContent>
                 </Card>
 
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-2">
-                        <CardDescription>Total GMV</CardDescription>
+                        <CardDescription>Tổng GMV</CardDescription>
                         <CardTitle className="text-3xl">
                             {isLoading || !kpi ? "..." : formatCurrency(kpi.totalGmv)}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-xs text-slate-500">Paid and fulfilled order value</p>
+                        <p className="text-xs text-slate-500">Giá trị đơn đã thanh toán và xử lý</p>
                     </CardContent>
                 </Card>
 
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-2">
-                        <CardDescription>Payment success rate</CardDescription>
+                        <CardDescription>Tỷ lệ thanh toán thành công</CardDescription>
                         <CardTitle className="text-3xl">
                             {isLoading || !kpi ? "..." : formatPercent(kpi.paymentSuccessRate)}
                         </CardTitle>
@@ -152,8 +153,8 @@ export default function DashboardPage() {
                     <CardContent>
                         <p className="text-xs text-slate-500">
                             {isLoading || !kpi
-                                ? "Loading..."
-                                : `${kpi.successfulPayments}/${kpi.totalPayments} successful`}
+                                ? "Đang tải..."
+                                : `${kpi.successfulPayments}/${kpi.totalPayments} giao dịch thành công`}
                         </p>
                     </CardContent>
                 </Card>
@@ -162,16 +163,16 @@ export default function DashboardPage() {
             <section className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
                 <Card className="border-slate-200 bg-white">
                     <CardHeader>
-                        <CardTitle>GMV trend (7 days)</CardTitle>
+                        <CardTitle>Xu hướng GMV (7 ngày)</CardTitle>
                         <CardDescription>
-                            Daily completed GMV for operational monitoring
+                            GMV hoàn tất theo ngày để theo dõi vận hành
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         {isLoading || !kpi ? (
-                            <p className="text-sm text-slate-500">Loading trend...</p>
+                            <p className="text-sm text-slate-500">Đang tải biểu đồ...</p>
                         ) : kpi.trend.length === 0 ? (
-                            <p className="text-sm text-slate-500">No trend data available</p>
+                            <p className="text-sm text-slate-500">Chưa có dữ liệu xu hướng</p>
                         ) : (
                             <div className="grid grid-cols-7 items-end gap-2">
                                 {kpi.trend.map((point) => {
@@ -186,7 +187,7 @@ export default function DashboardPage() {
                                             className="flex flex-col items-center gap-2"
                                         >
                                             <div className="text-[11px] text-slate-500">
-                                                {point.orderCount} orders
+                                                {point.orderCount} đơn
                                             </div>
                                             <div className="flex h-32 items-end">
                                                 <div
@@ -209,18 +210,19 @@ export default function DashboardPage() {
                 <div className="grid gap-4">
                     <Card className="border-slate-200 bg-white">
                         <CardHeader>
-                            <CardTitle>Finance alerts</CardTitle>
+                            <CardTitle>Cảnh báo tài chính</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2 text-sm text-slate-700">
                             <p>
-                                Pending payments: {isLoading || !kpi ? "..." : kpi.pendingPayments}
+                                Thanh toán chờ xử lý:{" "}
+                                {isLoading || !kpi ? "..." : kpi.pendingPayments}
                             </p>
                             <p>
-                                Pending settlements:{" "}
+                                Đối soát chờ xử lý:{" "}
                                 {isLoading || !kpi ? "..." : kpi.pendingSettlements}
                             </p>
                             <p className="text-xs text-slate-500">
-                                Last sync:{" "}
+                                Lần đồng bộ cuối:{" "}
                                 {isLoading || !kpi
                                     ? "..."
                                     : new Date(kpi.generatedAt).toLocaleString()}
@@ -230,8 +232,8 @@ export default function DashboardPage() {
 
                     <Card className="border-slate-200 bg-white">
                         <CardHeader>
-                            <CardTitle>Quick actions</CardTitle>
-                            <CardDescription>Navigate to key admin modules</CardDescription>
+                            <CardTitle>Thao tác nhanh</CardTitle>
+                            <CardDescription>Đi tới các module quản trị chính</CardDescription>
                         </CardHeader>
                         <CardContent className="flex flex-wrap gap-3">
                             {quickLinks.map((item) => (

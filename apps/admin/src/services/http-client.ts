@@ -90,7 +90,7 @@ async function parseApiResponse<T>(response: Response): Promise<ApiResponse<T> |
     try {
         return JSON.parse(text) as ApiResponse<T>;
     } catch {
-        throw new ApiRequestError("Received malformed API response", response.status, text);
+        throw new ApiRequestError("Nhận được phản hồi API không hợp lệ", response.status, text);
     }
 }
 
@@ -124,13 +124,13 @@ export async function requestApi<T>(
         const message =
             payload && typeof payload === "object" && "message" in payload
                 ? String(payload.message)
-                : `Request failed with status ${response.status}`;
+                : `Yêu cầu thất bại với mã trạng thái ${response.status}`;
 
         throw new ApiRequestError(message, response.status, payload);
     }
 
     if (!payload) {
-        throw new ApiRequestError("Empty API response payload", response.status);
+        throw new ApiRequestError("Phản hồi API không có dữ liệu", response.status);
     }
 
     return payload;

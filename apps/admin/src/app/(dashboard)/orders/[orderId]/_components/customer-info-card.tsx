@@ -11,11 +11,11 @@ export function CustomerInfoCard({ customer, address, className }: CustomerInfoC
     return (
         <Card className={className}>
             <CardHeader>
-                <CardTitle>Customer and shipping</CardTitle>
+                <CardTitle>Khách hàng và giao nhận</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3 text-sm text-slate-700">
                 <div className="grid grid-cols-[140px_1fr] gap-2">
-                    <span className="text-slate-500">Customer name</span>
+                    <span className="text-slate-500">Tên khách hàng</span>
                     <span className="font-medium">{customer.name}</span>
                 </div>
                 <div className="grid grid-cols-[140px_1fr] gap-2">
@@ -23,22 +23,22 @@ export function CustomerInfoCard({ customer, address, className }: CustomerInfoC
                     <span className="font-medium">{customer.email}</span>
                 </div>
                 <div className="grid grid-cols-[140px_1fr] gap-2">
-                    <span className="text-slate-500">Phone</span>
+                    <span className="text-slate-500">Số điện thoại</span>
                     <span>{customer.phone || "-"}</span>
                 </div>
 
                 <div className="border-t border-slate-200 pt-3" />
 
                 <div className="grid grid-cols-[140px_1fr] gap-2">
-                    <span className="text-slate-500">Recipient</span>
+                    <span className="text-slate-500">Người nhận</span>
                     <span>{address.recipientName}</span>
                 </div>
                 <div className="grid grid-cols-[140px_1fr] gap-2">
-                    <span className="text-slate-500">Recipient phone</span>
+                    <span className="text-slate-500">SĐT người nhận</span>
                     <span>{address.recipientPhone}</span>
                 </div>
                 <div className="grid grid-cols-[140px_1fr] gap-2">
-                    <span className="text-slate-500">Address</span>
+                    <span className="text-slate-500">Địa chỉ</span>
                     <span>
                         {address.streetAddress}
                         {address.wardDistrict ? `, ${address.wardDistrict}` : ""}
@@ -46,7 +46,7 @@ export function CustomerInfoCard({ customer, address, className }: CustomerInfoC
                     </span>
                 </div>
                 <div className="grid grid-cols-[140px_1fr] gap-2">
-                    <span className="text-slate-500">Postal code</span>
+                    <span className="text-slate-500">Mã bưu chính</span>
                     <span>{address.postalCode}</span>
                 </div>
             </CardContent>

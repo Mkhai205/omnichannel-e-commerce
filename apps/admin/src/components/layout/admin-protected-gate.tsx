@@ -75,7 +75,7 @@ export function AdminProtectedGate({ children }: AdminProtectedGateProps) {
     if (isChecking) {
         return (
             <div className="flex min-h-[calc(100dvh-8rem)] items-center justify-center">
-                <p className="text-sm text-slate-600">Checking admin session...</p>
+                <p className="text-sm text-slate-600">Đang kiểm tra phiên quản trị...</p>
             </div>
         );
     }

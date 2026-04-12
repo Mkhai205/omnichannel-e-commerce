@@ -30,14 +30,26 @@ type ActiveTab = "PAYMENTS" | "SETTLEMENTS";
 type PaymentStatusFilter = "ALL" | PaymentStatus;
 type SettlementStatusFilter = "ALL" | SellerSettlementStatus;
 
+function getPaymentStatusLabel(status: PaymentStatus): string {
+    if (status === "PENDING") return "Chờ xử lý";
+    if (status === "SUCCESS") return "Thành công";
+    if (status === "FAILED") return "Thất bại";
+    return "Đã hủy";
+}
+
+function getSettlementStatusLabel(status: SellerSettlementStatus): string {
+    if (status === "COMPLETED") return "Hoàn tất";
+    return "Hoàn tác";
+}
+
 function formatCurrency(value: string): string {
     const amount = Number(value);
 
     if (Number.isNaN(amount)) {
-        return "0d";
+        return "0đ";
     }
 
-    return `${amount.toLocaleString("vi-VN")}d`;
+    return `${amount.toLocaleString("vi-VN")}đ`;
 }
 
 function formatDate(value: string | null | undefined): string {
@@ -102,7 +114,7 @@ export default function PaymentsPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to load payments");
+                setErrorMessage("Không thể tải danh sách thanh toán");
             }
         } finally {
             setIsLoadingPayments(false);
@@ -130,7 +142,7 @@ export default function PaymentsPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to load settlements");
+                setErrorMessage("Không thể tải danh sách đối soát");
             }
         } finally {
             setIsLoadingSettlements(false);
@@ -161,7 +173,7 @@ export default function PaymentsPage() {
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-1">
                         <CardTitle className="text-sm font-medium text-slate-600">
-                            Payments total
+                            Tổng thanh toán
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -171,19 +183,19 @@ export default function PaymentsPage() {
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-1">
                         <CardTitle className="text-sm font-medium text-slate-600">
-                            Payments amount (page)
+                            Giá trị thanh toán (trang)
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-3xl font-semibold text-slate-900">
-                            {paymentPageAmount.toLocaleString("vi-VN")}d
+                            {paymentPageAmount.toLocaleString("vi-VN")}đ
                         </p>
                     </CardContent>
                 </Card>
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-1">
                         <CardTitle className="text-sm font-medium text-slate-600">
-                            Settlements total
+                            Tổng đối soát
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -195,12 +207,12 @@ export default function PaymentsPage() {
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-1">
                         <CardTitle className="text-sm font-medium text-slate-600">
-                            Settlements net (page)
+                            Giá trị đối soát ròng (trang)
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-3xl font-semibold text-slate-900">
-                            {settlementPageAmount.toLocaleString("vi-VN")}d
+                            {settlementPageAmount.toLocaleString("vi-VN")}đ
                         </p>
                     </CardContent>
                 </Card>
@@ -209,7 +221,7 @@ export default function PaymentsPage() {
             <Card className="border-slate-200 bg-white">
                 <CardHeader>
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                        <CardTitle>Payments and settlements</CardTitle>
+                        <CardTitle>Thanh toán và đối soát</CardTitle>
                         <div className="inline-flex rounded-md border border-slate-300 p-1">
                             <button
                                 type="button"
@@ -220,7 +232,7 @@ export default function PaymentsPage() {
                                 }`}
                                 onClick={() => setActiveTab("PAYMENTS")}
                             >
-                                Payments
+                                Thanh toán
                             </button>
                             <button
                                 type="button"
@@ -231,7 +243,7 @@ export default function PaymentsPage() {
                                 }`}
                                 onClick={() => setActiveTab("SETTLEMENTS")}
                             >
-                                Settlements
+                                Đối soát
                             </button>
                         </div>
                     </div>
@@ -248,7 +260,7 @@ export default function PaymentsPage() {
                         <>
                             <div className="grid gap-3 md:grid-cols-[1fr_180px_160px_160px_auto]">
                                 <Input
-                                    placeholder="Search txnRef, customer, order..."
+                                    placeholder="Tìm mã giao dịch, khách hàng, đơn hàng..."
                                     value={paymentKeyword}
                                     onChange={(event) => {
                                         setPaymentKeyword(event.target.value);
@@ -263,11 +275,11 @@ export default function PaymentsPage() {
                                         setPaymentPage(1);
                                     }}
                                 >
-                                    <option value="ALL">Status: ALL</option>
-                                    <option value="PENDING">Status: PENDING</option>
-                                    <option value="SUCCESS">Status: SUCCESS</option>
-                                    <option value="FAILED">Status: FAILED</option>
-                                    <option value="CANCELLED">Status: CANCELLED</option>
+                                    <option value="ALL">Trạng thái: Tất cả</option>
+                                    <option value="PENDING">Trạng thái: Chờ xử lý</option>
+                                    <option value="SUCCESS">Trạng thái: Thành công</option>
+                                    <option value="FAILED">Trạng thái: Thất bại</option>
+                                    <option value="CANCELLED">Trạng thái: Đã hủy</option>
                                 </select>
                                 <Input
                                     type="date"
@@ -290,29 +302,33 @@ export default function PaymentsPage() {
                                     variant="outline"
                                     onClick={() => void loadPayments()}
                                 >
-                                    Reload
+                                    Tải lại
                                 </Button>
                             </div>
 
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Txn</TableHead>
-                                        <TableHead>Customer</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Amount</TableHead>
-                                        <TableHead>Paid at</TableHead>
-                                        <TableHead>Orders</TableHead>
+                                        <TableHead>Mã giao dịch</TableHead>
+                                        <TableHead>Khách hàng</TableHead>
+                                        <TableHead>Trạng thái</TableHead>
+                                        <TableHead className="text-right">Số tiền</TableHead>
+                                        <TableHead>Thời điểm thanh toán</TableHead>
+                                        <TableHead>Số đơn</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {isLoadingPayments ? (
                                         <TableRow>
-                                            <TableCell colSpan={6}>Loading payments...</TableCell>
+                                            <TableCell colSpan={6}>
+                                                Đang tải thanh toán...
+                                            </TableCell>
                                         </TableRow>
                                     ) : paymentRows.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={6}>No payments found</TableCell>
+                                            <TableCell colSpan={6}>
+                                                Không có thanh toán phù hợp
+                                            </TableCell>
                                         </TableRow>
                                     ) : (
                                         paymentRows.map((payment) => (
@@ -337,7 +353,9 @@ export default function PaymentsPage() {
                                                         </span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell>{payment.status}</TableCell>
+                                                <TableCell>
+                                                    {getPaymentStatusLabel(payment.status)}
+                                                </TableCell>
                                                 <TableCell className="text-right font-medium">
                                                     {formatCurrency(payment.amount)}
                                                 </TableCell>
@@ -356,10 +374,10 @@ export default function PaymentsPage() {
                                     disabled={paymentPage <= 1 || isLoadingPayments}
                                     onClick={() => setPaymentPage((prev) => Math.max(1, prev - 1))}
                                 >
-                                    Previous
+                                    Trước
                                 </Button>
                                 <span className="text-sm text-slate-600">
-                                    Page {paymentPage}/{paymentTotalPages}
+                                    Trang {paymentPage}/{paymentTotalPages}
                                 </span>
                                 <Button
                                     type="button"
@@ -371,7 +389,7 @@ export default function PaymentsPage() {
                                         )
                                     }
                                 >
-                                    Next
+                                    Sau
                                 </Button>
                             </div>
                         </>
@@ -379,7 +397,7 @@ export default function PaymentsPage() {
                         <>
                             <div className="grid gap-3 md:grid-cols-[1fr_180px_160px_160px_auto]">
                                 <Input
-                                    placeholder="Search order, shop, seller..."
+                                    placeholder="Tìm đơn hàng, cửa hàng, người bán..."
                                     value={settlementKeyword}
                                     onChange={(event) => {
                                         setSettlementKeyword(event.target.value);
@@ -396,9 +414,9 @@ export default function PaymentsPage() {
                                         setSettlementPage(1);
                                     }}
                                 >
-                                    <option value="ALL">Status: ALL</option>
-                                    <option value="COMPLETED">Status: COMPLETED</option>
-                                    <option value="REVERSED">Status: REVERSED</option>
+                                    <option value="ALL">Trạng thái: Tất cả</option>
+                                    <option value="COMPLETED">Trạng thái: Hoàn tất</option>
+                                    <option value="REVERSED">Trạng thái: Hoàn tác</option>
                                 </select>
                                 <Input
                                     type="date"
@@ -421,31 +439,31 @@ export default function PaymentsPage() {
                                     variant="outline"
                                     onClick={() => void loadSettlements()}
                                 >
-                                    Reload
+                                    Tải lại
                                 </Button>
                             </div>
 
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Order</TableHead>
-                                        <TableHead>Shop</TableHead>
-                                        <TableHead>Seller</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Net</TableHead>
-                                        <TableHead>Settled at</TableHead>
+                                        <TableHead>Đơn hàng</TableHead>
+                                        <TableHead>Cửa hàng</TableHead>
+                                        <TableHead>Người bán</TableHead>
+                                        <TableHead>Trạng thái</TableHead>
+                                        <TableHead className="text-right">Ròng</TableHead>
+                                        <TableHead>Thời điểm đối soát</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {isLoadingSettlements ? (
                                         <TableRow>
-                                            <TableCell colSpan={6}>
-                                                Loading settlements...
-                                            </TableCell>
+                                            <TableCell colSpan={6}>Đang tải đối soát...</TableCell>
                                         </TableRow>
                                     ) : settlementRows.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={6}>No settlements found</TableCell>
+                                            <TableCell colSpan={6}>
+                                                Không có bản ghi đối soát
+                                            </TableCell>
                                         </TableRow>
                                     ) : (
                                         settlementRows.map((settlement) => (
@@ -453,7 +471,9 @@ export default function PaymentsPage() {
                                                 <TableCell>{settlement.orderNumber}</TableCell>
                                                 <TableCell>{settlement.shopName}</TableCell>
                                                 <TableCell>{settlement.sellerName}</TableCell>
-                                                <TableCell>{settlement.status}</TableCell>
+                                                <TableCell>
+                                                    {getSettlementStatusLabel(settlement.status)}
+                                                </TableCell>
                                                 <TableCell className="text-right font-medium">
                                                     {formatCurrency(settlement.netAmount)}
                                                 </TableCell>
@@ -475,10 +495,10 @@ export default function PaymentsPage() {
                                         setSettlementPage((prev) => Math.max(1, prev - 1))
                                     }
                                 >
-                                    Previous
+                                    Trước
                                 </Button>
                                 <span className="text-sm text-slate-600">
-                                    Page {settlementPage}/{settlementTotalPages}
+                                    Trang {settlementPage}/{settlementTotalPages}
                                 </span>
                                 <Button
                                     type="button"
@@ -493,7 +513,7 @@ export default function PaymentsPage() {
                                         )
                                     }
                                 >
-                                    Next
+                                    Sau
                                 </Button>
                             </div>
                         </>

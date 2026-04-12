@@ -9,7 +9,7 @@ import { ApiRequestError, getApiBaseUrl, requestApi } from "@/services/http-clie
 
 function requireData<T>(response: { data?: T; message: string; statusCode: number }): T {
     if (!response.data) {
-        throw new Error(`Missing response data: ${response.message} (${response.statusCode})`);
+        throw new Error(`Thiếu dữ liệu phản hồi: ${response.message} (${response.statusCode})`);
     }
 
     return response.data;
@@ -17,7 +17,11 @@ function requireData<T>(response: { data?: T; message: string; statusCode: numbe
 
 function ensureAdminUser(user: AuthUser): AuthUser {
     if (user.role !== "ADMIN") {
-        throw new ApiRequestError("Only ADMIN account can access this application", 403, user);
+        throw new ApiRequestError(
+            "Chỉ tài khoản ADMIN mới có thể truy cập ứng dụng này",
+            403,
+            user,
+        );
     }
 
     return user;

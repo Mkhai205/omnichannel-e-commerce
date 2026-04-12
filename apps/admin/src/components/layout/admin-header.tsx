@@ -81,7 +81,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
                     size="icon"
                     className="md:hidden"
                     onClick={onToggleSidebar}
-                    aria-label="Toggle sidebar"
+                    aria-label="Bật/tắt thanh bên"
                 >
                     <Menu aria-hidden="true" />
                 </Button>
@@ -92,10 +92,10 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
                     </div>
                     <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-slate-900">
-                            Admin Console
+                            Bảng điều khiển quản trị
                         </p>
                         <p className="truncate text-xs text-slate-500">
-                            Monitor and operate omnichannel system
+                            Giám sát và vận hành hệ thống đa kênh
                         </p>
                     </div>
                 </div>
@@ -103,14 +103,14 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button type="button" variant="outline" disabled={isLoadingProfile}>
-                            {profile?.email ?? "Admin"}
+                            {profile?.email ?? "Quản trị viên"}
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-64">
                         <DropdownMenuLabel className="grid gap-1">
-                            <span className="text-xs text-slate-500">Signed in as</span>
+                            <span className="text-xs text-slate-500">Đang đăng nhập với</span>
                             <span className="truncate text-sm font-medium">
-                                {profile?.fullName ?? "Admin user"}
+                                {profile?.fullName ?? "Người dùng quản trị"}
                             </span>
                             <span className="truncate text-xs text-slate-500">
                                 {profile?.email ?? "--"}
@@ -126,7 +126,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
                             className="text-rose-600"
                         >
                             <LogOut className="mr-2 size-4" aria-hidden="true" />
-                            {isLoggingOut ? "Signing out..." : "Sign out"}
+                            {isLoggingOut ? "Đang đăng xuất..." : "Đăng xuất"}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

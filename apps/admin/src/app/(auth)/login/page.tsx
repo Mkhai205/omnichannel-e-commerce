@@ -41,7 +41,7 @@ export default function LoginPage() {
         }
 
         if (!email.trim() || !password.trim()) {
-            setErrorMessage("Email and password are required");
+            setErrorMessage("Vui lòng nhập đầy đủ email và mật khẩu");
             return;
         }
 
@@ -61,7 +61,7 @@ export default function LoginPage() {
 
             if (response.user.status === "BANNED") {
                 await logoutAdmin();
-                setErrorMessage("This account is currently banned");
+                setErrorMessage("Tài khoản này hiện đang bị khóa");
                 return;
             }
 
@@ -70,7 +70,7 @@ export default function LoginPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to sign in right now");
+                setErrorMessage("Hiện không thể đăng nhập, vui lòng thử lại");
             }
         } finally {
             setIsSubmitting(false);
@@ -81,15 +81,15 @@ export default function LoginPage() {
         <main className="grid min-h-dvh place-items-center bg-slate-100 p-4">
             <Card className="w-full max-w-md border-slate-200 bg-white">
                 <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl">Admin sign in</CardTitle>
+                    <CardTitle className="text-2xl">Đăng nhập quản trị</CardTitle>
                     <CardDescription>
-                        Sign in with an ADMIN account to access the operations console
+                        Đăng nhập bằng tài khoản quản trị để truy cập bảng điều khiển vận hành
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form className="grid gap-4" onSubmit={handleSubmit}>
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email">Địa chỉ email</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -98,11 +98,11 @@ export default function LoginPage() {
                                 onChange={(event) => {
                                     setEmail(event.target.value);
                                 }}
-                                placeholder="admin@example.com"
+                                placeholder="quantri@example.com"
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">Mật khẩu</Label>
                             <Input
                                 id="password"
                                 type="password"
@@ -111,7 +111,7 @@ export default function LoginPage() {
                                 onChange={(event) => {
                                     setPassword(event.target.value);
                                 }}
-                                placeholder="Enter your password"
+                                placeholder="Nhập mật khẩu"
                             />
                         </div>
 
@@ -122,7 +122,7 @@ export default function LoginPage() {
                         ) : null}
 
                         <Button type="submit" disabled={isSubmitting} className="w-full">
-                            {isSubmitting ? "Signing in..." : "Sign in"}
+                            {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
                         </Button>
                     </form>
                 </CardContent>

@@ -28,6 +28,20 @@ const PAGE_SIZE = 20;
 const ROLE_FILTER_OPTIONS: Array<UserRole | "ALL"> = ["ALL", "CUSTOMER", "SELLER", "ADMIN"];
 const STATUS_FILTER_OPTIONS: Array<UserStatus | "ALL"> = ["ALL", "ACTIVE", "BANNED", "UNVERIFIED"];
 
+function getRoleLabel(role: UserRole | "ALL"): string {
+    if (role === "ALL") return "Tất cả";
+    if (role === "CUSTOMER") return "Khách hàng";
+    if (role === "SELLER") return "Người bán";
+    return "Quản trị viên";
+}
+
+function getStatusLabel(status: UserStatus | "ALL"): string {
+    if (status === "ALL") return "Tất cả";
+    if (status === "ACTIVE") return "Hoạt động";
+    if (status === "BANNED") return "Bị khóa";
+    return "Chưa xác minh";
+}
+
 export default function UsersPage() {
     const [users, setUsers] = useState<AdminUserListItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -61,7 +75,7 @@ export default function UsersPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to load users");
+                setErrorMessage("Không thể tải danh sách người dùng");
             }
         } finally {
             setIsLoading(false);
@@ -91,7 +105,7 @@ export default function UsersPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to update user role");
+                setErrorMessage("Không thể cập nhật vai trò người dùng");
             }
         } finally {
             setMutatingUserId(null);
@@ -109,7 +123,7 @@ export default function UsersPage() {
             if (isApiRequestError(error)) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Unable to update user status");
+                setErrorMessage("Không thể cập nhật trạng thái người dùng");
             }
         } finally {
             setMutatingUserId(null);
@@ -122,7 +136,7 @@ export default function UsersPage() {
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-1">
                         <CardTitle className="text-sm font-medium text-slate-600">
-                            Total users
+                            Tổng người dùng
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -132,7 +146,7 @@ export default function UsersPage() {
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-1">
                         <CardTitle className="text-sm font-medium text-slate-600">
-                            Admins in page
+                            Quản trị viên trên trang
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -142,7 +156,7 @@ export default function UsersPage() {
                 <Card className="border-slate-200 bg-white">
                     <CardHeader className="pb-1">
                         <CardTitle className="text-sm font-medium text-slate-600">
-                            Current page
+                            Trang hiện tại
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -153,12 +167,12 @@ export default function UsersPage() {
 
             <Card className="border-slate-200 bg-white">
                 <CardHeader>
-                    <CardTitle>Users moderation</CardTitle>
+                    <CardTitle>Kiểm duyệt người dùng</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-4">
                     <div className="grid gap-3 md:grid-cols-[1fr_220px_220px_auto]">
                         <Input
-                            placeholder="Search by email, name, phone"
+                            placeholder="Tìm theo email, tên, số điện thoại"
                             value={search}
                             onChange={(event) => {
                                 setSearch(event.target.value);
@@ -176,7 +190,7 @@ export default function UsersPage() {
                         >
                             {ROLE_FILTER_OPTIONS.map((option) => (
                                 <option key={option} value={option}>
-                                    Role: {option}
+                                    Vai trò: {getRoleLabel(option)}
                                 </option>
                             ))}
                         </select>
@@ -191,13 +205,13 @@ export default function UsersPage() {
                         >
                             {STATUS_FILTER_OPTIONS.map((option) => (
                                 <option key={option} value={option}>
-                                    Status: {option}
+                                    Trạng thái: {getStatusLabel(option)}
                                 </option>
                             ))}
                         </select>
 
                         <Button type="button" variant="outline" onClick={() => void loadUsers()}>
-                            Reload
+                            Tải lại
                         </Button>
                     </div>
 
@@ -210,21 +224,21 @@ export default function UsersPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>User</TableHead>
-                                <TableHead>Role</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Created</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead>Người dùng</TableHead>
+                                <TableHead>Vai trò</TableHead>
+                                <TableHead>Trạng thái</TableHead>
+                                <TableHead>Ngày tạo</TableHead>
+                                <TableHead className="text-right">Thao tác</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
                                 <TableRow>
-                                    <TableCell colSpan={5}>Loading users...</TableCell>
+                                    <TableCell colSpan={5}>Đang tải người dùng...</TableCell>
                                 </TableRow>
                             ) : users.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5}>No users found</TableCell>
+                                    <TableCell colSpan={5}>Không có người dùng phù hợp</TableCell>
                                 </TableRow>
                             ) : (
                                 users.map((user) => {
@@ -256,12 +270,12 @@ export default function UsersPage() {
                                                     }}
                                                     disabled={isMutating}
                                                 >
-                                                    <option value="CUSTOMER">CUSTOMER</option>
-                                                    <option value="SELLER">SELLER</option>
-                                                    <option value="ADMIN">ADMIN</option>
+                                                    <option value="CUSTOMER">Khách hàng</option>
+                                                    <option value="SELLER">Người bán</option>
+                                                    <option value="ADMIN">Quản trị viên</option>
                                                 </select>
                                             </TableCell>
-                                            <TableCell>{user.status}</TableCell>
+                                            <TableCell>{getStatusLabel(user.status)}</TableCell>
                                             <TableCell>
                                                 {new Date(user.createdAt).toLocaleDateString()}
                                             </TableCell>
@@ -275,7 +289,7 @@ export default function UsersPage() {
                                                         }
                                                         onClick={() => void handleSaveRole(user)}
                                                     >
-                                                        Save role
+                                                        Lưu vai trò
                                                     </Button>
                                                     <Button
                                                         type="button"
@@ -290,8 +304,8 @@ export default function UsersPage() {
                                                         }
                                                     >
                                                         {user.status === "BANNED"
-                                                            ? "Activate"
-                                                            : "Ban"}
+                                                            ? "Mở khóa"
+                                                            : "Khóa"}
                                                     </Button>
                                                 </div>
                                             </TableCell>
@@ -311,10 +325,10 @@ export default function UsersPage() {
                                 setPage((prev) => Math.max(1, prev - 1));
                             }}
                         >
-                            Previous
+                            Trước
                         </Button>
                         <span className="text-sm text-slate-600">
-                            Page {page}/{totalPages}
+                            Trang {page}/{totalPages}
                         </span>
                         <Button
                             type="button"
@@ -324,7 +338,7 @@ export default function UsersPage() {
                                 setPage((prev) => Math.min(totalPages, prev + 1));
                             }}
                         >
-                            Next
+                            Sau
                         </Button>
                     </div>
                 </CardContent>
