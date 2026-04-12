@@ -1,4 +1,5 @@
 import type { CustomerOrderDetailResponse } from "@repo/shared-types";
+import Image from "next/image";
 import { CreditCardIcon, MapPinIcon, PackageIcon, PhoneIcon, UserIcon } from "lucide-react";
 import { formatVnd } from "@/lib/currency";
 import {
@@ -65,9 +66,11 @@ export function OrderSummaryPanel({ order }: OrderSummaryPanelProps) {
                             className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 rounded-xl border border-gray-100 bg-gray-50 p-2.5"
                         >
                             {item.imageUrl ? (
-                                <img
+                                <Image
                                     src={item.imageUrl}
                                     alt={item.productName}
+                                    width={56}
+                                    height={56}
                                     className="h-14 w-14 rounded-lg object-cover"
                                     loading="lazy"
                                 />

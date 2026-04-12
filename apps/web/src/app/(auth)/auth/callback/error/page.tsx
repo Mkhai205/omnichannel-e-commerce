@@ -1,10 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { LOGIN_ROUTE } from "@/lib/auth-routes";
 
 export default function AuthCallbackErrorPage() {
+    return (
+        <Suspense fallback={null}>
+            <AuthCallbackErrorContent />
+        </Suspense>
+    );
+}
+
+function AuthCallbackErrorContent() {
     const searchParams = useSearchParams();
     const message = searchParams.get("message") || "Đăng nhập Google thất bại";
 

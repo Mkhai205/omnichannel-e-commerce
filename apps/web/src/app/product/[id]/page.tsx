@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SiteBreadcrumb } from "@/components/layout/site-breadcrumb";
 import { mapProductToTodaySuggestionCardItem } from "@/lib/home-today-suggestions";
 import {
     getCatalogProductById,

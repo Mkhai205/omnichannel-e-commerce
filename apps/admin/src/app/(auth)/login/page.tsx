@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useMemo, useState } from "react";
+import { Suspense, type FormEvent, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
     Button,
@@ -17,6 +17,24 @@ import { loginAdmin, logoutAdmin } from "@/services/auth-service";
 import { isApiRequestError } from "@/services/http-client";
 
 export default function LoginPage() {
+    return (
+        <Suspense
+            fallback={
+                <main className="grid min-h-dvh place-items-center bg-slate-100 p-4">
+                    <Card className="w-full max-w-md border-slate-200 bg-white">
+                        <CardContent className="py-6 text-sm text-slate-500">
+                            Đang tải trang đăng nhập...
+                        </CardContent>
+                    </Card>
+                </main>
+            }
+        >
+            <LoginForm />
+        </Suspense>
+    );
+}
+
+function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
 

@@ -3,7 +3,7 @@
 import type { PaymentStatusByOrderResponse } from "@repo/shared-types";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import {
     AlertTriangleIcon,
     CheckCircle2Icon,
@@ -88,6 +88,26 @@ function resolvePresentation(state: VerificationState): {
 }
 
 export default function CheckoutConfirmationPage() {
+    return (
+        <Suspense
+            fallback={
+                <main className="bg-gray-50 py-10 sm:py-14">
+                    <div className="mx-auto w-full max-w-4xl px-4 md:px-6">
+                        <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+                            <p className="text-sm text-gray-600">
+                                Đang tải thông tin thanh toán...
+                            </p>
+                        </section>
+                    </div>
+                </main>
+            }
+        >
+            <CheckoutConfirmationContent />
+        </Suspense>
+    );
+}
+
+function CheckoutConfirmationContent() {
     const searchParams = useSearchParams();
     const queryString = searchParams.toString();
 

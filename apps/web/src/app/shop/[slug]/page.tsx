@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { SiteBreadcrumb } from "@/components/layout/site-breadcrumb";
 import { getCatalogProducts } from "@/services/catalog-service";
 import { isApiRequestError } from "@/services/http-client";
 import { getPublicShopBySlug } from "@/services/shop-service";

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteNewsletter } from "@/components/layout/site-newsletter";
@@ -17,7 +17,9 @@ export function SiteShell({ children }: SiteShellProps) {
             <CartProvider>
                 <div className="flex min-h-screen flex-col bg-white text-gray-900">
                     <SiteHeader />
-                    <RouteToastListener />
+                    <Suspense fallback={null}>
+                        <RouteToastListener />
+                    </Suspense>
                     <div className="flex-1">{children}</div>
                     <SiteNewsletter />
                     <SiteFooter />

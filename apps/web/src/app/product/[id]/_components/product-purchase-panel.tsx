@@ -113,6 +113,7 @@ export function ProductPurchasePanel({
                         variant="outline"
                         size="icon-sm"
                         onClick={() => onQuantityChange(quantity + 1)}
+                        disabled={quantity >= maxQuantity}
                     >
                         <PlusIcon className="size-3.5" />
                     </Button>
