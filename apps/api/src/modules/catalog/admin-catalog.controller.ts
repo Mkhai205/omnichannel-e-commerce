@@ -19,13 +19,14 @@ import type {
   ApiResponse,
   ProductItem,
 } from '@repo/shared-types';
-import { Roles } from '../../core/decorators';
+import { CurrentUser, Roles } from '../../core/decorators';
 import { createSuccessResponse } from '../../core/http/api-response.util';
 import {
   ApiAuthSchemes,
   ApiCommonErrorResponses,
   ApiOkEnvelopeResponse,
 } from '../../core/http/swagger-response.decorator';
+import type { JwtPayload } from '../auth/types/jwt-payload.type';
 import { AdminCatalogService } from './admin-catalog.service';
 import { AdminProductsFilterDto } from './dto/admin-products-filter.dto';
 import {
@@ -87,10 +88,12 @@ export class AdminCatalogController {
     notFound: 'Product not found',
   })
   async updateProductStatus(
+    @CurrentUser() currentUser: JwtPayload,
     @Param('id', new ParseUUIDPipe()) productId: string,
     @Body() payload: UpdateProductStatusDto,
   ): Promise<ApiResponse<ProductItem>> {
     const product = await this.adminCatalogService.updateProductStatus(
+      currentUser.sub,
       productId,
       payload,
     );

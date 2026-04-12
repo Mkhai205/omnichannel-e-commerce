@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@repo/database';
-import type { SellerPaymentFilterStatus } from '@repo/shared-types';
+import type {
+  PaymentProvider,
+  PaymentStatus,
+  SellerPaymentFilterStatus,
+  SellerSettlementStatus,
+} from '@repo/shared-types';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
 
 const ADMIN_WALLET_SELECT = {
@@ -77,6 +82,66 @@ const SELLER_SETTLEMENT_CASHFLOW_SELECT = {
   settledAt: true,
 } satisfies Prisma.SellerSettlementSelect;
 
+const ADMIN_PAYMENT_SELECT = {
+  id: true,
+  userId: true,
+  provider: true,
+  status: true,
+  txnRef: true,
+  gatewayTransactionNo: true,
+  amount: true,
+  currency: true,
+  bankCode: true,
+  paidAt: true,
+  createdAt: true,
+  updatedAt: true,
+  user: {
+    select: {
+      fullName: true,
+      email: true,
+    },
+  },
+  orders: {
+    select: {
+      orderId: true,
+    },
+  },
+} satisfies Prisma.PaymentSelect;
+
+const ADMIN_SETTLEMENT_SELECT = {
+  id: true,
+  orderId: true,
+  shopId: true,
+  sellerWalletId: true,
+  status: true,
+  grossAmount: true,
+  commissionAmount: true,
+  netAmount: true,
+  settledAt: true,
+  createdAt: true,
+  updatedAt: true,
+  order: {
+    select: {
+      orderNumber: true,
+    },
+  },
+  shop: {
+    select: {
+      shopName: true,
+      user: {
+        select: {
+          fullName: true,
+        },
+      },
+    },
+  },
+} satisfies Prisma.SellerSettlementSelect;
+
+const KPI_TREND_ORDER_SELECT = {
+  createdAt: true,
+  totalAmount: true,
+} satisfies Prisma.OrderSelect;
+
 const SHOP_ID_SELECT = {
   id: true,
 } satisfies Prisma.ShopSelect;
@@ -91,6 +156,18 @@ export type SellerPaymentOrderRecord = Prisma.OrderGetPayload<{
 
 export type SellerSettlementCashflowRecord = Prisma.SellerSettlementGetPayload<{
   select: typeof SELLER_SETTLEMENT_CASHFLOW_SELECT;
+}>;
+
+export type AdminPaymentRecord = Prisma.PaymentGetPayload<{
+  select: typeof ADMIN_PAYMENT_SELECT;
+}>;
+
+export type AdminSettlementRecord = Prisma.SellerSettlementGetPayload<{
+  select: typeof ADMIN_SETTLEMENT_SELECT;
+}>;
+
+export type KpiTrendOrderRecord = Prisma.OrderGetPayload<{
+  select: typeof KPI_TREND_ORDER_SELECT;
 }>;
 
 @Injectable()
@@ -389,6 +466,320 @@ export class FinanceRepository {
         _all: true,
       },
     });
+  }
+
+  findAdminPayments(
+    input: {
+      page: number;
+      limit: number;
+      status?: PaymentStatus;
+      provider?: PaymentProvider;
+      search?: string;
+      createdFrom?: Date;
+      createdToExclusive?: Date;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.payment.findMany({
+      where: this.buildAdminPaymentsWhere(input),
+      skip: (input.page - 1) * input.limit,
+      take: input.limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: ADMIN_PAYMENT_SELECT,
+    });
+  }
+
+  countAdminPayments(
+    input: {
+      status?: PaymentStatus;
+      provider?: PaymentProvider;
+      search?: string;
+      createdFrom?: Date;
+      createdToExclusive?: Date;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.payment.count({
+      where: this.buildAdminPaymentsWhere(input),
+    });
+  }
+
+  findAdminSettlements(
+    input: {
+      page: number;
+      limit: number;
+      status?: SellerSettlementStatus;
+      search?: string;
+      settledFrom?: Date;
+      settledToExclusive?: Date;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.sellerSettlement.findMany({
+      where: this.buildAdminSettlementsWhere(input),
+      skip: (input.page - 1) * input.limit,
+      take: input.limit,
+      orderBy: {
+        settledAt: 'desc',
+      },
+      select: ADMIN_SETTLEMENT_SELECT,
+    });
+  }
+
+  countAdminSettlements(
+    input: {
+      status?: SellerSettlementStatus;
+      search?: string;
+      settledFrom?: Date;
+      settledToExclusive?: Date;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.sellerSettlement.count({
+      where: this.buildAdminSettlementsWhere(input),
+    });
+  }
+
+  countTotalUsers(tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.user.count();
+  }
+
+  countTotalShops(tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.shop.count();
+  }
+
+  countPendingShops(tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.shop.count({
+      where: {
+        status: 'PENDING',
+      },
+    });
+  }
+
+  countTotalOrders(tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.order.count();
+  }
+
+  countOrdersCreatedAfterOrAt(
+    createdAfterOrAt: Date,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.count({
+      where: {
+        createdAt: {
+          gte: createdAfterOrAt,
+        },
+      },
+    });
+  }
+
+  aggregateGrossMerchandiseValue(tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.order.aggregate({
+      where: {
+        status: {
+          in: ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'],
+        },
+      },
+      _sum: {
+        totalAmount: true,
+      },
+    });
+  }
+
+  countTotalPayments(tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.payment.count();
+  }
+
+  countSuccessfulPayments(tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.payment.count({
+      where: {
+        status: 'SUCCESS',
+      },
+    });
+  }
+
+  countPendingPayments(tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.payment.count({
+      where: {
+        status: 'PENDING',
+      },
+    });
+  }
+
+  countPendingSettlements(tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.order.count({
+      where: {
+        status: 'DELIVERED',
+        settlementStatus: 'PENDING',
+      },
+    });
+  }
+
+  findKpiTrendOrders(createdAfterOrAt: Date, tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+
+    return client.order.findMany({
+      where: {
+        createdAt: {
+          gte: createdAfterOrAt,
+        },
+        status: {
+          in: ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'],
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      select: KPI_TREND_ORDER_SELECT,
+    });
+  }
+
+  private buildAdminPaymentsWhere(input: {
+    status?: PaymentStatus;
+    provider?: PaymentProvider;
+    search?: string;
+    createdFrom?: Date;
+    createdToExclusive?: Date;
+  }): Prisma.PaymentWhereInput {
+    const where: Prisma.PaymentWhereInput = {
+      ...(input.status ? { status: input.status } : {}),
+      ...(input.provider ? { provider: input.provider } : {}),
+    };
+
+    if (input.search) {
+      where.OR = [
+        {
+          txnRef: {
+            contains: input.search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          gatewayTransactionNo: {
+            contains: input.search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          user: {
+            fullName: {
+              contains: input.search,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          user: {
+            email: {
+              contains: input.search,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          orders: {
+            some: {
+              order: {
+                orderNumber: {
+                  contains: input.search,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          },
+        },
+      ];
+    }
+
+    if (input.createdFrom || input.createdToExclusive) {
+      where.createdAt = {
+        ...(input.createdFrom ? { gte: input.createdFrom } : {}),
+        ...(input.createdToExclusive ? { lt: input.createdToExclusive } : {}),
+      };
+    }
+
+    return where;
+  }
+
+  private buildAdminSettlementsWhere(input: {
+    status?: SellerSettlementStatus;
+    search?: string;
+    settledFrom?: Date;
+    settledToExclusive?: Date;
+  }): Prisma.SellerSettlementWhereInput {
+    const where: Prisma.SellerSettlementWhereInput = {
+      ...(input.status ? { status: input.status } : {}),
+    };
+
+    if (input.search) {
+      where.OR = [
+        {
+          order: {
+            orderNumber: {
+              contains: input.search,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          shop: {
+            shopName: {
+              contains: input.search,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          shop: {
+            user: {
+              fullName: {
+                contains: input.search,
+                mode: 'insensitive',
+              },
+            },
+          },
+        },
+      ];
+    }
+
+    if (input.settledFrom || input.settledToExclusive) {
+      where.settledAt = {
+        ...(input.settledFrom ? { gte: input.settledFrom } : {}),
+        ...(input.settledToExclusive ? { lt: input.settledToExclusive } : {}),
+      };
+    }
+
+    return where;
   }
 
   private toSellerPaymentStatusWhere(status?: SellerPaymentFilterStatus): {

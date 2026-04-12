@@ -113,3 +113,85 @@ export interface SellerPaymentsOverviewResponse {
     discrepancyCount: number;
     cashflow: SellerPaymentCashflowPoint[];
 }
+
+export interface AdminPaymentsFilterRequest {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: PaymentStatus;
+    provider?: PaymentProvider;
+    createdFrom?: string;
+    createdTo?: string;
+}
+
+export interface AdminPaymentListItem {
+    id: UUID;
+    userId: UUID;
+    customerName: string;
+    customerEmail: string;
+    provider: PaymentProvider;
+    status: PaymentStatus;
+    txnRef: string;
+    gatewayTransactionNo?: string | null;
+    amount: string;
+    currency: string;
+    bankCode?: string | null;
+    orderCount: number;
+    paidAt?: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export type AdminPaymentsListResponse = PaginatedResponse<AdminPaymentListItem>;
+
+export type SellerSettlementStatus = "COMPLETED" | "REVERSED";
+
+export interface AdminSettlementsFilterRequest {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: SellerSettlementStatus;
+    settledFrom?: string;
+    settledTo?: string;
+}
+
+export interface AdminSettlementListItem {
+    id: UUID;
+    orderId: UUID;
+    orderNumber: string;
+    shopId: UUID;
+    shopName: string;
+    sellerName: string;
+    sellerWalletId: UUID;
+    status: SellerSettlementStatus;
+    grossAmount: string;
+    commissionAmount: string;
+    netAmount: string;
+    settledAt: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export type AdminSettlementsListResponse = PaginatedResponse<AdminSettlementListItem>;
+
+export interface AdminDashboardTrendPoint {
+    label: string;
+    orderCount: number;
+    gmv: number;
+}
+
+export interface AdminDashboardKpiResponse {
+    totalUsers: number;
+    totalShops: number;
+    pendingShops: number;
+    totalOrders: number;
+    todayOrders: number;
+    totalGmv: string;
+    paymentSuccessRate: number;
+    successfulPayments: number;
+    totalPayments: number;
+    pendingPayments: number;
+    pendingSettlements: number;
+    trend: AdminDashboardTrendPoint[];
+    generatedAt: string;
+}

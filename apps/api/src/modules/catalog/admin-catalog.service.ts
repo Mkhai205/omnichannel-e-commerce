@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import type {
@@ -16,6 +17,8 @@ import { CatalogRepository } from './catalog.repository';
 
 @Injectable()
 export class AdminCatalogService {
+  private readonly logger = new Logger(AdminCatalogService.name);
+
   constructor(
     private readonly catalogRepository: CatalogRepository,
     private readonly storageService: StorageService,
@@ -54,6 +57,7 @@ export class AdminCatalogService {
   }
 
   async updateProductStatus(
+    adminUserId: string,
     productId: string,
     payload: UpdateProductStatusRequest,
   ): Promise<ProductItem> {
@@ -72,6 +76,10 @@ export class AdminCatalogService {
       {
         status: payload.status,
       },
+    );
+
+    this.logger.log(
+      `[ADMIN_AUDIT] action=UPDATE_PRODUCT_STATUS actor=${adminUserId} product=${productId} from=${product.status} to=${payload.status}`,
     );
 
     return this.toProductItem(updatedProduct);
