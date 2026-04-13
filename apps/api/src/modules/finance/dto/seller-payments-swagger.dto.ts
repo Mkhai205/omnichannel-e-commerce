@@ -110,3 +110,99 @@ export class SellerPaymentsOverviewSwaggerDto {
   @ApiProperty({ type: [SellerPaymentCashflowPointSwaggerDto] })
   cashflow!: SellerPaymentCashflowPointSwaggerDto[];
 }
+
+export class SellerAnalyticsRevenuePointSwaggerDto {
+  @ApiProperty({ example: '10/04' })
+  label!: string;
+
+  @ApiProperty({ example: 1350000 })
+  value!: number;
+
+  @ApiPropertyOptional({ example: true })
+  emphasize?: boolean;
+}
+
+export class SellerAnalyticsChannelShareSwaggerDto {
+  @ApiProperty({ example: 'Website cửa hàng' })
+  name!: string;
+
+  @ApiProperty({ example: 52 })
+  percent!: number;
+}
+
+export class SellerAnalyticsTopCustomerSwaggerDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ example: 'Nguyễn Văn A' })
+  name!: string;
+
+  @ApiProperty({ example: 'vana@example.com' })
+  email!: string;
+
+  @ApiProperty({ example: 6 })
+  orderCount!: number;
+
+  @ApiProperty({ example: '5200000.00' })
+  lifetimeValue!: string;
+}
+
+export class SellerAnalyticsTopProductSwaggerDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ example: 'Tai nghe XYZ' })
+  name!: string;
+
+  @ApiProperty({ example: 87 })
+  soldQuantity!: number;
+
+  @ApiProperty({ example: '9200000.00' })
+  revenue!: string;
+
+  @ApiProperty({ example: 12.5 })
+  growthPercent!: number;
+}
+
+export class SellerAnalyticsSummarySwaggerDto {
+  @ApiProperty({ example: '450000.00' })
+  averageOrderValue!: string;
+
+  @ApiPropertyOptional({ nullable: true, example: null })
+  conversionRatePercent!: number | null;
+}
+
+export class SellerAnalyticsSwaggerDto {
+  @ApiProperty({ enum: ['today', '7days', '30days'], example: '30days' })
+  timeRange!: 'today' | '7days' | '30days';
+
+  @ApiProperty({ example: '24500000.00' })
+  totalRevenue!: string;
+
+  @ApiProperty({ example: 9.2 })
+  trendPercent!: number;
+
+  @ApiProperty({ example: 'so với kỳ trước' })
+  trendLabel!: string;
+
+  @ApiProperty({ type: [SellerAnalyticsRevenuePointSwaggerDto] })
+  revenueSeries!: SellerAnalyticsRevenuePointSwaggerDto[];
+
+  @ApiProperty({ example: 85 })
+  channelGrowthPercent!: number;
+
+  @ApiProperty({ type: [SellerAnalyticsChannelShareSwaggerDto] })
+  channelShares!: SellerAnalyticsChannelShareSwaggerDto[];
+
+  @ApiProperty({ type: [SellerAnalyticsTopCustomerSwaggerDto] })
+  topCustomers!: SellerAnalyticsTopCustomerSwaggerDto[];
+
+  @ApiProperty({ type: [SellerAnalyticsTopProductSwaggerDto] })
+  topProducts!: SellerAnalyticsTopProductSwaggerDto[];
+
+  @ApiProperty({ type: SellerAnalyticsSummarySwaggerDto })
+  summary!: SellerAnalyticsSummarySwaggerDto;
+
+  @ApiProperty({ example: '2026-04-14T09:12:00.000Z' })
+  generatedAt!: string;
+}

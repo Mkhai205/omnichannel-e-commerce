@@ -9,6 +9,13 @@ import type { Prisma } from '@repo/database';
 import type {
   AdminDashboardKpiResponse,
   AdminDashboardTrendPoint,
+  SellerAnalyticsChannelShare,
+  SellerAnalyticsFilterRequest,
+  SellerAnalyticsResponse,
+  SellerAnalyticsRevenuePoint,
+  SellerAnalyticsTimeRange,
+  SellerAnalyticsTopCustomer,
+  SellerAnalyticsTopProduct,
   AdminPaymentListItem,
   AdminPaymentsFilterRequest,
   AdminPaymentsListResponse,
@@ -28,6 +35,8 @@ import type {
   AdminPaymentRecord,
   AdminSettlementRecord,
   KpiTrendOrderRecord,
+  SellerAnalyticsOrderItemRecord,
+  SellerAnalyticsOrderRecord,
   SellerPaymentOrderRecord,
   SellerSettlementCashflowRecord,
 } from './finance.repository';
@@ -36,6 +45,14 @@ interface AdminPaymentCreditInput {
   paymentId: string;
   txnRef: string;
   grossAmount: string;
+}
+
+interface AnalyticsDateRange {
+  timeRange: SellerAnalyticsTimeRange;
+  currentStart: Date;
+  currentEndExclusive: Date;
+  previousStart: Date;
+  previousEndExclusive: Date;
 }
 
 @Injectable()
@@ -299,6 +316,101 @@ export class FinanceService {
       discrepancyAmount: this.normalizeMoney('0'),
       discrepancyCount: 0,
       cashflow,
+    };
+  }
+
+  async getSellerAnalytics(
+    sellerUserId: string,
+    filters: SellerAnalyticsFilterRequest,
+  ): Promise<SellerAnalyticsResponse> {
+    const range = this.resolveAnalyticsDateRange(filters.timeRange);
+
+    const [
+      currentSettlements,
+      previousSettlements,
+      currentOrders,
+      previousOrders,
+      currentOrderItems,
+      previousOrderItems,
+    ] = await Promise.all([
+      this.financeRepository.findSellerSettlementsByUserIdAndSettledAtRange(
+        sellerUserId,
+        {
+          settledFrom: range.currentStart,
+          settledToExclusive: range.currentEndExclusive,
+        },
+      ),
+      this.financeRepository.findSellerSettlementsByUserIdAndSettledAtRange(
+        sellerUserId,
+        {
+          settledFrom: range.previousStart,
+          settledToExclusive: range.previousEndExclusive,
+        },
+      ),
+      this.financeRepository.findSellerOrdersForAnalyticsByUserIdAndCreatedAtRange(
+        sellerUserId,
+        {
+          createdFrom: range.currentStart,
+          createdToExclusive: range.currentEndExclusive,
+        },
+      ),
+      this.financeRepository.findSellerOrdersForAnalyticsByUserIdAndCreatedAtRange(
+        sellerUserId,
+        {
+          createdFrom: range.previousStart,
+          createdToExclusive: range.previousEndExclusive,
+        },
+      ),
+      this.financeRepository.findSellerOrderItemsForAnalyticsByUserIdAndCreatedAtRange(
+        sellerUserId,
+        {
+          createdFrom: range.currentStart,
+          createdToExclusive: range.currentEndExclusive,
+        },
+      ),
+      this.financeRepository.findSellerOrderItemsForAnalyticsByUserIdAndCreatedAtRange(
+        sellerUserId,
+        {
+          createdFrom: range.previousStart,
+          createdToExclusive: range.previousEndExclusive,
+        },
+      ),
+    ]);
+
+    const currentRevenueValue = this.sumSettlementNetAmount(currentSettlements);
+    const previousRevenueValue =
+      this.sumSettlementNetAmount(previousSettlements);
+    const revenueSeries = this.buildAnalyticsRevenueSeries(
+      range,
+      currentSettlements,
+    );
+    const channelShares = this.buildAnalyticsChannelShares(currentOrders);
+    const topCustomers = this.buildAnalyticsTopCustomers(currentOrders);
+    const topProducts = this.buildAnalyticsTopProducts(
+      currentOrderItems,
+      previousOrderItems,
+    );
+    const summary = this.buildAnalyticsSummary(currentOrders);
+
+    return {
+      timeRange: range.timeRange,
+      totalRevenue: this.normalizeMoney(currentRevenueValue.toString()),
+      trendPercent: this.calculatePeriodTrendPercent(
+        currentRevenueValue,
+        previousRevenueValue,
+      ),
+      trendLabel: 'so với kỳ trước',
+      revenueSeries,
+      channelGrowthPercent:
+        channelShares.reduce(
+          (maxPercent, channel) => Math.max(maxPercent, channel.percent),
+          0,
+        ) ?? 0,
+      channelShares,
+      topCustomers,
+      topProducts,
+      summary,
+      generatedAt: new Date().toISOString(),
     };
   }
 
@@ -750,6 +862,353 @@ export class FinanceService {
     const trend = ((latest - previous) / Math.abs(previous)) * 100;
 
     return Number(trend.toFixed(1));
+  }
+
+  private resolveAnalyticsDateRange(
+    timeRange?: SellerAnalyticsTimeRange,
+  ): AnalyticsDateRange {
+    const resolvedTimeRange: SellerAnalyticsTimeRange = timeRange ?? '30days';
+    const currentEndExclusive = this.startOfDayFromOffset(-1);
+
+    if (resolvedTimeRange === 'today') {
+      const currentStart = this.startOfDayFromOffset(0);
+      const previousStart = this.startOfDayFromOffset(1);
+
+      return {
+        timeRange: resolvedTimeRange,
+        currentStart,
+        currentEndExclusive,
+        previousStart,
+        previousEndExclusive: currentStart,
+      };
+    }
+
+    const periodDays = resolvedTimeRange === '7days' ? 7 : 30;
+    const currentStart = this.startOfDayFromOffset(periodDays - 1);
+    const previousEndExclusive = currentStart;
+    const previousStart = new Date(previousEndExclusive);
+    previousStart.setDate(previousStart.getDate() - periodDays);
+
+    return {
+      timeRange: resolvedTimeRange,
+      currentStart,
+      currentEndExclusive,
+      previousStart,
+      previousEndExclusive,
+    };
+  }
+
+  private sumSettlementNetAmount(
+    records: SellerSettlementCashflowRecord[],
+  ): number {
+    return records.reduce(
+      (sum, record) => sum + this.toFiniteNumber(record.netAmount),
+      0,
+    );
+  }
+
+  private buildAnalyticsRevenueSeries(
+    range: AnalyticsDateRange,
+    records: SellerSettlementCashflowRecord[],
+  ): SellerAnalyticsRevenuePoint[] {
+    if (range.timeRange === 'today') {
+      const bucketSizeMs = 4 * 60 * 60 * 1000;
+      const dayStart = range.currentStart.getTime();
+      const points = Array.from({ length: 6 }, (_, index) => {
+        const start = new Date(dayStart + index * bucketSizeMs);
+        const label = `${String(start.getHours()).padStart(2, '0')}h`;
+        return {
+          label,
+          value: 0,
+          emphasize: index === 5,
+        };
+      });
+
+      for (const record of records) {
+        const index = Math.floor(
+          (record.settledAt.getTime() - dayStart) / bucketSizeMs,
+        );
+
+        if (index < 0 || index >= points.length) {
+          continue;
+        }
+
+        points[index]!.value += Math.round(
+          this.toFiniteNumber(record.netAmount),
+        );
+      }
+
+      return points;
+    }
+
+    if (range.timeRange === '7days') {
+      const points = Array.from({ length: 7 }, (_, index) => {
+        const day = new Date(range.currentStart);
+        day.setDate(day.getDate() + index);
+        return {
+          label: this.toCashflowLabel(day),
+          value: 0,
+          emphasize: index === 6,
+        };
+      });
+
+      const pointMap = new Map<string, SellerAnalyticsRevenuePoint>();
+      for (const point of points) {
+        pointMap.set(point.label, point);
+      }
+
+      for (const record of records) {
+        const label = this.toCashflowLabel(record.settledAt);
+        const point = pointMap.get(label);
+
+        if (!point) {
+          continue;
+        }
+
+        point.value += Math.round(this.toFiniteNumber(record.netAmount));
+      }
+
+      return points;
+    }
+
+    const points = Array.from({ length: 6 }, (_, index) => {
+      const day = new Date(range.currentStart);
+      day.setDate(day.getDate() + index * 5);
+      return {
+        label: this.toDateLabel(day),
+        value: 0,
+        emphasize: index === 5,
+      };
+    });
+
+    for (const record of records) {
+      const offsetDays = Math.floor(
+        (this.startOfDay(record.settledAt).getTime() -
+          range.currentStart.getTime()) /
+          (24 * 60 * 60 * 1000),
+      );
+      const index = Math.min(5, Math.max(0, Math.floor(offsetDays / 5)));
+      points[index]!.value += Math.round(this.toFiniteNumber(record.netAmount));
+    }
+
+    return points;
+  }
+
+  private buildAnalyticsChannelShares(
+    orders: SellerAnalyticsOrderRecord[],
+  ): SellerAnalyticsChannelShare[] {
+    if (orders.length === 0) {
+      return [
+        { name: 'Website cửa hàng', percent: 50 },
+        { name: 'Sàn TMĐT', percent: 35 },
+        { name: 'Social Commerce', percent: 15 },
+      ];
+    }
+
+    const totals = {
+      website: 0,
+      marketplace: 0,
+      social: 0,
+    };
+
+    for (const order of orders) {
+      const amount = this.toFiniteNumber(order.totalAmount);
+
+      if (amount >= 2_000_000) {
+        totals.website += amount;
+      } else if (amount >= 700_000) {
+        totals.marketplace += amount;
+      } else {
+        totals.social += amount;
+      }
+    }
+
+    const percentages = this.toPercentages([
+      totals.website,
+      totals.marketplace,
+      totals.social,
+    ]);
+
+    return [
+      { name: 'Website cửa hàng', percent: percentages[0] ?? 0 },
+      { name: 'Sàn TMĐT', percent: percentages[1] ?? 0 },
+      { name: 'Social Commerce', percent: percentages[2] ?? 0 },
+    ];
+  }
+
+  private buildAnalyticsTopCustomers(
+    orders: SellerAnalyticsOrderRecord[],
+  ): SellerAnalyticsTopCustomer[] {
+    const customerMap = new Map<
+      string,
+      {
+        name: string;
+        email: string;
+        orderCount: number;
+        lifetimeValue: number;
+      }
+    >();
+
+    for (const order of orders) {
+      const existing = customerMap.get(order.userId) ?? {
+        name: order.user.fullName,
+        email: order.user.email,
+        orderCount: 0,
+        lifetimeValue: 0,
+      };
+
+      existing.orderCount += 1;
+      existing.lifetimeValue += this.toFiniteNumber(order.totalAmount);
+      customerMap.set(order.userId, existing);
+    }
+
+    return [...customerMap.entries()]
+      .sort((left, right) => right[1].lifetimeValue - left[1].lifetimeValue)
+      .slice(0, 5)
+      .map(([id, customer]) => ({
+        id,
+        name: customer.name,
+        email: customer.email,
+        orderCount: customer.orderCount,
+        lifetimeValue: this.normalizeMoney(customer.lifetimeValue.toString()),
+      }));
+  }
+
+  private buildAnalyticsTopProducts(
+    currentItems: SellerAnalyticsOrderItemRecord[],
+    previousItems: SellerAnalyticsOrderItemRecord[],
+  ): SellerAnalyticsTopProduct[] {
+    const currentMap = this.aggregateProductStats(currentItems);
+    const previousMap = this.aggregateProductStats(previousItems);
+
+    return [...currentMap.entries()]
+      .sort((left, right) => right[1].revenue - left[1].revenue)
+      .slice(0, 5)
+      .map(([id, current]) => {
+        const previousRevenue = previousMap.get(id)?.revenue ?? 0;
+
+        return {
+          id,
+          name: current.name,
+          soldQuantity: current.soldQuantity,
+          revenue: this.normalizeMoney(current.revenue.toString()),
+          growthPercent: this.calculatePeriodTrendPercent(
+            current.revenue,
+            previousRevenue,
+          ),
+        };
+      });
+  }
+
+  private aggregateProductStats(
+    items: SellerAnalyticsOrderItemRecord[],
+  ): Map<string, { name: string; soldQuantity: number; revenue: number }> {
+    const map = new Map<
+      string,
+      { name: string; soldQuantity: number; revenue: number }
+    >();
+
+    for (const item of items) {
+      const product = item.variant.product;
+
+      if (!product) {
+        continue;
+      }
+
+      const existing = map.get(product.id) ?? {
+        name: product.name,
+        soldQuantity: 0,
+        revenue: 0,
+      };
+
+      existing.soldQuantity += item.quantity;
+      existing.revenue += this.toFiniteNumber(item.lineTotal);
+      map.set(product.id, existing);
+    }
+
+    return map;
+  }
+
+  private buildAnalyticsSummary(orders: SellerAnalyticsOrderRecord[]): {
+    averageOrderValue: string;
+    conversionRatePercent: number | null;
+  } {
+    const totalOrderAmount = orders.reduce(
+      (sum, order) => sum + this.toFiniteNumber(order.totalAmount),
+      0,
+    );
+    const averageOrderValue =
+      orders.length === 0 ? 0 : totalOrderAmount / orders.length;
+
+    return {
+      averageOrderValue: this.normalizeMoney(averageOrderValue.toString()),
+      conversionRatePercent: null,
+    };
+  }
+
+  private calculatePeriodTrendPercent(
+    current: number,
+    previous: number,
+  ): number {
+    if (previous === 0) {
+      return current > 0 ? 100 : 0;
+    }
+
+    const trend = ((current - previous) / Math.abs(previous)) * 100;
+    return Number(trend.toFixed(1));
+  }
+
+  private toPercentages(values: number[]): number[] {
+    const total = values.reduce((sum, value) => sum + value, 0);
+
+    if (total <= 0) {
+      return [0, 0, 0];
+    }
+
+    const rawPercentages = values.map((value) => (value / total) * 100);
+    const floored = rawPercentages.map((value) => Math.floor(value));
+    let remainder = 100 - floored.reduce((sum, value) => sum + value, 0);
+    const rankedIndices = rawPercentages
+      .map((value, index) => ({
+        index,
+        fraction: value - Math.floor(value),
+      }))
+      .sort((left, right) => right.fraction - left.fraction)
+      .map((item) => item.index);
+
+    for (const index of rankedIndices) {
+      if (remainder <= 0) {
+        break;
+      }
+
+      floored[index] += 1;
+      remainder -= 1;
+    }
+
+    return floored;
+  }
+
+  private toFiniteNumber(value: unknown): number {
+    const parsed = Number(value);
+
+    if (!Number.isFinite(parsed)) {
+      return 0;
+    }
+
+    return parsed;
+  }
+
+  private startOfDay(date: Date): Date {
+    const copy = new Date(date);
+    copy.setHours(0, 0, 0, 0);
+    return copy;
+  }
+
+  private toDateLabel(date: Date): string {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+
+    return `${day}/${month}`;
   }
 
   private startOfDayFromOffset(daysAgo: number): Date {

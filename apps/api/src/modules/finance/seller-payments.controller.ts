@@ -2,6 +2,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import type {
   ApiResponse,
+  SellerAnalyticsResponse,
   SellerPaymentsOverviewResponse,
   SellerPaymentsTransactionsResponse,
   SellerWalletSummaryResponse,
@@ -14,8 +15,12 @@ import {
   ApiOkEnvelopeResponse,
 } from '../../core/http/swagger-response.decorator';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
-import { SellerPaymentsFilterDto } from './dto/seller-payments-filter.dto';
 import {
+  SellerAnalyticsFilterDto,
+  SellerPaymentsFilterDto,
+} from './dto/seller-payments-filter.dto';
+import {
+  SellerAnalyticsSwaggerDto,
   SellerPaymentsOverviewSwaggerDto,
   SellerPaymentsTransactionsSwaggerDto,
   SellerWalletSummarySwaggerDto,
@@ -106,6 +111,37 @@ export class SellerPaymentsController {
 
     return createSuccessResponse(overview, {
       message: 'Seller payments overview retrieved successfully',
+    });
+  }
+
+  @Get('analytics')
+  @ApiOperation({ summary: 'Get seller analytics dashboard data' })
+  @ApiAuthSchemes()
+  @ApiQuery({
+    name: 'timeRange',
+    required: false,
+    enum: ['today', '7days', '30days'],
+  })
+  @ApiOkEnvelopeResponse(
+    SellerAnalyticsSwaggerDto,
+    'Seller analytics retrieved successfully',
+  )
+  @ApiCommonErrorResponses({
+    badRequest: 'Invalid query parameters',
+    unauthorized: 'Authentication required',
+    notFound: false,
+  })
+  async getAnalytics(
+    @CurrentUser() currentUser: JwtPayload,
+    @Query() filters: SellerAnalyticsFilterDto,
+  ): Promise<ApiResponse<SellerAnalyticsResponse>> {
+    const analytics = await this.financeService.getSellerAnalytics(
+      currentUser.sub,
+      filters,
+    );
+
+    return createSuccessResponse(analytics, {
+      message: 'Seller analytics retrieved successfully',
     });
   }
 }

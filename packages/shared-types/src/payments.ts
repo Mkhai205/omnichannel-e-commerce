@@ -114,6 +114,58 @@ export interface SellerPaymentsOverviewResponse {
     cashflow: SellerPaymentCashflowPoint[];
 }
 
+export type SellerAnalyticsTimeRange = "today" | "7days" | "30days";
+
+export interface SellerAnalyticsFilterRequest {
+    timeRange?: SellerAnalyticsTimeRange;
+}
+
+export interface SellerAnalyticsRevenuePoint {
+    label: string;
+    value: number;
+    emphasize?: boolean;
+}
+
+export interface SellerAnalyticsChannelShare {
+    name: string;
+    percent: number;
+}
+
+export interface SellerAnalyticsTopCustomer {
+    id: UUID;
+    name: string;
+    email: string;
+    orderCount: number;
+    lifetimeValue: string;
+}
+
+export interface SellerAnalyticsTopProduct {
+    id: UUID;
+    name: string;
+    soldQuantity: number;
+    revenue: string;
+    growthPercent: number;
+}
+
+export interface SellerAnalyticsSummary {
+    averageOrderValue: string;
+    conversionRatePercent: number | null;
+}
+
+export interface SellerAnalyticsResponse {
+    timeRange: SellerAnalyticsTimeRange;
+    totalRevenue: string;
+    trendPercent: number;
+    trendLabel: string;
+    revenueSeries: SellerAnalyticsRevenuePoint[];
+    channelGrowthPercent: number;
+    channelShares: SellerAnalyticsChannelShare[];
+    topCustomers: SellerAnalyticsTopCustomer[];
+    topProducts: SellerAnalyticsTopProduct[];
+    summary: SellerAnalyticsSummary;
+    generatedAt: string;
+}
+
 export interface AdminPaymentsFilterRequest {
     page?: number;
     limit?: number;
