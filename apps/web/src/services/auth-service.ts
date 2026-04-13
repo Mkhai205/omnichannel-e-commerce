@@ -20,7 +20,8 @@ function requireData<T>(response: { data?: T; message: string; statusCode: numbe
 }
 
 export function buildCustomerGoogleLoginUrl(): string {
-    return `${getApiBaseUrl()}/auth/google/login`;
+    const query = new URLSearchParams({ source: "user" });
+    return `${getApiBaseUrl()}/auth/google/login?${query.toString()}`;
 }
 
 export async function loginCustomer(payload: LoginRequest): Promise<LoginResponse> {

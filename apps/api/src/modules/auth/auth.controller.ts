@@ -5,10 +5,12 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Logger,
   Post,
   Query,
   Req,
   Res,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -65,6 +67,8 @@ import {
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
+
   constructor(
     private readonly authService: AuthService,
     private readonly authTokenService: AuthTokenService,
@@ -344,7 +348,14 @@ export class AuthController {
       response.redirect(
         this.authGoogleService.getLoginSuccessRedirectByRole(result.user.role),
       );
-    } catch {
+    } catch (error) {
+      const message = this.resolveGoogleFailureMessage(error);
+
+      this.logger.error(
+        `[GOOGLE_OAUTH] login failed source=${source} message=${message}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+
       clearOAuthStateCookie(
         response,
         stateCookieName,
@@ -356,9 +367,30 @@ export class AuthController {
         this.authTokenService.getCookieDomain(),
       );
       response.redirect(
-        `${failureRedirect}?message=${encodeURIComponent('Google login failed')}`,
+        `${failureRedirect}?message=${encodeURIComponent(message)}`,
       );
     }
+  }
+
+  private resolveGoogleFailureMessage(error: unknown): string {
+    if (error instanceof UnauthorizedException) {
+      const response = error.getResponse();
+
+      if (typeof response === 'string' && response.trim().length > 0) {
+        return response;
+      }
+
+      if (
+        response &&
+        typeof response === 'object' &&
+        'message' in response &&
+        typeof (response as { message?: unknown }).message === 'string'
+      ) {
+        return ((response as { message: string }).message || '').trim() || 'Google login failed';
+      }
+    }
+
+    return 'Google login failed';
   }
 
   @Public()
