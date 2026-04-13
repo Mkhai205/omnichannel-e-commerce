@@ -142,6 +142,36 @@ const KPI_TREND_ORDER_SELECT = {
   totalAmount: true,
 } satisfies Prisma.OrderSelect;
 
+const SELLER_ANALYTICS_ORDER_SELECT = {
+  id: true,
+  userId: true,
+  totalAmount: true,
+  createdAt: true,
+  user: {
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+    },
+  },
+} satisfies Prisma.OrderSelect;
+
+const SELLER_ANALYTICS_ORDER_ITEM_SELECT = {
+  id: true,
+  quantity: true,
+  lineTotal: true,
+  variant: {
+    select: {
+      product: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  },
+} satisfies Prisma.OrderItemSelect;
+
 const SHOP_ID_SELECT = {
   id: true,
 } satisfies Prisma.ShopSelect;
@@ -168,6 +198,14 @@ export type AdminSettlementRecord = Prisma.SellerSettlementGetPayload<{
 
 export type KpiTrendOrderRecord = Prisma.OrderGetPayload<{
   select: typeof KPI_TREND_ORDER_SELECT;
+}>;
+
+export type SellerAnalyticsOrderRecord = Prisma.OrderGetPayload<{
+  select: typeof SELLER_ANALYTICS_ORDER_SELECT;
+}>;
+
+export type SellerAnalyticsOrderItemRecord = Prisma.OrderItemGetPayload<{
+  select: typeof SELLER_ANALYTICS_ORDER_ITEM_SELECT;
 }>;
 
 @Injectable()
@@ -661,6 +699,93 @@ export class FinanceRepository {
         createdAt: 'asc',
       },
       select: KPI_TREND_ORDER_SELECT,
+    });
+  }
+
+  findSellerSettlementsByUserIdAndSettledAtRange(
+    sellerUserId: string,
+    input: {
+      settledFrom: Date;
+      settledToExclusive: Date;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.sellerSettlement.findMany({
+      where: {
+        shop: {
+          userId: sellerUserId,
+        },
+        status: 'COMPLETED',
+        settledAt: {
+          gte: input.settledFrom,
+          lt: input.settledToExclusive,
+        },
+      },
+      orderBy: {
+        settledAt: 'asc',
+      },
+      select: SELLER_SETTLEMENT_CASHFLOW_SELECT,
+    });
+  }
+
+  findSellerOrdersForAnalyticsByUserIdAndCreatedAtRange(
+    sellerUserId: string,
+    input: {
+      createdFrom: Date;
+      createdToExclusive: Date;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.order.findMany({
+      where: {
+        shop: {
+          userId: sellerUserId,
+        },
+        status: {
+          in: ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'],
+        },
+        createdAt: {
+          gte: input.createdFrom,
+          lt: input.createdToExclusive,
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      select: SELLER_ANALYTICS_ORDER_SELECT,
+    });
+  }
+
+  findSellerOrderItemsForAnalyticsByUserIdAndCreatedAtRange(
+    sellerUserId: string,
+    input: {
+      createdFrom: Date;
+      createdToExclusive: Date;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    return client.orderItem.findMany({
+      where: {
+        order: {
+          shop: {
+            userId: sellerUserId,
+          },
+          status: {
+            in: ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'],
+          },
+          createdAt: {
+            gte: input.createdFrom,
+            lt: input.createdToExclusive,
+          },
+        },
+      },
+      select: SELLER_ANALYTICS_ORDER_ITEM_SELECT,
     });
   }
 

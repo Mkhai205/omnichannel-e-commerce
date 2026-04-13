@@ -1,4 +1,6 @@
 import type {
+    SellerAnalyticsFilterRequest,
+    SellerAnalyticsResponse,
     SellerPaymentsFilterRequest,
     SellerPaymentsOverviewResponse,
     SellerPaymentsTransactionsResponse,
@@ -56,6 +58,23 @@ export async function getSellerPaymentsTransactions(
         query.length > 0
             ? `/seller/payments/transactions?${query}`
             : "/seller/payments/transactions",
+    );
+
+    return requireData(response);
+}
+
+export async function getSellerAnalytics(
+    filters: SellerAnalyticsFilterRequest,
+): Promise<SellerAnalyticsResponse> {
+    const params = new URLSearchParams();
+
+    if (filters.timeRange) {
+        params.set("timeRange", filters.timeRange);
+    }
+
+    const query = params.toString();
+    const response = await requestApi<SellerAnalyticsResponse>(
+        query.length > 0 ? `/seller/payments/analytics?${query}` : "/seller/payments/analytics",
     );
 
     return requireData(response);

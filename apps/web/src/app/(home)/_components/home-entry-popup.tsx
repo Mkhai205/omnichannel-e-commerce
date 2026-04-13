@@ -50,7 +50,7 @@ export function HomeEntryPopup() {
 
                 <div className="relative">
                     <Link
-                        href="/shop"
+                        href="/categories"
                         onClick={closePopup}
                         className="group block overflow-hidden rounded-4xl"
                     >

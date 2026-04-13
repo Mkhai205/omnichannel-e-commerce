@@ -100,7 +100,7 @@ export function HomeHeroCarousel() {
                 <CarouselContent className="ml-0">
                     {HERO_SLIDES.map((slide) => (
                         <CarouselItem key={slide.src} className="pl-0">
-                            <Link href="/shop" className="group block">
+                            <Link href="/categories" className="group block">
                                 <div className="relative overflow-hidden rounded-2xl border border-orange-100 bg-orange-50 shadow-sm">
                                     <Image
                                         src={slide.src}

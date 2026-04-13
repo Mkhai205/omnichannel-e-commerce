@@ -6,7 +6,7 @@ export function HomeHotDealsBanner() {
     return (
         <section className="mx-auto w-full max-w-7xl px-4 pt-4 pb-8 md:px-6">
             <div className="grid gap-4 lg:grid-cols-3">
-                <Link href="/shop" className="group relative overflow-hidden rounded-2xl">
+                <Link href="/categories" className="group relative overflow-hidden rounded-2xl">
                     <Image
                         src="/hot-deals/banner/1.png"
                         alt="Sale of the Month"
@@ -46,7 +46,7 @@ export function HomeHotDealsBanner() {
                     </div>
                 </Link>
 
-                <Link href="/shop" className="group relative overflow-hidden rounded-2xl">
+                <Link href="/categories" className="group relative overflow-hidden rounded-2xl">
                     <Image
                         src="/hot-deals/banner/2.png"
                         alt="Low-Fat Meat"
@@ -69,7 +69,7 @@ export function HomeHotDealsBanner() {
                     </div>
                 </Link>
 
-                <Link href="/shop" className="group relative overflow-hidden rounded-2xl">
+                <Link href="/categories" className="group relative overflow-hidden rounded-2xl">
                     <Image
                         src="/hot-deals/banner/3.png"
                         alt="100% Fresh Fruit"
