@@ -13,6 +13,7 @@ interface MinioClientConfig {
   endPoint: string;
   port: number;
   useSSL: boolean;
+  publicBaseUrl: string;
   accessKey: string;
   secretKey: string;
   region: string;
@@ -107,10 +108,7 @@ export class MinioClientService implements OnModuleInit {
   }
 
   getPublicBaseUrl(): string {
-    const protocol = this.config.useSSL ? 'https' : 'http';
-    const endpointWithPort = `${this.config.endPoint}:${this.config.port}`;
-
-    return `${protocol}://${endpointWithPort}`;
+    return this.config.publicBaseUrl;
   }
 
   private async ensureBuckets(): Promise<void> {
@@ -155,6 +153,10 @@ export class MinioClientService implements OnModuleInit {
     const endPoint = this.configService.get<string>('MINIO_ENDPOINT');
     const port = this.configService.get<number>('MINIO_PORT');
     const useSSL = this.configService.get<boolean>('MINIO_SECURE');
+    const publicEndpoint = this.configService.get<string>(
+      'MINIO_PUBLIC_ENDPOINT',
+    );
+    const nodeEnv = this.configService.get<string>('NODE_ENV');
     const accessKey = this.configService.get<string>('MINIO_ROOT_USER');
     const secretKey = this.configService.get<string>('MINIO_ROOT_PASSWORD');
     const region = this.configService.get<string>('MINIO_REGION', 'us-east-1');
@@ -179,16 +181,62 @@ export class MinioClientService implements OnModuleInit {
       throw new Error('At least one MinIO bucket must be configured');
     }
 
+    const publicBaseUrl = this.resolvePublicBaseUrl({
+      publicEndpoint,
+      fallbackEndpoint: endPoint,
+      fallbackPort: port,
+      fallbackUseSSL: useSSL,
+      nodeEnv,
+    });
+
     return {
       endPoint,
       port,
       useSSL,
+      publicBaseUrl,
       accessKey,
       secretKey,
       region,
       buckets,
       publicBuckets,
     };
+  }
+
+  private resolvePublicBaseUrl(options: {
+    publicEndpoint?: string;
+    fallbackEndpoint: string;
+    fallbackPort: number;
+    fallbackUseSSL: boolean;
+    nodeEnv?: string;
+  }): string {
+    const {
+      publicEndpoint,
+      fallbackEndpoint,
+      fallbackPort,
+      fallbackUseSSL,
+      nodeEnv,
+    } = options;
+
+    const isProduction = nodeEnv?.trim().toLowerCase() === 'production';
+    const defaultProtocol = isProduction
+      ? 'https'
+      : fallbackUseSSL
+        ? 'https'
+        : 'http';
+
+    const normalizedEndpoint = (publicEndpoint ?? '')
+      .trim()
+      .replace(/\/+$/, '');
+
+    if (normalizedEndpoint.length > 0) {
+      if (/^https?:\/\//i.test(normalizedEndpoint)) {
+        return normalizedEndpoint;
+      }
+
+      return `${defaultProtocol}://${normalizedEndpoint}`;
+    }
+
+    return `${defaultProtocol}://${fallbackEndpoint}:${fallbackPort}`;
   }
 
   private toList(value: string | undefined): string[] {

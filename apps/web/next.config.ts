@@ -34,6 +34,7 @@ const apiRemotePattern = parseRemotePattern(process.env.NEXT_PUBLIC_API_URL);
 const nextConfig: NextConfig = {
     images: {
         remotePatterns: [
+            { protocol: "https", hostname: "storage.kakadev.xyz", pathname: "/**" },
             { protocol: "http", hostname: "101.96.66.225", port: "8006", pathname: "/**" },
             { protocol: "http", hostname: "localhost", port: "9000", pathname: "/**" },
             ...(apiRemotePattern ? [apiRemotePattern] : []),

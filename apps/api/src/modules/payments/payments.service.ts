@@ -15,13 +15,7 @@ import type {
 } from '@repo/shared-types';
 import { createHash } from 'crypto';
 import type { ReturnQueryFromVNPay } from 'vnpay';
-import {
-  HashAlgorithm,
-  ProductCode,
-  VNPay,
-  VnpLocale,
-  dateFormat,
-} from 'vnpay';
+import { HashAlgorithm, ProductCode, VNPay, VnpLocale } from 'vnpay';
 import { FinanceService } from '../finance/finance.service';
 import { PaymentsRepository } from './payments.repository';
 import { VNPAY_CONFIG_KEY } from '../../core/config/env.constant';
@@ -155,8 +149,8 @@ export class PaymentsService {
         vnp_OrderType: this.defaultOrderType,
         vnp_ReturnUrl: this.vnpayReturnUrl,
         vnp_Locale: locale,
-        vnp_CreateDate: dateFormat(now),
-        vnp_ExpireDate: dateFormat(expiresAt),
+        vnp_CreateDate: this.toVnpayGmt7Timestamp(now),
+        vnp_ExpireDate: this.toVnpayGmt7Timestamp(expiresAt),
         ...(payload.bankCode?.trim() ? { vnp_BankCode: payload.bankCode } : {}),
       };
 
@@ -582,6 +576,18 @@ export class PaymentsService {
     const randomPart = Math.random().toString(16).slice(2, 8).toUpperCase();
 
     return `PAY-${timestamp}-${userSuffix}${randomPart}`;
+  }
+
+  private toVnpayGmt7Timestamp(date: Date): number {
+    const shifted = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+    const year = shifted.getUTCFullYear().toString();
+    const month = String(shifted.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(shifted.getUTCDate()).padStart(2, '0');
+    const hour = String(shifted.getUTCHours()).padStart(2, '0');
+    const minute = String(shifted.getUTCMinutes()).padStart(2, '0');
+    const second = String(shifted.getUTCSeconds()).padStart(2, '0');
+
+    return Number(`${year}${month}${day}${hour}${minute}${second}`);
   }
 
   private normalizeIpAddress(ipAddress: string): string {

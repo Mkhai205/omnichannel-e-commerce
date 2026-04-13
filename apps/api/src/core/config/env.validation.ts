@@ -71,6 +71,9 @@ function normalizeRequiredString(value: unknown): string {
 }
 
 export function validateEnv(config: RawEnv): RawEnv {
+  const nodeEnv = String(config.NODE_ENV ?? APP_CONFIG_KEY.NODE_ENV)
+    .trim()
+    .toLowerCase();
   const jwtAccessSecret = normalizeRequiredString(config.JWT_ACCESS_SECRET);
   const jwtRefreshSecret = normalizeRequiredString(config.JWT_REFRESH_SECRET);
   const googleClientId = normalizeRequiredString(config.GOOGLE_CLIENT_ID);
@@ -80,6 +83,9 @@ export function validateEnv(config: RawEnv): RawEnv {
   const googleCallbackUrl = normalizeRequiredString(config.GOOGLE_CALLBACK_URL);
   const databaseUrl = normalizeRequiredString(config.DATABASE_URL);
   const minioEndpoint = normalizeRequiredString(config.MINIO_ENDPOINT);
+  const minioPublicEndpoint = normalizeRequiredString(
+    config.MINIO_PUBLIC_ENDPOINT,
+  );
   const minioRootUser = normalizeRequiredString(config.MINIO_ROOT_USER);
   const minioRootPassword = normalizeRequiredString(config.MINIO_ROOT_PASSWORD);
   const gmailSmtpUser = normalizeRequiredString(config.GMAIL_SMTP_USER);
@@ -111,6 +117,28 @@ export function validateEnv(config: RawEnv): RawEnv {
     throw new Error(
       'Environment variables MINIO_ENDPOINT, MINIO_ROOT_USER, and MINIO_ROOT_PASSWORD are required for MinIO storage',
     );
+  }
+
+  if (nodeEnv === 'production') {
+    if (!minioPublicEndpoint) {
+      throw new Error(
+        'Environment variable MINIO_PUBLIC_ENDPOINT is required in production and must point to a public host',
+      );
+    }
+
+    const normalizedPublicHost = minioPublicEndpoint
+      .replace(/^https?:\/\//i, '')
+      .toLowerCase();
+
+    if (
+      /^(minio|localhost|127\.0\.0\.1|0\.0\.0\.0)(:|\/|$)/.test(
+        normalizedPublicHost,
+      )
+    ) {
+      throw new Error(
+        'MINIO_PUBLIC_ENDPOINT cannot use internal hosts (minio/localhost/127.0.0.1) in production',
+      );
+    }
   }
 
   const mailEnabled = parseBoolean(
@@ -146,7 +174,7 @@ export function validateEnv(config: RawEnv): RawEnv {
   return {
     ...config,
     // Application configuration
-    NODE_ENV: String(config.NODE_ENV ?? APP_CONFIG_KEY.NODE_ENV),
+    NODE_ENV: nodeEnv,
     CORS_ORIGIN: String(config.CORS_ORIGIN ?? APP_CONFIG_KEY.CORS_ORIGIN),
     // JWT configuration
     JWT_ACCESS_SECRET: jwtAccessSecret,
@@ -264,9 +292,8 @@ export function validateEnv(config: RawEnv): RawEnv {
     ).trim(),
     MINIO_BUCKETS: minioBuckets,
     MINIO_PUBLIC_BUCKETS: minioPublicBuckets,
-    MINIO_PUBLIC_ENDPOINT: String(
-      config.MINIO_PUBLIC_ENDPOINT ?? `${minioEndpoint}:${minioPort}`,
-    ).trim(),
+    MINIO_PUBLIC_ENDPOINT:
+      minioPublicEndpoint || `${minioEndpoint}:${minioPort}`,
     MINIO_PRESIGNED_URL_EXPIRES_IN_SECONDS: parseNumber(
       config.MINIO_PRESIGNED_URL_EXPIRES_IN_SECONDS,
       MINIO_CONFIG_KEY.MINIO_PRESIGNED_URL_EXPIRES_IN_SECONDS,
