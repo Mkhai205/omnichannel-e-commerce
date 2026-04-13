@@ -41,7 +41,7 @@ export function SiteHeader() {
         }
 
         toast.success(`Đang tìm kiếm: ${normalizedKeyword}`);
-        router.push(`/shop?q=${encodeURIComponent(normalizedKeyword)}`);
+        router.push(`/categories?q=${encodeURIComponent(normalizedKeyword)}`);
     };
 
     return (

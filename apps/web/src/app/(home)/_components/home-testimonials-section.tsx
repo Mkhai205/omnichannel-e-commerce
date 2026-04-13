@@ -103,7 +103,7 @@ export function HomeTestimonialsSection() {
                     </h2>
 
                     <Link
-                        href="/shop"
+                        href="/categories"
                         className="inline-flex items-center gap-1 text-sm font-semibold text-success hover:text-success-dark"
                     >
                         Xem thêm

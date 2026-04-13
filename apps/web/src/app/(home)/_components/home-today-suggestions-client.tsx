@@ -185,7 +185,7 @@ export function HomeTodaySuggestionsClient({
                     </h2>
                 </div>
                 <Link
-                    href="/shop"
+                    href="/categories"
                     className="inline-flex items-center gap-1 text-sm font-semibold text-success hover:text-success-dark"
                 >
                     Xem tất cả
