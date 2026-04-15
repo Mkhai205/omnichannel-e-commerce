@@ -12,6 +12,8 @@ import { StorageModule } from './infrastructure/storage/storage.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CartModule } from './modules/cart/cart.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
+import { ChannelSyncModule } from './modules/channel-sync/channel-sync.module';
+import { FinanceModule } from './modules/finance/finance.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ShippingModule } from './modules/shipping/shipping.module';
@@ -33,6 +35,8 @@ import { UsersModule } from './modules/users/users.module';
     AuthModule,
     CartModule,
     CatalogModule,
+    ChannelSyncModule,
+    FinanceModule,
     OrdersModule,
     PaymentsModule,
     ShippingModule,
