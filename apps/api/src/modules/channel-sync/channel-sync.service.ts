@@ -49,14 +49,17 @@ export class ChannelSyncService {
       );
     }
 
-    const connection = this.channelSyncRepository.upsertConnection(shopId, {
-      channelType,
-      status: 'CONNECTED',
-      externalShopId: payload.externalShopId,
-      accessToken: payload.accessToken,
-      refreshToken: payload.refreshToken,
-      tokenExpiresAt: payload.tokenExpiresAt,
-    });
+    const connection = await this.channelSyncRepository.upsertConnection(
+      shopId,
+      {
+        channelType,
+        status: 'CONNECTED',
+        externalShopId: payload.externalShopId,
+        accessToken: payload.accessToken,
+        refreshToken: payload.refreshToken,
+        tokenExpiresAt: payload.tokenExpiresAt,
+      },
+    );
 
     this.logger.log(
       `[CHANNEL_SYNC] seller=${userId} shop=${shopId} channel=${channelType} action=connect`,
@@ -77,7 +80,7 @@ export class ChannelSyncService {
       throw new BadRequestException('WEB channel cannot be disconnected');
     }
 
-    const existing = this.channelSyncRepository.findConnection(
+    const existing = await this.channelSyncRepository.findConnection(
       shopId,
       channelType,
     );
@@ -87,10 +90,13 @@ export class ChannelSyncService {
       };
     }
 
-    const connection = this.channelSyncRepository.upsertConnection(shopId, {
-      channelType,
-      status: 'DISCONNECTED',
-    });
+    const connection = await this.channelSyncRepository.upsertConnection(
+      shopId,
+      {
+        channelType,
+        status: 'DISCONNECTED',
+      },
+    );
 
     this.logger.log(
       `[CHANNEL_SYNC] seller=${userId} shop=${shopId} channel=${channelType} action=disconnect`,
@@ -107,7 +113,7 @@ export class ChannelSyncService {
     payload: TriggerChannelSyncRequest,
   ): Promise<TriggerChannelSyncResponse> {
     const shopId = await this.resolveSellerShopId(userId);
-    const connection = this.channelSyncRepository.findConnection(
+    const connection = await this.channelSyncRepository.findConnection(
       shopId,
       channelType,
     );
@@ -120,7 +126,7 @@ export class ChannelSyncService {
 
     const outcome = this.simulateSyncOutcome(channelType, payload.direction);
 
-    const run = this.channelSyncRepository.createSyncRun(shopId, {
+    const run = await this.channelSyncRepository.createSyncRun(shopId, {
       channelType,
       direction: payload.direction,
       trigger: payload.trigger ?? 'MANUAL',

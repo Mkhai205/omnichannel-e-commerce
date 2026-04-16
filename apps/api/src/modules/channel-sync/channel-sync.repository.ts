@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
+import { Prisma } from '@repo/database';
 import type {
   ChannelConnectionStatus,
   ChannelSyncDirection,
@@ -10,6 +10,7 @@ import type {
   SellerChannelSyncRunItem,
   SellerChannelSyncRunsResponse,
 } from '@repo/shared-types';
+import { PrismaService } from '../../infrastructure/database/prisma.service';
 
 const SUPPORTED_CHANNELS: SalesChannelType[] = [
   'WEB',
@@ -17,19 +18,52 @@ const SUPPORTED_CHANNELS: SalesChannelType[] = [
   'SHOPEE_MOCK',
 ];
 
-interface ChannelConnectionStoreRecord extends SellerChannelConnectionItem {
-  accessToken?: string | null;
-  refreshToken?: string | null;
-}
+const CHANNEL_CONNECTION_SELECT = {
+  id: true,
+  shopId: true,
+  channelType: true,
+  status: true,
+  externalShopId: true,
+  tokenExpiresAt: true,
+  lastSyncedAt: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.SellerChannelConnectionSelect;
 
-interface ShopChannelStore {
-  connections: Map<SalesChannelType, ChannelConnectionStoreRecord>;
-  syncRuns: SellerChannelSyncRunItem[];
-}
+const CHANNEL_SYNC_RUN_SELECT = {
+  id: true,
+  connectionId: true,
+  direction: true,
+  trigger: true,
+  status: true,
+  totalCount: true,
+  createdCount: true,
+  updatedCount: true,
+  failedCount: true,
+  message: true,
+  startedAt: true,
+  finishedAt: true,
+  createdAt: true,
+  updatedAt: true,
+  connection: {
+    select: {
+      shopId: true,
+      channelType: true,
+    },
+  },
+} satisfies Prisma.SellerChannelSyncRunSelect;
+
+type ChannelConnectionRecord = Prisma.SellerChannelConnectionGetPayload<{
+  select: typeof CHANNEL_CONNECTION_SELECT;
+}>;
+
+type ChannelSyncRunRecord = Prisma.SellerChannelSyncRunGetPayload<{
+  select: typeof CHANNEL_SYNC_RUN_SELECT;
+}>;
 
 interface UpsertConnectionInput {
   channelType: SalesChannelType;
-  status: ChannelConnectionStatus;
+  status?: ChannelConnectionStatus;
   externalShopId?: string;
   accessToken?: string;
   refreshToken?: string;
@@ -51,117 +85,159 @@ interface CreateSyncRunInput {
 
 @Injectable()
 export class ChannelSyncRepository {
-  private readonly storesByShopId = new Map<string, ShopChannelStore>();
+  constructor(private readonly prisma: PrismaService) {}
 
-  listConnections(shopId: string): SellerChannelConnectionItem[] {
-    const store = this.ensureShopStore(shopId);
+  async listConnections(
+    shopId: string,
+  ): Promise<SellerChannelConnectionItem[]> {
+    await this.seedDefaultConnectionsForShop(shopId);
 
-    return SUPPORTED_CHANNELS.map((channelType) => {
-      const connection = store.connections.get(channelType);
-      if (!connection) {
-        throw new Error(`Missing channel connection seed for ${channelType}`);
-      }
-
-      return this.toPublicConnection(connection);
+    const records = await this.prisma.sellerChannelConnection.findMany({
+      where: { shopId },
+      select: CHANNEL_CONNECTION_SELECT,
     });
+
+    const channelOrder = new Map(
+      SUPPORTED_CHANNELS.map((channelType, index) => [channelType, index]),
+    );
+
+    return records
+      .sort((left, right) => {
+        const leftOrder = channelOrder.get(left.channelType) ?? 0;
+        const rightOrder = channelOrder.get(right.channelType) ?? 0;
+        return leftOrder - rightOrder;
+      })
+      .map((record) => this.toPublicConnection(record));
   }
 
-  findConnection(
+  async findConnection(
     shopId: string,
     channelType: SalesChannelType,
-  ): SellerChannelConnectionItem {
-    const store = this.ensureShopStore(shopId);
-    const connection = store.connections.get(channelType);
+  ): Promise<SellerChannelConnectionItem> {
+    await this.seedDefaultConnectionsForShop(shopId);
 
-    if (!connection) {
+    const record = await this.prisma.sellerChannelConnection.findUnique({
+      where: {
+        shopId_channelType: {
+          shopId,
+          channelType,
+        },
+      },
+      select: CHANNEL_CONNECTION_SELECT,
+    });
+
+    if (!record) {
       throw new Error(`Missing channel connection for ${channelType}`);
     }
 
-    return this.toPublicConnection(connection);
+    return this.toPublicConnection(record);
   }
 
-  upsertConnection(
+  async upsertConnection(
     shopId: string,
     input: UpsertConnectionInput,
-  ): SellerChannelConnectionItem {
-    const store = this.ensureShopStore(shopId);
-    const nowIso = new Date().toISOString();
-    const existing = store.connections.get(input.channelType);
+  ): Promise<SellerChannelConnectionItem> {
+    await this.seedDefaultConnectionsForShop(shopId);
 
-    if (!existing) {
-      const seeded = this.createSeededConnection(
+    const record = await this.prisma.sellerChannelConnection.upsert({
+      where: {
+        shopId_channelType: {
+          shopId,
+          channelType: input.channelType,
+        },
+      },
+      create: {
         shopId,
-        input.channelType,
-        nowIso,
-      );
-      store.connections.set(input.channelType, seeded);
-    }
+        channelType: input.channelType,
+        status: input.status ?? 'DISCONNECTED',
+        externalShopId: input.externalShopId ?? null,
+        accessToken: input.accessToken ?? null,
+        refreshToken: input.refreshToken ?? null,
+        tokenExpiresAt: input.tokenExpiresAt
+          ? new Date(input.tokenExpiresAt)
+          : null,
+        lastSyncedAt: input.lastSyncedAt ? new Date(input.lastSyncedAt) : null,
+      },
+      update: {
+        ...(input.status !== undefined ? { status: input.status } : {}),
+        ...(input.externalShopId !== undefined
+          ? { externalShopId: input.externalShopId }
+          : {}),
+        ...(input.accessToken !== undefined
+          ? { accessToken: input.accessToken }
+          : {}),
+        ...(input.refreshToken !== undefined
+          ? { refreshToken: input.refreshToken }
+          : {}),
+        ...(input.tokenExpiresAt !== undefined
+          ? {
+              tokenExpiresAt: input.tokenExpiresAt
+                ? new Date(input.tokenExpiresAt)
+                : null,
+            }
+          : {}),
+        ...(input.lastSyncedAt !== undefined
+          ? {
+              lastSyncedAt: input.lastSyncedAt
+                ? new Date(input.lastSyncedAt)
+                : null,
+            }
+          : {}),
+      },
+      select: CHANNEL_CONNECTION_SELECT,
+    });
 
-    const connection = store.connections.get(input.channelType);
-    if (!connection) {
-      throw new Error(
-        `Cannot resolve channel connection for ${input.channelType}`,
-      );
-    }
-
-    connection.status = input.status;
-    connection.externalShopId =
-      input.externalShopId ?? connection.externalShopId ?? null;
-    connection.accessToken =
-      input.accessToken ?? connection.accessToken ?? null;
-    connection.refreshToken =
-      input.refreshToken ?? connection.refreshToken ?? null;
-    connection.tokenExpiresAt =
-      input.tokenExpiresAt ?? connection.tokenExpiresAt ?? null;
-    connection.lastSyncedAt =
-      input.lastSyncedAt ?? connection.lastSyncedAt ?? null;
-    connection.updatedAt = nowIso;
-
-    return this.toPublicConnection(connection);
+    return this.toPublicConnection(record);
   }
 
-  createSyncRun(
+  async createSyncRun(
     shopId: string,
     input: CreateSyncRunInput,
-  ): SellerChannelSyncRunItem {
-    const store = this.ensureShopStore(shopId);
-    const connection = store.connections.get(input.channelType);
+  ): Promise<SellerChannelSyncRunItem> {
+    const connection = await this.findConnection(shopId, input.channelType);
+
     if (!connection) {
       throw new Error(
         `Cannot resolve channel connection for ${input.channelType}`,
       );
     }
 
-    const nowIso = new Date().toISOString();
+    const now = new Date();
 
-    const run: SellerChannelSyncRunItem = {
-      id: randomUUID(),
-      connectionId: connection.id,
-      shopId,
-      channelType: input.channelType,
-      direction: input.direction,
-      trigger: input.trigger,
-      status: input.status,
-      totalCount: input.totalCount,
-      createdCount: input.createdCount,
-      updatedCount: input.updatedCount,
-      failedCount: input.failedCount,
-      message: input.message ?? null,
-      startedAt: nowIso,
-      finishedAt: nowIso,
-      createdAt: nowIso,
-      updatedAt: nowIso,
-    };
+    const run = await this.prisma.$transaction(async (tx) => {
+      const createdRun = await tx.sellerChannelSyncRun.create({
+        data: {
+          connectionId: connection.id,
+          direction: input.direction,
+          trigger: input.trigger,
+          status: input.status,
+          totalCount: input.totalCount,
+          createdCount: input.createdCount,
+          updatedCount: input.updatedCount,
+          failedCount: input.failedCount,
+          message: input.message ?? null,
+          startedAt: now,
+          finishedAt: now,
+        },
+        select: CHANNEL_SYNC_RUN_SELECT,
+      });
 
-    store.syncRuns.unshift(run);
+      await tx.sellerChannelConnection.update({
+        where: {
+          id: connection.id,
+        },
+        data: {
+          lastSyncedAt: now,
+        },
+      });
 
-    connection.lastSyncedAt = nowIso;
-    connection.updatedAt = nowIso;
+      return createdRun;
+    });
 
-    return run;
+    return this.toSyncRunItem(run);
   }
 
-  listSyncRuns(
+  async listSyncRuns(
     shopId: string,
     filters: {
       page: number;
@@ -170,31 +246,33 @@ export class ChannelSyncRepository {
       direction?: ChannelSyncDirection;
       status?: ChannelSyncStatus;
     },
-  ): SellerChannelSyncRunsResponse {
-    const store = this.ensureShopStore(shopId);
+  ): Promise<SellerChannelSyncRunsResponse> {
+    await this.seedDefaultConnectionsForShop(shopId);
 
-    const filteredRuns = store.syncRuns.filter((run) => {
-      if (filters.channelType && run.channelType !== filters.channelType) {
-        return false;
-      }
+    const where: Prisma.SellerChannelSyncRunWhereInput = {
+      connection: {
+        shopId,
+        ...(filters.channelType ? { channelType: filters.channelType } : {}),
+      },
+      ...(filters.direction ? { direction: filters.direction } : {}),
+      ...(filters.status ? { status: filters.status } : {}),
+    };
 
-      if (filters.direction && run.direction !== filters.direction) {
-        return false;
-      }
-
-      if (filters.status && run.status !== filters.status) {
-        return false;
-      }
-
-      return true;
-    });
-
-    const offset = (filters.page - 1) * filters.limit;
-    const data = filteredRuns.slice(offset, offset + filters.limit);
-    const totalItems = filteredRuns.length;
+    const [records, totalItems] = await Promise.all([
+      this.prisma.sellerChannelSyncRun.findMany({
+        where,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip: (filters.page - 1) * filters.limit,
+        take: filters.limit,
+        select: CHANNEL_SYNC_RUN_SELECT,
+      }),
+      this.prisma.sellerChannelSyncRun.count({ where }),
+    ]);
 
     return {
-      data,
+      data: records.map((record) => this.toSyncRunItem(record)),
       meta: {
         page: filters.page,
         limit: filters.limit,
@@ -205,59 +283,19 @@ export class ChannelSyncRepository {
     };
   }
 
-  private ensureShopStore(shopId: string): ShopChannelStore {
-    const existing = this.storesByShopId.get(shopId);
-    if (existing) {
-      return existing;
-    }
-
-    const nowIso = new Date().toISOString();
-    const seededConnections = new Map<
-      SalesChannelType,
-      ChannelConnectionStoreRecord
-    >();
-
-    for (const channelType of SUPPORTED_CHANNELS) {
-      seededConnections.set(
+  private async seedDefaultConnectionsForShop(shopId: string): Promise<void> {
+    await this.prisma.sellerChannelConnection.createMany({
+      data: SUPPORTED_CHANNELS.map((channelType) => ({
+        shopId,
         channelType,
-        this.createSeededConnection(shopId, channelType, nowIso),
-      );
-    }
-
-    const store: ShopChannelStore = {
-      connections: seededConnections,
-      syncRuns: [],
-    };
-
-    this.storesByShopId.set(shopId, store);
-
-    return store;
-  }
-
-  private createSeededConnection(
-    shopId: string,
-    channelType: SalesChannelType,
-    nowIso: string,
-  ): ChannelConnectionStoreRecord {
-    const isWebChannel = channelType === 'WEB';
-
-    return {
-      id: randomUUID(),
-      shopId,
-      channelType,
-      status: isWebChannel ? 'CONNECTED' : 'DISCONNECTED',
-      externalShopId: null,
-      tokenExpiresAt: null,
-      lastSyncedAt: null,
-      createdAt: nowIso,
-      updatedAt: nowIso,
-      accessToken: null,
-      refreshToken: null,
-    };
+        status: channelType === 'WEB' ? 'CONNECTED' : 'DISCONNECTED',
+      })),
+      skipDuplicates: true,
+    });
   }
 
   private toPublicConnection(
-    connection: ChannelConnectionStoreRecord,
+    connection: ChannelConnectionRecord,
   ): SellerChannelConnectionItem {
     return {
       id: connection.id,
@@ -265,10 +303,33 @@ export class ChannelSyncRepository {
       channelType: connection.channelType,
       status: connection.status,
       externalShopId: connection.externalShopId,
-      tokenExpiresAt: connection.tokenExpiresAt,
-      lastSyncedAt: connection.lastSyncedAt,
-      createdAt: connection.createdAt,
-      updatedAt: connection.updatedAt,
+      tokenExpiresAt: connection.tokenExpiresAt?.toISOString() ?? null,
+      lastSyncedAt: connection.lastSyncedAt?.toISOString() ?? null,
+      createdAt: connection.createdAt.toISOString(),
+      updatedAt: connection.updatedAt.toISOString(),
+    };
+  }
+
+  private toSyncRunItem(
+    record: ChannelSyncRunRecord,
+  ): SellerChannelSyncRunItem {
+    return {
+      id: record.id,
+      connectionId: record.connectionId,
+      shopId: record.connection.shopId,
+      channelType: record.connection.channelType,
+      direction: record.direction,
+      trigger: record.trigger,
+      status: record.status,
+      totalCount: record.totalCount,
+      createdCount: record.createdCount,
+      updatedCount: record.updatedCount,
+      failedCount: record.failedCount,
+      message: record.message,
+      startedAt: record.startedAt.toISOString(),
+      finishedAt: record.finishedAt?.toISOString() ?? null,
+      createdAt: record.createdAt.toISOString(),
+      updatedAt: record.updatedAt.toISOString(),
     };
   }
 }

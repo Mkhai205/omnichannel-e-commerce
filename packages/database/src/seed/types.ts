@@ -31,6 +31,7 @@ export type CatalogSeedOptions = {
 export type SeedSummary = {
     users: number;
     shops: number;
+    channels: number;
     categories: number;
     products: number;
     productVariants: number;

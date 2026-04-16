@@ -4,6 +4,7 @@ import { seedAddresses } from "./modules/addresses.js";
 import { seedCarts } from "./modules/carts.js";
 import { seedCatalog } from "./modules/catalog.js";
 import { seedCategories } from "./modules/categories.js";
+import { seedChannels } from "./modules/channels.js";
 import { seedFinance } from "./modules/finance.js";
 import { seedOrders } from "./modules/orders.js";
 import { seedShops } from "./modules/shops.js";
@@ -18,6 +19,7 @@ export async function seedCore(
 ): Promise<SeedSummary> {
     const users = await seedUsers(prisma);
     const shops = await seedShops(prisma);
+    const channels = await seedChannels(prisma);
     const categoriesResult = await seedCategories(prisma);
     const { products, productVariants, productReviews, variants } = await seedCatalog(prisma, {
         ...options.catalog,
@@ -42,6 +44,7 @@ export async function seedCore(
     return {
         users,
         shops,
+        channels,
         categories: categoriesResult.count,
         products,
         productVariants,
