@@ -1,64 +1,9 @@
 import { parseArgs } from "node:util";
-import {
-    DEFAULT_ACTIVE_RATIO,
-    DEFAULT_PRODUCTS_PER_CATEGORY,
-    DEFAULT_SEED_VALUE,
-    DEFAULT_VARIANTS_MAX,
-    DEFAULT_VARIANTS_MIN,
-} from "./constants.js";
-import type { SeedCleanupMode, SeedMode, SeedProfile } from "./types.js";
+import { DEFAULT_SEED_VALUE } from "./constants.js";
 
 export type SeedRunOptions = {
-    profile: SeedProfile;
-    mode: SeedMode;
-    cleanupMode: SeedCleanupMode;
-    dryRun: boolean;
-    includeFinance: boolean;
     seedValue: number;
-    productsPerCategory: number;
-    variantsMin: number;
-    variantsMax: number;
-    activeRatio: number;
-};
-
-type ProfilePreset = {
-    mode: SeedMode;
-    cleanupMode: SeedCleanupMode;
-    includeFinance: boolean;
-    productsPerCategory: number;
-    variantsMin: number;
-    variantsMax: number;
-    activeRatio: number;
-};
-
-const PROFILE_PRESETS: Record<SeedProfile, ProfilePreset> = {
-    core: {
-        mode: "full",
-        cleanupMode: "reset-seed-only",
-        includeFinance: false,
-        productsPerCategory: DEFAULT_PRODUCTS_PER_CATEGORY,
-        variantsMin: DEFAULT_VARIANTS_MIN,
-        variantsMax: DEFAULT_VARIANTS_MAX,
-        activeRatio: DEFAULT_ACTIVE_RATIO,
-    },
-    qa: {
-        mode: "full",
-        cleanupMode: "reset-seed-only",
-        includeFinance: true,
-        productsPerCategory: 5,
-        variantsMin: 2,
-        variantsMax: 4,
-        activeRatio: 0.85,
-    },
-    "catalog-load": {
-        mode: "catalog",
-        cleanupMode: "prune-catalog-generated",
-        includeFinance: false,
-        productsPerCategory: 120,
-        variantsMin: 3,
-        variantsMax: 5,
-        activeRatio: 0.9,
-    },
+    dryRun: boolean;
 };
 
 export function getRequiredDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string {
@@ -80,6 +25,7 @@ export function assertLocalDatabase(databaseUrl: string): void {
         "db",
         "host.docker.internal",
     ]);
+
     let parsed: URL;
 
     try {
@@ -93,21 +39,7 @@ export function assertLocalDatabase(databaseUrl: string): void {
     }
 }
 
-function parseSeedProfile(rawValue: string | undefined): SeedProfile {
-    if (!rawValue || rawValue === "core") {
-        return "core";
-    }
-
-    if (rawValue === "qa" || rawValue === "catalog-load") {
-        return rawValue;
-    }
-
-    throw new Error(
-        `Unsupported seed profile "${rawValue}". Expected "core", "qa", or "catalog-load".`,
-    );
-}
-
-export function parseSeedValue(rawValue: string | undefined): number {
+function parseSeedValue(rawValue: string | undefined): number {
     if (!rawValue) {
         return DEFAULT_SEED_VALUE;
     }
@@ -121,11 +53,7 @@ export function parseSeedValue(rawValue: string | undefined): number {
     return parsed;
 }
 
-function parseBooleanLike(
-    rawValue: string | boolean | undefined,
-    fallbackValue: boolean,
-    fieldName: string,
-): boolean {
+function parseBooleanLike(rawValue: string | boolean | undefined, fallbackValue: boolean): boolean {
     if (rawValue === undefined) {
         return fallbackValue;
     }
@@ -144,153 +72,23 @@ function parseBooleanLike(
         return false;
     }
 
-    throw new Error(`${fieldName} must be a boolean value`);
-}
-
-function parsePositiveInteger(
-    rawValue: string | undefined,
-    fallbackValue: number,
-    fieldName: string,
-): number {
-    if (!rawValue) {
-        return fallbackValue;
-    }
-
-    const parsed = Number.parseInt(rawValue, 10);
-
-    if (!Number.isFinite(parsed) || parsed < 1) {
-        throw new Error(`${fieldName} must be a positive integer`);
-    }
-
-    return parsed;
-}
-
-function parseRatio(rawValue: string | undefined): number {
-    if (!rawValue) {
-        return DEFAULT_ACTIVE_RATIO;
-    }
-
-    const parsed = Number.parseFloat(rawValue);
-
-    if (!Number.isFinite(parsed) || parsed < 0 || parsed > 1) {
-        throw new Error("active-ratio must be a number between 0 and 1");
-    }
-
-    return parsed;
-}
-
-function parseSeedMode(rawValue: string | undefined): SeedMode {
-    if (!rawValue || rawValue === "full") {
-        return "full";
-    }
-
-    if (rawValue === "catalog") {
-        return "catalog";
-    }
-
-    throw new Error(`Unsupported seed mode \"${rawValue}\". Expected \"full\" or \"catalog\".`);
-}
-
-function parseCleanupMode(rawValue: string | undefined): SeedCleanupMode {
-    if (!rawValue || rawValue === "none") {
-        return "none";
-    }
-
-    if (
-        rawValue === "reset-all" ||
-        rawValue === "reset-seed-only" ||
-        rawValue === "prune-catalog-generated"
-    ) {
-        return rawValue;
-    }
-
-    throw new Error(
-        `Unsupported cleanup mode "${rawValue}". Expected "none", "reset-all", "reset-seed-only", or "prune-catalog-generated".`,
-    );
-}
-
-function resolveDefaultCleanupMode(profile: SeedProfile, mode: SeedMode): SeedCleanupMode {
-    const presetCleanupMode = PROFILE_PRESETS[profile].cleanupMode;
-
-    if (mode === "catalog") {
-        return presetCleanupMode === "none" ? "none" : presetCleanupMode;
-    }
-
-    if (presetCleanupMode === "none" || presetCleanupMode === "prune-catalog-generated") {
-        return "reset-seed-only";
-    }
-
-    return presetCleanupMode;
+    throw new Error("dry-run must be a boolean value");
 }
 
 export function parseSeedRunOptions(args: string[], env: NodeJS.ProcessEnv): SeedRunOptions {
+    const normalizedArgs = args.filter((arg) => arg !== "--");
+
     const { values } = parseArgs({
-        args,
+        args: normalizedArgs,
         allowPositionals: true,
         options: {
-            profile: { type: "string" },
-            mode: { type: "string" },
-            "cleanup-mode": { type: "string" },
-            "dry-run": { type: "boolean" },
-            "include-finance": { type: "boolean" },
             "seed-value": { type: "string" },
-            "products-per-category": { type: "string" },
-            "variants-min": { type: "string" },
-            "variants-max": { type: "string" },
-            "active-ratio": { type: "string" },
+            "dry-run": { type: "boolean" },
         },
     });
 
-    const profile = parseSeedProfile(values.profile ?? env.SEED_PROFILE);
-    const preset = PROFILE_PRESETS[profile];
-    const mode = parseSeedMode(values.mode ?? env.SEED_MODE ?? preset.mode);
-    const cleanupMode = parseCleanupMode(
-        values["cleanup-mode"] ?? env.SEED_CLEANUP_MODE ?? resolveDefaultCleanupMode(profile, mode),
-    );
-    const dryRun = parseBooleanLike(values["dry-run"] ?? env.SEED_DRY_RUN, false, "dry-run");
-    const includeFinance =
-        mode === "catalog"
-            ? false
-            : parseBooleanLike(
-                  values["include-finance"] ?? env.SEED_INCLUDE_FINANCE,
-                  preset.includeFinance,
-                  "include-finance",
-              );
-    const seedValue = parseSeedValue(values["seed-value"] ?? env.SEED_RANDOM_SEED);
-    const productsPerCategory = parsePositiveInteger(
-        values["products-per-category"] ?? env.SEED_PRODUCTS_PER_CATEGORY,
-        preset.productsPerCategory,
-        "products-per-category",
-    );
-    const variantsMin = parsePositiveInteger(
-        values["variants-min"] ?? env.SEED_VARIANTS_MIN,
-        preset.variantsMin,
-        "variants-min",
-    );
-    const variantsMax = parsePositiveInteger(
-        values["variants-max"] ?? env.SEED_VARIANTS_MAX,
-        preset.variantsMax,
-        "variants-max",
-    );
-
-    if (variantsMin > variantsMax) {
-        throw new Error("variants-min must be less than or equal to variants-max");
-    }
-
-    const activeRatio = parseRatio(
-        values["active-ratio"] ?? env.SEED_ACTIVE_RATIO ?? String(preset.activeRatio),
-    );
-
     return {
-        profile,
-        mode,
-        cleanupMode,
-        dryRun,
-        includeFinance,
-        seedValue,
-        productsPerCategory,
-        variantsMin,
-        variantsMax,
-        activeRatio,
+        seedValue: parseSeedValue(values["seed-value"] ?? env.SEED_RANDOM_SEED),
+        dryRun: parseBooleanLike(values["dry-run"] ?? env.SEED_DRY_RUN, false),
     };
 }

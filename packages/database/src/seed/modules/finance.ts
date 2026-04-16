@@ -1,17 +1,8 @@
-import { faker } from "../faker.js";
+import { randomUUID } from "node:crypto";
 import type { Prisma, PrismaClient } from "../../generated/prisma/client.js";
 import { DEFAULT_SEED_ADMIN_WALLET_CODE, SEED_IDS } from "../constants.js";
+import type { SeedOrderRecord } from "../types.js";
 import { formatCents, parseMoneyToCents } from "../utils.js";
-
-type PaymentFixture = {
-    id: string;
-    orderId: string;
-    txnRef: string;
-    status: "PENDING" | "SUCCESS";
-    gatewayTransactionNo: string | null;
-    responseCode: string;
-    message: string;
-};
 
 type WalletBreakdown = {
     grossAmount: string;
@@ -19,38 +10,18 @@ type WalletBreakdown = {
     netAmount: string;
 };
 
-const PAYMENT_FIXTURES: PaymentFixture[] = [
-    {
-        id: SEED_IDS.payments.pendingOrder,
-        orderId: SEED_IDS.orders.pendingPayment,
-        txnRef: "SEED-TXN-0001",
-        status: "PENDING",
-        gatewayTransactionNo: null,
-        responseCode: "99",
-        message: "Pending user payment confirmation",
-    },
-    {
-        id: SEED_IDS.payments.paidA,
-        orderId: SEED_IDS.orders.paidA,
-        txnRef: "SEED-TXN-0002",
-        status: "SUCCESS",
-        gatewayTransactionNo: "SEED-GW-0002",
-        responseCode: "00",
-        message: "Payment success",
-    },
-    {
-        id: SEED_IDS.payments.paidB,
-        orderId: SEED_IDS.orders.paidB,
-        txnRef: "SEED-TXN-0003",
-        status: "SUCCESS",
-        gatewayTransactionNo: "SEED-GW-0003",
-        responseCode: "00",
-        message: "Payment success",
-    },
-];
+function mapPaymentStatus(
+    orderStatus: SeedOrderRecord["status"],
+): "PENDING" | "SUCCESS" | "CANCELLED" {
+    if (orderStatus === "PENDING_PAYMENT") {
+        return "PENDING";
+    }
 
-function toMoneyString(value: Prisma.Decimal | string): string {
-    return typeof value === "string" ? value : value.toString();
+    if (orderStatus === "CANCELLED") {
+        return "CANCELLED";
+    }
+
+    return "SUCCESS";
 }
 
 function calculateWalletBreakdown(totalAmount: string): WalletBreakdown {
@@ -65,7 +36,13 @@ function calculateWalletBreakdown(totalAmount: string): WalletBreakdown {
     };
 }
 
-export async function seedFinance(prisma: PrismaClient): Promise<{
+export async function seedFinance(
+    prisma: PrismaClient,
+    input: {
+        orderRecords: SeedOrderRecord[];
+        shopIds: string[];
+    },
+): Promise<{
     payments: number;
     paymentOrders: number;
     paymentWebhookLogs: number;
@@ -74,30 +51,6 @@ export async function seedFinance(prisma: PrismaClient): Promise<{
     sellerWallets: number;
     sellerSettlements: number;
 }> {
-    const orderIds = PAYMENT_FIXTURES.map((fixture) => fixture.orderId);
-    const orders = await prisma.order.findMany({
-        where: {
-            id: {
-                in: orderIds,
-            },
-        },
-        select: {
-            id: true,
-            orderNumber: true,
-            userId: true,
-            shopId: true,
-            totalAmount: true,
-        },
-    });
-
-    const orderById = new Map(orders.map((order) => [order.id, order]));
-
-    for (const fixture of PAYMENT_FIXTURES) {
-        if (!orderById.has(fixture.orderId)) {
-            throw new Error(`Missing seeded order for finance fixture ${fixture.orderId}`);
-        }
-    }
-
     const adminWallet = await prisma.adminWallet.upsert({
         where: {
             code: DEFAULT_SEED_ADMIN_WALLET_CODE,
@@ -112,121 +65,109 @@ export async function seedFinance(prisma: PrismaClient): Promise<{
         },
     });
 
-    const sellerWalletResult = await prisma.sellerWallet.createMany({
-        data: [
-            {
-                id: SEED_IDS.sellerWallets.approved,
-                shopId: SEED_IDS.shops.approved,
-            },
-            {
-                id: SEED_IDS.sellerWallets.pending,
-                shopId: SEED_IDS.shops.pending,
-            },
-            {
-                id: SEED_IDS.sellerWallets.rejected,
-                shopId: SEED_IDS.shops.rejected,
-            },
-        ],
-        skipDuplicates: true,
+    const sellerWalletMap = new Map<string, string>();
+
+    input.shopIds.forEach((shopId) => {
+        sellerWalletMap.set(shopId, randomUUID());
     });
 
-    const paymentRows: Prisma.PaymentCreateManyInput[] = PAYMENT_FIXTURES.map((fixture) => {
-        const order = orderById.get(fixture.orderId);
+    const sellerWallets = await prisma.sellerWallet.createMany({
+        data: input.shopIds.map((shopId) => ({
+            id: sellerWalletMap.get(shopId) ?? randomUUID(),
+            shopId,
+        })),
+    });
 
-        if (!order) {
-            throw new Error(`Order not found while mapping payment fixture ${fixture.orderId}`);
-        }
-
-        const amount = toMoneyString(order.totalAmount);
-        const isSuccess = fixture.status === "SUCCESS";
+    const paymentRows = input.orderRecords.map((order, index) => {
+        const paymentStatus = mapPaymentStatus(order.status);
+        const paymentId = randomUUID();
 
         return {
-            id: fixture.id,
+            id: paymentId,
+            orderId: order.id,
+            orderNumber: order.orderNumber,
             userId: order.userId,
-            provider: "VNPAY",
-            status: fixture.status,
-            txnRef: fixture.txnRef,
-            gatewayTransactionNo: fixture.gatewayTransactionNo,
-            amount,
-            currency: "VND",
-            bankCode: "NCB",
-            orderInfo: `Seed payment for ${order.orderNumber}`,
-            paidAt: isSuccess ? new Date() : null,
-            failedReason: null,
-            requestPayload: {
-                source: "seed",
-                orderId: order.id,
-                orderNumber: order.orderNumber,
-            },
-            responsePayload: {
-                responseCode: fixture.responseCode,
-                message: fixture.message,
-            },
-            expiresAt: isSuccess ? null : new Date(Date.now() + 15 * 60 * 1000),
+            shopId: order.shopId,
+            paymentStatus,
+            txnRef: `SEED-TXN-20260416-${String(index + 1).padStart(5, "0")}`,
+            gatewayTransactionNo:
+                paymentStatus === "SUCCESS"
+                    ? `SEED-GW-20260416-${String(index + 1).padStart(5, "0")}`
+                    : null,
+            totalAmount: order.totalAmount,
         };
     });
 
     const payments = await prisma.payment.createMany({
-        data: paymentRows,
-        skipDuplicates: true,
+        data: paymentRows.map((payment) => ({
+            id: payment.id,
+            userId: payment.userId,
+            provider: "VNPAY",
+            status: payment.paymentStatus,
+            txnRef: payment.txnRef,
+            gatewayTransactionNo: payment.gatewayTransactionNo,
+            amount: payment.totalAmount,
+            currency: "VND",
+            bankCode: "NCB",
+            orderInfo: `Seed payment for ${payment.orderNumber}`,
+            paidAt: payment.paymentStatus === "SUCCESS" ? new Date() : null,
+            failedReason: payment.paymentStatus === "CANCELLED" ? "Order was cancelled" : null,
+            requestPayload: {
+                source: "seed",
+                orderId: payment.orderId,
+                orderNumber: payment.orderNumber,
+            },
+            responsePayload: {
+                status: payment.paymentStatus,
+            },
+            expiresAt:
+                payment.paymentStatus === "PENDING" ? new Date(Date.now() + 15 * 60 * 1000) : null,
+        })),
     });
 
     const paymentOrders = await prisma.paymentOrder.createMany({
-        data: PAYMENT_FIXTURES.map((fixture) => ({
-            paymentId: fixture.id,
-            orderId: fixture.orderId,
+        data: paymentRows.map((payment) => ({
+            id: randomUUID(),
+            paymentId: payment.id,
+            orderId: payment.orderId,
         })),
-        skipDuplicates: true,
     });
 
     const paymentWebhookLogs = await prisma.paymentWebhookLog.createMany({
-        data: PAYMENT_FIXTURES.map((fixture, index) => ({
-            id: faker.string.uuid(),
-            paymentId: fixture.id,
+        data: paymentRows.map((payment, index) => ({
+            id: randomUUID(),
+            paymentId: payment.id,
             provider: "VNPAY",
-            eventKey: `SEED-WEBHOOK-${String(index + 1).padStart(4, "0")}`,
-            txnRef: fixture.txnRef,
+            eventKey: `SEED-WEBHOOK-20260416-${String(index + 1).padStart(5, "0")}`,
+            txnRef: payment.txnRef,
             isVerified: true,
-            isSuccess: fixture.status === "SUCCESS",
-            responseCode: fixture.responseCode,
-            message: fixture.message,
+            isSuccess: payment.paymentStatus === "SUCCESS",
+            responseCode: payment.paymentStatus === "SUCCESS" ? "00" : "99",
+            message: `Seed webhook ${payment.paymentStatus}`,
             payload: {
                 source: "seed",
-                txnRef: fixture.txnRef,
-                status: fixture.status,
+                status: payment.paymentStatus,
+                orderId: payment.orderId,
             },
         })),
-        skipDuplicates: true,
     });
 
-    const successfulFixtures = PAYMENT_FIXTURES.filter((fixture) => fixture.status === "SUCCESS");
-    const sellerWalletIdByShopId = new Map<string, string>([
-        [SEED_IDS.shops.approved, SEED_IDS.sellerWallets.approved],
-        [SEED_IDS.shops.pending, SEED_IDS.sellerWallets.pending],
-        [SEED_IDS.shops.rejected, SEED_IDS.sellerWallets.rejected],
-    ]);
-
+    const successPayments = paymentRows.filter((payment) => payment.paymentStatus === "SUCCESS");
     const ledgerRows: Prisma.AdminWalletLedgerCreateManyInput[] = [];
     const settlementRows: Prisma.SellerSettlementCreateManyInput[] = [];
-    const walletCreditById = new Map<string, bigint>();
+    const creditedByWalletId = new Map<string, bigint>();
     let totalInflowCents = 0n;
-    let totalReleasedSellerCents = 0n;
     let totalCommissionCents = 0n;
+    let totalReleasedSellerCents = 0n;
 
-    successfulFixtures.forEach((fixture, index) => {
-        const order = orderById.get(fixture.orderId);
-
-        if (!order) {
-            return;
-        }
-
-        const sellerWalletId = sellerWalletIdByShopId.get(order.shopId);
+    successPayments.forEach((payment) => {
+        const sellerWalletId = sellerWalletMap.get(payment.shopId);
 
         if (!sellerWalletId) {
-            throw new Error(`Missing seller wallet fixture for shop ${order.shopId}`);
+            throw new Error(`Missing seller wallet for shop ${payment.shopId}`);
         }
 
-        const breakdown = calculateWalletBreakdown(toMoneyString(order.totalAmount));
+        const breakdown = calculateWalletBreakdown(payment.totalAmount);
         const grossCents = parseMoneyToCents(breakdown.grossAmount);
         const commissionCents = parseMoneyToCents(breakdown.commissionAmount);
         const netCents = parseMoneyToCents(breakdown.netAmount);
@@ -234,55 +175,45 @@ export async function seedFinance(prisma: PrismaClient): Promise<{
         totalInflowCents += grossCents;
         totalCommissionCents += commissionCents;
         totalReleasedSellerCents += netCents;
-        walletCreditById.set(
-            sellerWalletId,
-            (walletCreditById.get(sellerWalletId) ?? 0n) + netCents,
-        );
 
-        const inflowId =
-            index === 0
-                ? SEED_IDS.adminWalletLedgers.paymentInflowA
-                : SEED_IDS.adminWalletLedgers.paymentInflowB;
-        const settlementLedgerId =
-            index === 0
-                ? SEED_IDS.adminWalletLedgers.sellerSettlementA
-                : SEED_IDS.adminWalletLedgers.sellerSettlementB;
-        const settlementId =
-            index === 0 ? SEED_IDS.sellerSettlements.paidA : SEED_IDS.sellerSettlements.paidB;
+        creditedByWalletId.set(
+            sellerWalletId,
+            (creditedByWalletId.get(sellerWalletId) ?? 0n) + netCents,
+        );
 
         ledgerRows.push(
             {
-                id: inflowId,
+                id: randomUUID(),
                 adminWalletId: adminWallet.id,
-                paymentId: fixture.id,
-                orderId: order.id,
+                paymentId: payment.id,
+                orderId: payment.orderId,
                 type: "PAYMENT_INFLOW",
-                idempotencyKey: `SEED-LEDGER-INFLOW-${order.id}`,
+                idempotencyKey: `SEED-LEDGER-INFLOW-${payment.orderId}`,
                 grossAmount: breakdown.grossAmount,
                 commission: breakdown.commissionAmount,
                 netAmount: breakdown.netAmount,
-                note: `Seed inflow for ${order.orderNumber}`,
+                note: `Seed inflow for ${payment.orderNumber}`,
             },
             {
-                id: settlementLedgerId,
+                id: randomUUID(),
                 adminWalletId: adminWallet.id,
-                paymentId: fixture.id,
-                orderId: order.id,
+                paymentId: payment.id,
+                orderId: payment.orderId,
                 type: "SELLER_SETTLEMENT",
-                idempotencyKey: `SEED-LEDGER-SETTLEMENT-${order.id}`,
+                idempotencyKey: `SEED-LEDGER-SETTLEMENT-${payment.orderId}`,
                 grossAmount: breakdown.netAmount,
                 commission: "0.00",
                 netAmount: breakdown.netAmount,
-                note: `Seed settlement for ${order.orderNumber}`,
+                note: `Seed settlement for ${payment.orderNumber}`,
             },
         );
 
         settlementRows.push({
-            id: settlementId,
-            orderId: order.id,
-            shopId: order.shopId,
+            id: randomUUID(),
+            orderId: payment.orderId,
+            shopId: payment.shopId,
             sellerWalletId,
-            idempotencyKey: `SEED-SETTLEMENT-${order.id}`,
+            idempotencyKey: `SEED-SETTLEMENT-${payment.orderId}`,
             status: "COMPLETED",
             grossAmount: breakdown.grossAmount,
             commissionAmount: breakdown.commissionAmount,
@@ -291,25 +222,29 @@ export async function seedFinance(prisma: PrismaClient): Promise<{
         });
     });
 
-    const adminWalletLedgers = await prisma.adminWalletLedger.createMany({
-        data: ledgerRows,
-        skipDuplicates: true,
-    });
+    const adminWalletLedgers =
+        ledgerRows.length > 0
+            ? await prisma.adminWalletLedger.createMany({
+                  data: ledgerRows,
+              })
+            : { count: 0 };
 
-    const sellerSettlements = await prisma.sellerSettlement.createMany({
-        data: settlementRows,
-        skipDuplicates: true,
-    });
+    const sellerSettlements =
+        settlementRows.length > 0
+            ? await prisma.sellerSettlement.createMany({
+                  data: settlementRows,
+              })
+            : { count: 0 };
 
-    for (const [sellerWalletId, creditCents] of walletCreditById.entries()) {
+    for (const [walletId, creditedCents] of creditedByWalletId.entries()) {
         await prisma.sellerWallet.update({
             where: {
-                id: sellerWalletId,
+                id: walletId,
             },
             data: {
-                availableBalance: formatCents(creditCents),
+                availableBalance: formatCents(creditedCents),
                 pendingBalance: "0.00",
-                totalCredited: formatCents(creditCents),
+                totalCredited: formatCents(creditedCents),
             },
         });
     }
@@ -332,7 +267,7 @@ export async function seedFinance(prisma: PrismaClient): Promise<{
         paymentWebhookLogs: paymentWebhookLogs.count,
         adminWallets: 1,
         adminWalletLedgers: adminWalletLedgers.count,
-        sellerWallets: sellerWalletResult.count,
+        sellerWallets: sellerWallets.count,
         sellerSettlements: sellerSettlements.count,
     };
 }
