@@ -117,3 +117,23 @@ export type SellerWallet = Prisma.SellerWalletModel
  * 
  */
 export type SellerSettlement = Prisma.SellerSettlementModel
+/**
+ * Model SellerChannelConnection
+ * 
+ */
+export type SellerChannelConnection = Prisma.SellerChannelConnectionModel
+/**
+ * Model SellerChannelProductMapping
+ * 
+ */
+export type SellerChannelProductMapping = Prisma.SellerChannelProductMappingModel
+/**
+ * Model SellerChannelOrderMapping
+ * 
+ */
+export type SellerChannelOrderMapping = Prisma.SellerChannelOrderMappingModel
+/**
+ * Model SellerChannelSyncRun
+ * 
+ */
+export type SellerChannelSyncRun = Prisma.SellerChannelSyncRunModel
