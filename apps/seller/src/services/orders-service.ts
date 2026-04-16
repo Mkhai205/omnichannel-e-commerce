@@ -33,6 +33,10 @@ function toQueryString(filters: SellerOrdersFilterRequest): string {
         params.set("status", filters.status);
     }
 
+    if (filters.channelType) {
+        params.set("channelType", filters.channelType);
+    }
+
     if (typeof filters.search === "string" && filters.search.trim().length > 0) {
         params.set("search", filters.search.trim());
     }

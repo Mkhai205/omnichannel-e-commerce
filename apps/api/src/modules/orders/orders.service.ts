@@ -238,12 +238,14 @@ export class OrdersService {
       this.ordersRepository.findSellerOrdersByUserId(sellerUserId, {
         page,
         limit,
+        channelType: filters.channelType,
         status: filters.status,
         search,
         placedFrom,
         placedToExclusive,
       }),
       this.ordersRepository.countSellerOrdersByUserId(sellerUserId, {
+        channelType: filters.channelType,
         status: filters.status,
         search,
         placedFrom,

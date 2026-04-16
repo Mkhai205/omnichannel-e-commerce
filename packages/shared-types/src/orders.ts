@@ -1,4 +1,5 @@
 import type { PaginatedResponse, UUID } from "./common.js";
+import type { SalesChannelType } from "./channels.js";
 import type { CreateVnpayPaymentUrlResponse } from "./payments.js";
 
 export type OrderStatus =
@@ -61,6 +62,7 @@ export interface SellerOrdersFilterRequest {
     placedFrom?: string;
     placedTo?: string;
     status?: OrderStatus;
+    channelType?: SalesChannelType;
 }
 
 export interface CustomerOrdersFilterRequest {
