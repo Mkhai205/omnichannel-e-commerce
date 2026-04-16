@@ -65,6 +65,11 @@ export class SellerCatalogController {
   @ApiQuery({ name: 'search', required: false, type: String })
   @ApiQuery({ name: 'categoryId', required: false, type: String })
   @ApiQuery({
+    name: 'channelType',
+    required: false,
+    enum: ['WEB', 'TIKTOK_MOCK', 'SHOPEE_MOCK'],
+  })
+  @ApiQuery({
     name: 'status',
     required: false,
     enum: ['DRAFT', 'ACTIVE', 'HIDDEN'],

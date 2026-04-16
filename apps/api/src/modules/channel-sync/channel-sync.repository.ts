@@ -83,6 +83,15 @@ interface CreateSyncRunInput {
   message?: string;
 }
 
+interface UpsertProductMappingsInput {
+  channelType: SalesChannelType;
+  productId: string;
+  variants: Array<{
+    id: string;
+    sku: string;
+  }>;
+}
+
 @Injectable()
 export class ChannelSyncRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -283,6 +292,127 @@ export class ChannelSyncRepository {
     };
   }
 
+  async upsertProductMappings(
+    connectionId: string,
+    input: UpsertProductMappingsInput,
+  ): Promise<{
+    totalCount: number;
+    createdCount: number;
+    updatedCount: number;
+    failedCount: number;
+    mappedVariantCount: number;
+  }> {
+    if (input.variants.length === 0) {
+      return {
+        totalCount: 0,
+        createdCount: 0,
+        updatedCount: 0,
+        failedCount: 0,
+        mappedVariantCount: 0,
+      };
+    }
+
+    const variantIds = input.variants.map((variant) => variant.id);
+    const existingMappings =
+      await this.prisma.sellerChannelProductMapping.findMany({
+        where: {
+          connectionId,
+          variantId: {
+            in: variantIds,
+          },
+        },
+        select: {
+          variantId: true,
+        },
+      });
+
+    const existingVariantIdSet = new Set(
+      existingMappings.map((mapping) => mapping.variantId),
+    );
+    const now = new Date();
+
+    let createdCount = 0;
+    let updatedCount = 0;
+    let failedCount = 0;
+
+    for (const variant of input.variants) {
+      try {
+        const existed = existingVariantIdSet.has(variant.id);
+        await this.prisma.sellerChannelProductMapping.upsert({
+          where: {
+            connectionId_variantId: {
+              connectionId,
+              variantId: variant.id,
+            },
+          },
+          create: {
+            connectionId,
+            variantId: variant.id,
+            externalProductId: this.toExternalProductId(
+              input.channelType,
+              input.productId,
+            ),
+            externalSku: this.toExternalSku(input.channelType, variant.sku),
+            isActive: true,
+            lastSyncedAt: now,
+          },
+          update: {
+            externalProductId: this.toExternalProductId(
+              input.channelType,
+              input.productId,
+            ),
+            externalSku: this.toExternalSku(input.channelType, variant.sku),
+            isActive: true,
+            lastSyncedAt: now,
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        if (existed) {
+          updatedCount += 1;
+        } else {
+          createdCount += 1;
+        }
+      } catch {
+        failedCount += 1;
+      }
+    }
+
+    return {
+      totalCount: input.variants.length,
+      createdCount,
+      updatedCount,
+      failedCount,
+      mappedVariantCount: createdCount + updatedCount,
+    };
+  }
+
+  async getMappedVariantIds(
+    connectionId: string,
+    variantIds: string[],
+  ): Promise<Set<string>> {
+    if (variantIds.length === 0) {
+      return new Set();
+    }
+
+    const mappings = await this.prisma.sellerChannelProductMapping.findMany({
+      where: {
+        connectionId,
+        variantId: {
+          in: variantIds,
+        },
+        isActive: true,
+      },
+      select: {
+        variantId: true,
+      },
+    });
+
+    return new Set(mappings.map((mapping) => mapping.variantId));
+  }
+
   private async seedDefaultConnectionsForShop(shopId: string): Promise<void> {
     await this.prisma.sellerChannelConnection.createMany({
       data: SUPPORTED_CHANNELS.map((channelType) => ({
@@ -331,5 +461,16 @@ export class ChannelSyncRepository {
       createdAt: record.createdAt.toISOString(),
       updatedAt: record.updatedAt.toISOString(),
     };
+  }
+
+  private toExternalProductId(
+    channelType: SalesChannelType,
+    productId: string,
+  ): string {
+    return `${channelType}-${productId}`.slice(0, 120);
+  }
+
+  private toExternalSku(channelType: SalesChannelType, sku: string): string {
+    return `${sku}-${channelType}`.slice(0, 120);
   }
 }

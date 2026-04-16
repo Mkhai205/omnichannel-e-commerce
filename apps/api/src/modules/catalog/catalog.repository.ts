@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@repo/database';
-import type { ProductStatus } from '@repo/shared-types';
+import type { ProductStatus, SalesChannelType } from '@repo/shared-types';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
 
 const CATEGORY_SELECT = {
@@ -117,6 +117,7 @@ export interface ProductsQueryInput {
   categoryId?: string;
   shopId?: string;
   status?: ProductStatus;
+  channelType?: SalesChannelType;
   minPrice?: string;
   maxPrice?: string;
   minRating?: number;
@@ -127,6 +128,7 @@ type ProductsWhereFilterInput = {
   categoryId?: string;
   shopId?: string;
   status?: ProductStatus;
+  channelType?: SalesChannelType;
   minPrice?: string;
   maxPrice?: string;
   minRating?: number;
@@ -509,6 +511,7 @@ export class CatalogRepository {
     input: ProductsWhereFilterInput,
   ): Prisma.ProductWhereInput {
     const where: Prisma.ProductWhereInput = {};
+    const variantSomeFilter: Prisma.ProductVariantWhereInput = {};
 
     if (input.status) {
       where.status = input.status;
@@ -539,10 +542,23 @@ export class CatalogRepository {
         priceFilter.lte = new Prisma.Decimal(input.maxPrice);
       }
 
-      where.variants = {
+      variantSomeFilter.price = priceFilter;
+    }
+
+    if (input.channelType && input.channelType !== 'WEB') {
+      variantSomeFilter.channelProductMappings = {
         some: {
-          price: priceFilter,
+          isActive: true,
+          connection: {
+            channelType: input.channelType,
+          },
         },
+      };
+    }
+
+    if (Object.keys(variantSomeFilter).length > 0) {
+      where.variants = {
+        some: variantSomeFilter,
       };
     }
 

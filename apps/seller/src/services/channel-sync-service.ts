@@ -3,9 +3,13 @@ import type {
     ConnectSellerChannelResponse,
     DisconnectSellerChannelResponse,
     SalesChannelType,
+    SellerChannelProductSyncStatusesRequest,
+    SellerChannelProductSyncStatusesResponse,
     SellerChannelConnectionItem,
     SellerChannelSyncRunsFilterRequest,
     SellerChannelSyncRunsResponse,
+    SyncProductToChannelsRequest,
+    SyncProductToChannelsResponse,
     TriggerChannelSyncRequest,
     TriggerChannelSyncResponse,
 } from "@repo/shared-types";
@@ -106,6 +110,34 @@ export async function getSellerChannelSyncRuns(
 
     const response = await requestApi<SellerChannelSyncRunsResponse>(
         query.length > 0 ? `/seller/channels/sync-runs?${query}` : "/seller/channels/sync-runs",
+    );
+
+    return requireData(response);
+}
+
+export async function syncSellerProductToChannels(
+    payload: SyncProductToChannelsRequest,
+): Promise<SyncProductToChannelsResponse> {
+    const response = await requestApi<SyncProductToChannelsResponse>(
+        "/seller/channels/products/sync",
+        {
+            method: "POST",
+            body: JSON.stringify(payload),
+        },
+    );
+
+    return requireData(response);
+}
+
+export async function getSellerProductChannelSyncStatuses(
+    payload: SellerChannelProductSyncStatusesRequest,
+): Promise<SellerChannelProductSyncStatusesResponse> {
+    const response = await requestApi<SellerChannelProductSyncStatusesResponse>(
+        "/seller/channels/products/sync-statuses",
+        {
+            method: "POST",
+            body: JSON.stringify(payload),
+        },
     );
 
     return requireData(response);

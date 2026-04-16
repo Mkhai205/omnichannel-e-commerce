@@ -7,14 +7,16 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type {
   ApiResponse,
   ConnectSellerChannelResponse,
   DisconnectSellerChannelResponse,
   SalesChannelType,
   SellerChannelConnectionItem,
+  SellerChannelProductSyncStatusesResponse,
   SellerChannelSyncRunsResponse,
+  SyncProductToChannelsResponse,
   TriggerChannelSyncResponse,
 } from '@repo/shared-types';
 import { CurrentUser, Roles } from '../../core/decorators';
@@ -22,7 +24,9 @@ import { createSuccessResponse } from '../../core/http/api-response.util';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
 import { ChannelSyncService } from './channel-sync.service';
 import { ConnectSellerChannelDto } from './dto/connect-seller-channel.dto';
+import { SellerChannelProductSyncStatusesDto } from './dto/seller-channel-product-sync-statuses.dto';
 import { SellerChannelSyncRunsFilterDto } from './dto/seller-channel-sync-runs-filter.dto';
+import { SyncProductToChannelsDto } from './dto/sync-product-to-channels.dto';
 import { TriggerChannelSyncDto } from './dto/trigger-channel-sync.dto';
 
 const SALES_CHANNEL_TYPES: SalesChannelType[] = [
@@ -84,6 +88,44 @@ export class SellerChannelController {
 
     return createSuccessResponse(response, {
       message: 'Seller channel disconnected successfully',
+    });
+  }
+
+  @Post('products/sync')
+  @ApiOperation({ summary: 'Sync one product to selected channels' })
+  @ApiBody({ type: SyncProductToChannelsDto })
+  async syncMyProductToChannels(
+    @CurrentUser() currentUser: JwtPayload,
+    @Body() body: SyncProductToChannelsDto,
+  ): Promise<ApiResponse<SyncProductToChannelsResponse>> {
+    const response = await this.channelSyncService.syncMyProductToChannels(
+      currentUser.sub,
+      body,
+    );
+
+    return createSuccessResponse(response, {
+      message: 'Product synced to selected channels successfully',
+    });
+  }
+
+  @Post('products/sync-statuses')
+  @ApiOperation({
+    summary:
+      'Get product sync statuses for one channel in current seller scope',
+  })
+  @ApiBody({ type: SellerChannelProductSyncStatusesDto })
+  async getMyProductChannelSyncStatuses(
+    @CurrentUser() currentUser: JwtPayload,
+    @Body() body: SellerChannelProductSyncStatusesDto,
+  ): Promise<ApiResponse<SellerChannelProductSyncStatusesResponse>> {
+    const response =
+      await this.channelSyncService.getMyProductChannelSyncStatuses(
+        currentUser.sub,
+        body,
+      );
+
+    return createSuccessResponse(response, {
+      message: 'Product sync statuses retrieved successfully',
     });
   }
 

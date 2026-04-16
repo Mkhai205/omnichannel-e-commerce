@@ -65,6 +65,7 @@ export class SellerCatalogService {
       search,
       categoryId: filters.categoryId,
       status: filters.status,
+      channelType: filters.channelType,
     };
 
     const [products, totalItems] = await Promise.all([

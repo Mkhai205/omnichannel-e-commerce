@@ -1,3 +1,4 @@
+import type { SalesChannelType } from "./channels.js";
 import type { PaginatedResponse, UUID } from "./common.js";
 
 export type ProductStatus = "DRAFT" | "ACTIVE" | "HIDDEN";
@@ -117,6 +118,7 @@ export interface SellerProductsFilterRequest {
     search?: string;
     categoryId?: UUID;
     status?: ProductStatus;
+    channelType?: SalesChannelType;
 }
 
 export interface AdminProductsFilterRequest {

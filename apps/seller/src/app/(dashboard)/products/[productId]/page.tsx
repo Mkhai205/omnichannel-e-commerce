@@ -2,7 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import type { ProductItem } from "@repo/shared-types";
+import type {
+    ProductItem,
+    SalesChannelType,
+    SellerChannelConnectionItem,
+} from "@repo/shared-types";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import {
     createSellerProduct,
@@ -15,6 +19,7 @@ import {
     updateSellerProduct,
     updateSellerProductVariant,
 } from "@/services/catalog-service";
+import { getSellerChannels, syncSellerProductToChannels } from "@/services/channel-sync-service";
 import { isApiRequestError } from "@/services/http-client";
 import { ProductEditorForm } from "../_components/product-editor-form";
 import { normalizeVariants, validateCatalogImageFile } from "../utils/product-draft";
@@ -32,6 +37,12 @@ const PRODUCT_STATUS_LABEL: Record<ProductDraft["status"], string> = {
     DRAFT: "Nháp",
     ACTIVE: "Đang bán",
     HIDDEN: "Đã ẩn",
+};
+
+const CHANNEL_LABELS: Record<SalesChannelType, string> = {
+    WEB: "Website nội bộ",
+    TIKTOK_MOCK: "TikTok Mock",
+    SHOPEE_MOCK: "Shopee Mock",
 };
 
 function buildDefaultDraft(): ProductDraft {
@@ -96,12 +107,17 @@ export default function ProductDetailPage() {
     const isCreateMode = productId === "new";
 
     const [categories, setCategories] = useState<CategoryOption[]>([]);
+    const [channelConnections, setChannelConnections] = useState<SellerChannelConnectionItem[]>([]);
+    const [selectedSyncChannelTypes, setSelectedSyncChannelTypes] = useState<SalesChannelType[]>(
+        [],
+    );
     const [draft, setDraft] = useState<ProductDraft>(buildDefaultDraft());
     const [resolvedProductId, setResolvedProductId] = useState<string | null>(null);
     const [originalVariantIds, setOriginalVariantIds] = useState<string[]>([]);
 
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSyncingChannels, setIsSyncingChannels] = useState(false);
     const [isUploadingImage, setIsUploadingImage] = useState(false);
     const [uploadingVariantIds, setUploadingVariantIds] = useState<string[]>([]);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -130,6 +146,11 @@ export default function ProductDetailPage() {
         setCategories(loaded);
     }, []);
 
+    const fetchChannels = useCallback(async () => {
+        const connections = await getSellerChannels();
+        setChannelConnections(connections);
+    }, []);
+
     const fetchProduct = useCallback(async () => {
         if (isCreateMode) {
             setDraft(buildDefaultDraft());
@@ -152,7 +173,7 @@ export default function ProductDetailPage() {
         setIsLoading(true);
 
         try {
-            await Promise.all([fetchCategories(), fetchProduct()]);
+            await Promise.all([fetchCategories(), fetchProduct(), fetchChannels()]);
             setErrorMessage(null);
         } catch (error) {
             if (error instanceof Error) {
@@ -165,7 +186,7 @@ export default function ProductDetailPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [fetchCategories, fetchProduct]);
+    }, [fetchCategories, fetchProduct, fetchChannels]);
 
     useEffect(() => {
         void loadInitialData();
@@ -290,6 +311,60 @@ export default function ProductDetailPage() {
         }
     }, []);
 
+    const syncProductToSelectedChannels = useCallback(
+        async (targetProductId: string, options?: { showSuccessMessage?: boolean }) => {
+            const normalizedProductId = targetProductId.trim();
+            if (normalizedProductId.length === 0) {
+                setErrorMessage("ID sản phẩm không hợp lệ để đồng bộ.");
+                return null;
+            }
+
+            const selectedChannels = selectedSyncChannelTypes.filter(
+                (channelType) => channelType !== "WEB",
+            );
+            if (selectedChannels.length === 0) {
+                return null;
+            }
+
+            setIsSyncingChannels(true);
+
+            try {
+                const response = await syncSellerProductToChannels({
+                    productId: normalizedProductId,
+                    channelTypes: selectedChannels,
+                });
+
+                const syncedChannels = response.results
+                    .filter((result) => result.mappedVariantCount > 0)
+                    .map((result) => CHANNEL_LABELS[result.channelType]);
+
+                if (options?.showSuccessMessage) {
+                    setSuccessMessage(
+                        syncedChannels.length > 0
+                            ? `Đã đồng bộ sản phẩm sang: ${syncedChannels.join(", ")}.`
+                            : "Không có kênh nào được đồng bộ thành công.",
+                    );
+                }
+                setErrorMessage(null);
+
+                return response;
+            } catch (error) {
+                if (isApiRequestError(error)) {
+                    setErrorMessage(error.message);
+                } else if (error instanceof Error) {
+                    setErrorMessage(error.message);
+                } else {
+                    setErrorMessage("Không thể đồng bộ sản phẩm sang kênh đã chọn.");
+                }
+
+                return null;
+            } finally {
+                setIsSyncingChannels(false);
+            }
+        },
+        [selectedSyncChannelTypes],
+    );
+
     const handleSubmit = async () => {
         if (draft.name.trim().length === 0) {
             setErrorMessage("Tên sản phẩm không được để trống");
@@ -326,6 +401,10 @@ export default function ProductDetailPage() {
                         stockQuantity: variant.stockQuantity,
                         attributes: variant.attributes,
                     });
+                }
+
+                if (selectedSyncChannelTypes.length > 0) {
+                    await syncProductToSelectedChannels(createdProduct.id);
                 }
 
                 setSuccessMessage("Tạo sản phẩm thành công.");
@@ -393,6 +472,40 @@ export default function ProductDetailPage() {
         }
     };
 
+    const handleSyncNow = async () => {
+        if (isCreateMode) {
+            return;
+        }
+
+        const normalizedProductId = (resolvedProductId ?? productId).trim();
+        if (normalizedProductId.length === 0) {
+            setErrorMessage("ID sản phẩm không hợp lệ để đồng bộ.");
+            return;
+        }
+
+        if (selectedSyncChannelTypes.length === 0) {
+            setErrorMessage("Vui lòng chọn ít nhất một kênh để đồng bộ.");
+            return;
+        }
+
+        await syncProductToSelectedChannels(normalizedProductId, {
+            showSuccessMessage: true,
+        });
+    };
+
+    const syncableConnections = useMemo(
+        () => channelConnections.filter((connection) => connection.channelType !== "WEB"),
+        [channelConnections],
+    );
+
+    const toggleSyncChannel = (channelType: SalesChannelType) => {
+        setSelectedSyncChannelTypes((previous) =>
+            previous.includes(channelType)
+                ? previous.filter((currentType) => currentType !== channelType)
+                : [...previous, channelType],
+        );
+    };
+
     const handleDeleteProduct = async () => {
         if (isCreateMode || productId.length === 0) {
             return;
@@ -449,10 +562,88 @@ export default function ProductDetailPage() {
                                 imageKey={draft.imageKey}
                                 imageUrl={draft.imageUrl}
                                 isCreateMode={isCreateMode}
-                                disabled={isSubmitting || !resolvedProductId}
+                                disabled={isSubmitting || isSyncingChannels || !resolvedProductId}
                                 isUploading={isUploadingImage}
                                 onUpload={handleUploadProductImage}
                             />
+
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-base">
+                                        {isCreateMode
+                                            ? "Đồng bộ sau khi tạo"
+                                            : "Đồng bộ sang kênh khác"}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3 text-sm text-slate-600">
+                                    <p className="text-xs text-slate-500">
+                                        WEB nội bộ là nguồn chính. Chọn các kênh đã kết nối để đồng
+                                        bộ sản phẩm.
+                                    </p>
+
+                                    {syncableConnections.length === 0 ? (
+                                        <p className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
+                                            Chưa có kênh ngoài nào khả dụng.
+                                        </p>
+                                    ) : (
+                                        syncableConnections.map((connection) => {
+                                            const isConnected = connection.status === "CONNECTED";
+
+                                            return (
+                                                <label
+                                                    key={connection.id}
+                                                    className="flex items-center justify-between gap-3 rounded-md border border-slate-200 px-3 py-2"
+                                                >
+                                                    <div className="grid gap-1">
+                                                        <span className="font-medium text-slate-800">
+                                                            {CHANNEL_LABELS[connection.channelType]}
+                                                        </span>
+                                                        <span className="text-xs text-slate-500">
+                                                            {isConnected
+                                                                ? "Đã kết nối"
+                                                                : "Chưa kết nối"}
+                                                        </span>
+                                                    </div>
+
+                                                    <input
+                                                        type="checkbox"
+                                                        className="h-4 w-4"
+                                                        disabled={
+                                                            !isConnected ||
+                                                            isSubmitting ||
+                                                            isSyncingChannels
+                                                        }
+                                                        checked={selectedSyncChannelTypes.includes(
+                                                            connection.channelType,
+                                                        )}
+                                                        onChange={() =>
+                                                            toggleSyncChannel(
+                                                                connection.channelType,
+                                                            )
+                                                        }
+                                                    />
+                                                </label>
+                                            );
+                                        })
+                                    )}
+
+                                    {!isCreateMode ? (
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="w-full"
+                                            disabled={
+                                                isSubmitting ||
+                                                isSyncingChannels ||
+                                                selectedSyncChannelTypes.length === 0
+                                            }
+                                            onClick={handleSyncNow}
+                                        >
+                                            {isSyncingChannels ? "Đang đồng bộ..." : "Đồng bộ ngay"}
+                                        </Button>
+                                    ) : null}
+                                </CardContent>
+                            </Card>
 
                             <Card>
                                 <CardHeader>
@@ -482,14 +673,14 @@ export default function ProductDetailPage() {
                         <Button
                             type="button"
                             variant="outline"
-                            disabled={isSubmitting || isUploadingImage}
+                            disabled={isSubmitting || isSyncingChannels || isUploadingImage}
                             onClick={handleBackToProducts}
                         >
                             Hủy
                         </Button>
                         <Button
                             type="button"
-                            disabled={isSubmitting || isUploadingImage}
+                            disabled={isSubmitting || isSyncingChannels || isUploadingImage}
                             onClick={handleSubmit}
                         >
                             {isSubmitting || isUploadingImage

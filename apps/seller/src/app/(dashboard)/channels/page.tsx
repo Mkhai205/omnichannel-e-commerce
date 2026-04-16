@@ -191,8 +191,8 @@ export default function ChannelsPage() {
                         Quản lý kênh bán đa kênh
                     </CardTitle>
                     <CardDescription>
-                        Kết nối TikTok/Shopee mock và chạy đồng bộ đơn hàng, sản phẩm, tồn kho ngay
-                        trong dashboard seller.
+                        Kết nối TikTok/Shopee và chạy đồng bộ đơn hàng, sản phẩm, tồn kho ngay trong
+                        dashboard seller.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
