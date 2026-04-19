@@ -41,8 +41,8 @@ const PRODUCT_STATUS_LABEL: Record<ProductDraft["status"], string> = {
 
 const CHANNEL_LABELS: Record<SalesChannelType, string> = {
     WEB: "Website nội bộ",
-    TIKTOK_MOCK: "TikTok Mock",
-    SHOPEE_MOCK: "Shopee Mock",
+    TIKTOK_MOCK: "TikTok",
+    SHOPEE_MOCK: "Shopee",
 };
 
 function buildDefaultDraft(): ProductDraft {

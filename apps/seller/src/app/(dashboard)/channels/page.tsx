@@ -33,8 +33,8 @@ import { isApiRequestError } from "@/services/http-client";
 
 const CHANNEL_LABELS: Record<SalesChannelType, string> = {
     WEB: "Website nội bộ",
-    TIKTOK_MOCK: "TikTok Mock",
-    SHOPEE_MOCK: "Shopee Mock",
+    TIKTOK_MOCK: "TikTok",
+    SHOPEE_MOCK: "Shopee",
 };
 
 const DIRECTION_LABELS: Record<ChannelSyncDirection, string> = {
@@ -247,7 +247,7 @@ export default function ChannelsPage() {
                                                     event.target.value,
                                                 )
                                             }
-                                            placeholder="External shop id (mock)"
+                                            placeholder="External shop id"
                                         />
 
                                         <div className="flex flex-wrap gap-2">

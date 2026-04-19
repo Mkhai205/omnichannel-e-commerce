@@ -21,8 +21,8 @@ const CHANNEL_ORDER: SalesChannelType[] = ["WEB", "TIKTOK_MOCK", "SHOPEE_MOCK"];
 
 const CHANNEL_LABELS: Record<SalesChannelType, string> = {
     WEB: "Website nội bộ",
-    TIKTOK_MOCK: "TikTok Mock",
-    SHOPEE_MOCK: "Shopee Mock",
+    TIKTOK_MOCK: "TikTok",
+    SHOPEE_MOCK: "Shopee",
 };
 
 function parseMoney(value: string): number {

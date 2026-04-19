@@ -27,8 +27,8 @@ const EXTERNAL_CHANNELS: SalesChannelType[] = CHANNEL_ORDER.filter(
 
 const CHANNEL_LABELS: Record<SalesChannelType, string> = {
     WEB: "Website nội bộ",
-    TIKTOK_MOCK: "TikTok Mock",
-    SHOPEE_MOCK: "Shopee Mock",
+    TIKTOK_MOCK: "TikTok",
+    SHOPEE_MOCK: "Shopee",
 };
 
 export default function ProductsPage() {
