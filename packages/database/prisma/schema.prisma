@@ -30,23 +30,24 @@ model User {
 }
 
 model Shop {
-  id              String             @id @default(uuid()) @db.Uuid
-  userId          String             @unique @map("user_id") @db.Uuid
-  shopName        String             @map("shop_name") @db.VarChar(255)
-  slug            String             @unique @db.VarChar(255)
-  description     String?            @db.Text
-  avatarKey       String?            @map("avatar_key") @db.VarChar(500)
-  coverKey        String?            @map("cover_key") @db.VarChar(500)
-  businessLicense String?            @map("business_license") @db.VarChar(255)
-  status          ShopStatus         @default(PENDING)
-  rejectionReason String?            @map("rejection_reason") @db.VarChar(500)
-  createdAt       DateTime           @default(now()) @map("created_at")
-  updatedAt       DateTime           @updatedAt @map("updated_at")
-  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  products        Product[]
-  orders          Order[]
-  sellerWallet    SellerWallet?
-  settlements     SellerSettlement[]
+  id                 String                    @id @default(uuid()) @db.Uuid
+  userId             String                    @unique @map("user_id") @db.Uuid
+  shopName           String                    @map("shop_name") @db.VarChar(255)
+  slug               String                    @unique @db.VarChar(255)
+  description        String?                   @db.Text
+  avatarKey          String?                   @map("avatar_key") @db.VarChar(500)
+  coverKey           String?                   @map("cover_key") @db.VarChar(500)
+  businessLicense    String?                   @map("business_license") @db.VarChar(255)
+  status             ShopStatus                @default(PENDING)
+  rejectionReason    String?                   @map("rejection_reason") @db.VarChar(500)
+  createdAt          DateTime                  @default(now()) @map("created_at")
+  updatedAt          DateTime                  @updatedAt @map("updated_at")
+  user               User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products           Product[]
+  orders             Order[]
+  channelConnections SellerChannelConnection[]
+  sellerWallet       SellerWallet?
+  settlements        SellerSettlement[]
 
   @@index([status])
   @@map("shops")
@@ -92,18 +93,19 @@ model Product {
 }
 
 model ProductVariant {
-  id            String      @id @default(uuid()) @db.Uuid
-  productId     String      @map("product_id") @db.Uuid
-  sku           String      @unique @db.VarChar(100)
-  attributes    Json
-  price         Decimal     @db.Decimal(12, 2)
-  imageKey      String?     @map("image_key") @db.VarChar(500)
-  stockQuantity Int         @default(0) @map("stock_quantity")
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
-  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  cartItems     CartItem[]
-  orderItems    OrderItem[]
+  id                     String                        @id @default(uuid()) @db.Uuid
+  productId              String                        @map("product_id") @db.Uuid
+  sku                    String                        @unique @db.VarChar(100)
+  attributes             Json
+  price                  Decimal                       @db.Decimal(12, 2)
+  imageKey               String?                       @map("image_key") @db.VarChar(500)
+  stockQuantity          Int                           @default(0) @map("stock_quantity")
+  createdAt              DateTime                      @default(now()) @map("created_at")
+  updatedAt              DateTime                      @updatedAt @map("updated_at")
+  product                Product                       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItems              CartItem[]
+  orderItems             OrderItem[]
+  channelProductMappings SellerChannelProductMapping[]
 
   @@index([productId])
   @@map("product_variants")
@@ -209,28 +211,32 @@ model RefreshToken {
 }
 
 model Order {
-  id                String              @id @default(uuid()) @db.Uuid
-  orderNumber       String              @unique @map("order_number") @db.VarChar(50)
-  userId            String              @map("user_id") @db.Uuid
-  shopId            String              @map("shop_id") @db.Uuid
-  shippingAddressId String              @map("shipping_address_id") @db.Uuid
-  status            OrderStatus         @default(PENDING_PAYMENT)
-  shippedAt         DateTime?           @map("shipped_at")
-  deliveredAt       DateTime?           @map("delivered_at")
-  settlementStatus  SettlementStatus    @default(PENDING) @map("settlement_status")
-  settledAt         DateTime?           @map("settled_at")
-  subtotal          Decimal             @db.Decimal(12, 2)
-  totalAmount       Decimal             @map("total_amount") @db.Decimal(12, 2)
-  note              String?             @db.Text
-  createdAt         DateTime            @default(now()) @map("created_at")
-  updatedAt         DateTime            @updatedAt @map("updated_at")
-  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  shop              Shop                @relation(fields: [shopId], references: [id])
-  shippingAddress   Address             @relation(fields: [shippingAddressId], references: [id])
-  items             OrderItem[]
-  paymentOrders     PaymentOrder[]
-  adminWalletLogs   AdminWalletLedger[]
-  sellerSettlement  SellerSettlement?
+  id                        String                      @id @default(uuid()) @db.Uuid
+  orderNumber               String                      @unique @map("order_number") @db.VarChar(50)
+  userId                    String                      @map("user_id") @db.Uuid
+  shopId                    String                      @map("shop_id") @db.Uuid
+  shippingAddressId         String                      @map("shipping_address_id") @db.Uuid
+  status                    OrderStatus                 @default(PENDING_PAYMENT)
+  shippedAt                 DateTime?                   @map("shipped_at")
+  deliveredAt               DateTime?                   @map("delivered_at")
+  settlementStatus          SettlementStatus            @default(PENDING) @map("settlement_status")
+  settledAt                 DateTime?                   @map("settled_at")
+  sourceChannelType         SalesChannelType            @default(WEB) @map("source_channel_type")
+  sourceChannelConnectionId String?                     @map("source_channel_connection_id") @db.Uuid
+  subtotal                  Decimal                     @db.Decimal(12, 2)
+  totalAmount               Decimal                     @map("total_amount") @db.Decimal(12, 2)
+  note                      String?                     @db.Text
+  createdAt                 DateTime                    @default(now()) @map("created_at")
+  updatedAt                 DateTime                    @updatedAt @map("updated_at")
+  user                      User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shop                      Shop                        @relation(fields: [shopId], references: [id])
+  shippingAddress           Address                     @relation(fields: [shippingAddressId], references: [id])
+  sourceChannelConnection   SellerChannelConnection?    @relation("OrderSourceChannel", fields: [sourceChannelConnectionId], references: [id], onDelete: SetNull)
+  items                     OrderItem[]
+  channelOrderMappings      SellerChannelOrderMapping[]
+  paymentOrders             PaymentOrder[]
+  adminWalletLogs           AdminWalletLedger[]
+  sellerSettlement          SellerSettlement?
 
   @@index([userId])
   @@index([shopId])
@@ -238,6 +244,8 @@ model Order {
   @@index([status])
   @@index([shippedAt])
   @@index([settlementStatus])
+  @@index([sourceChannelType])
+  @@index([sourceChannelConnectionId])
   @@index([createdAt])
   @@map("orders")
 }
@@ -400,6 +408,87 @@ model SellerSettlement {
   @@map("seller_settlements")
 }
 
+model SellerChannelConnection {
+  id              String                        @id @default(uuid()) @db.Uuid
+  shopId          String                        @map("shop_id") @db.Uuid
+  channelType     SalesChannelType              @map("channel_type")
+  status          ChannelConnectionStatus       @default(DISCONNECTED)
+  externalShopId  String?                       @map("external_shop_id") @db.VarChar(100)
+  accessToken     String?                       @map("access_token") @db.VarChar(500)
+  refreshToken    String?                       @map("refresh_token") @db.VarChar(500)
+  tokenExpiresAt  DateTime?                     @map("token_expires_at")
+  lastSyncedAt    DateTime?                     @map("last_synced_at")
+  createdAt       DateTime                      @default(now()) @map("created_at")
+  updatedAt       DateTime                      @updatedAt @map("updated_at")
+  shop            Shop                          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  sourceOrders    Order[]                       @relation("OrderSourceChannel")
+  productMappings SellerChannelProductMapping[]
+  orderMappings   SellerChannelOrderMapping[]
+  syncRuns        SellerChannelSyncRun[]
+
+  @@unique([shopId, channelType])
+  @@index([shopId, status])
+  @@index([channelType, status])
+  @@map("seller_channel_connections")
+}
+
+model SellerChannelProductMapping {
+  id                String                  @id @default(uuid()) @db.Uuid
+  connectionId      String                  @map("connection_id") @db.Uuid
+  variantId         String                  @map("variant_id") @db.Uuid
+  externalProductId String                  @map("external_product_id") @db.VarChar(120)
+  externalSku       String                  @map("external_sku") @db.VarChar(120)
+  isActive          Boolean                 @default(true) @map("is_active")
+  lastSyncedAt      DateTime?               @map("last_synced_at")
+  createdAt         DateTime                @default(now()) @map("created_at")
+  updatedAt         DateTime                @updatedAt @map("updated_at")
+  connection        SellerChannelConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  variant           ProductVariant          @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, variantId])
+  @@unique([connectionId, externalSku])
+  @@index([variantId])
+  @@map("seller_channel_product_mappings")
+}
+
+model SellerChannelOrderMapping {
+  id              String                  @id @default(uuid()) @db.Uuid
+  connectionId    String                  @map("connection_id") @db.Uuid
+  externalOrderId String                  @map("external_order_id") @db.VarChar(120)
+  orderId         String                  @map("order_id") @db.Uuid
+  rawPayload      Json                    @default("{}") @map("raw_payload")
+  createdAt       DateTime                @default(now()) @map("created_at")
+  updatedAt       DateTime                @updatedAt @map("updated_at")
+  connection      SellerChannelConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  order           Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, externalOrderId])
+  @@index([orderId])
+  @@map("seller_channel_order_mappings")
+}
+
+model SellerChannelSyncRun {
+  id           String                  @id @default(uuid()) @db.Uuid
+  connectionId String                  @map("connection_id") @db.Uuid
+  direction    ChannelSyncDirection
+  trigger      ChannelSyncTrigger      @default(MANUAL)
+  status       ChannelSyncStatus
+  totalCount   Int                     @default(0) @map("total_count")
+  createdCount Int                     @default(0) @map("created_count")
+  updatedCount Int                     @default(0) @map("updated_count")
+  failedCount  Int                     @default(0) @map("failed_count")
+  message      String?                 @db.VarChar(500)
+  startedAt    DateTime                @default(now()) @map("started_at")
+  finishedAt   DateTime?               @map("finished_at")
+  createdAt    DateTime                @default(now()) @map("created_at")
+  updatedAt    DateTime                @updatedAt @map("updated_at")
+  connection   SellerChannelConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@index([connectionId, direction, createdAt])
+  @@index([status, createdAt])
+  @@map("seller_channel_sync_runs")
+}
+
 enum UserRole {
   CUSTOMER
   SELLER
@@ -467,4 +556,34 @@ enum AdminWalletLedgerType {
 enum SellerSettlementStatus {
   COMPLETED
   REVERSED
+}
+
+enum SalesChannelType {
+  WEB
+  TIKTOK_MOCK
+  SHOPEE_MOCK
+}
+
+enum ChannelConnectionStatus {
+  CONNECTED
+  DISCONNECTED
+  EXPIRED
+  ERROR
+}
+
+enum ChannelSyncDirection {
+  IMPORT_ORDERS
+  EXPORT_PRODUCTS
+  EXPORT_INVENTORY
+}
+
+enum ChannelSyncTrigger {
+  MANUAL
+  CRON
+}
+
+enum ChannelSyncStatus {
+  SUCCESS
+  PARTIAL
+  FAILED
 }

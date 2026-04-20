@@ -1,11 +1,12 @@
 import bcrypt from "bcryptjs";
 import type { Prisma, PrismaClient } from "../../generated/prisma/client.js";
 import { DEFAULT_SEED_PASSWORD, SEED_IDS } from "../constants.js";
+import type { SeedUserContext } from "../types.js";
 import { uniquePhone } from "../utils.js";
 import { randomVietnameseFullName } from "../vietnamese.js";
 
-export async function seedUsers(prisma: PrismaClient): Promise<number> {
-    const customerNames = Array.from({ length: 5 }, () => randomVietnameseFullName());
+export async function seedUsers(prisma: PrismaClient): Promise<SeedUserContext> {
+    const customerNames = Array.from({ length: 3 }, () => randomVietnameseFullName());
     const passwordHash = await bcrypt.hash(DEFAULT_SEED_PASSWORD, 10);
 
     const users: Prisma.UserCreateManyInput[] = [
@@ -19,8 +20,8 @@ export async function seedUsers(prisma: PrismaClient): Promise<number> {
             status: "ACTIVE",
         },
         {
-            id: SEED_IDS.users.sellerApproved,
-            email: "seller.approved.seed@demo.local",
+            id: SEED_IDS.users.sellerA,
+            email: "seller.a.seed@demo.local",
             passwordHash,
             fullName: randomVietnameseFullName(),
             phone: uniquePhone(2),
@@ -28,20 +29,11 @@ export async function seedUsers(prisma: PrismaClient): Promise<number> {
             status: "ACTIVE",
         },
         {
-            id: SEED_IDS.users.sellerPending,
-            email: "seller.pending.seed@demo.local",
+            id: SEED_IDS.users.sellerB,
+            email: "seller.b.seed@demo.local",
             passwordHash,
             fullName: randomVietnameseFullName(),
             phone: uniquePhone(3),
-            role: "SELLER",
-            status: "ACTIVE",
-        },
-        {
-            id: SEED_IDS.users.sellerRejected,
-            email: "seller.rejected.seed@demo.local",
-            passwordHash,
-            fullName: randomVietnameseFullName(),
-            phone: uniquePhone(4),
             role: "SELLER",
             status: "ACTIVE",
         },
@@ -50,7 +42,7 @@ export async function seedUsers(prisma: PrismaClient): Promise<number> {
             email: "customer.a.seed@demo.local",
             passwordHash,
             fullName: customerNames[0] ?? randomVietnameseFullName(),
-            phone: uniquePhone(5),
+            phone: uniquePhone(4),
             role: "CUSTOMER",
             status: "ACTIVE",
         },
@@ -59,7 +51,7 @@ export async function seedUsers(prisma: PrismaClient): Promise<number> {
             email: "customer.b.seed@demo.local",
             passwordHash,
             fullName: customerNames[1] ?? randomVietnameseFullName(),
-            phone: uniquePhone(6),
+            phone: uniquePhone(5),
             role: "CUSTOMER",
             status: "ACTIVE",
         },
@@ -68,31 +60,18 @@ export async function seedUsers(prisma: PrismaClient): Promise<number> {
             email: "customer.c.seed@demo.local",
             passwordHash,
             fullName: customerNames[2] ?? randomVietnameseFullName(),
-            phone: uniquePhone(7),
+            phone: uniquePhone(6),
             role: "CUSTOMER",
             status: "ACTIVE",
-        },
-        {
-            id: SEED_IDS.users.customerD,
-            email: "customer.d.seed@demo.local",
-            passwordHash,
-            fullName: customerNames[3] ?? randomVietnameseFullName(),
-            phone: uniquePhone(8),
-            role: "CUSTOMER",
-            status: "ACTIVE",
-        },
-        {
-            id: SEED_IDS.users.customerUnverified,
-            email: "customer.unverified.seed@demo.local",
-            passwordHash,
-            fullName: customerNames[4] ?? randomVietnameseFullName(),
-            phone: uniquePhone(9),
-            role: "CUSTOMER",
-            status: "UNVERIFIED",
         },
     ];
 
     await prisma.user.createMany({ data: users });
 
-    return users.length;
+    return {
+        count: users.length,
+        adminId: SEED_IDS.users.admin,
+        sellerIds: [SEED_IDS.users.sellerA, SEED_IDS.users.sellerB],
+        customerIds: [SEED_IDS.users.customerA, SEED_IDS.users.customerB, SEED_IDS.users.customerC],
+    };
 }

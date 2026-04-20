@@ -70,7 +70,11 @@ export const ModelName = {
   AdminWallet: 'AdminWallet',
   AdminWalletLedger: 'AdminWalletLedger',
   SellerWallet: 'SellerWallet',
-  SellerSettlement: 'SellerSettlement'
+  SellerSettlement: 'SellerSettlement',
+  SellerChannelConnection: 'SellerChannelConnection',
+  SellerChannelProductMapping: 'SellerChannelProductMapping',
+  SellerChannelOrderMapping: 'SellerChannelOrderMapping',
+  SellerChannelSyncRun: 'SellerChannelSyncRun'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -262,6 +266,8 @@ export const OrderScalarFieldEnum = {
   deliveredAt: 'deliveredAt',
   settlementStatus: 'settlementStatus',
   settledAt: 'settledAt',
+  sourceChannelType: 'sourceChannelType',
+  sourceChannelConnectionId: 'sourceChannelConnectionId',
   subtotal: 'subtotal',
   totalAmount: 'totalAmount',
   note: 'note',
@@ -396,6 +402,71 @@ export const SellerSettlementScalarFieldEnum = {
 } as const
 
 export type SellerSettlementScalarFieldEnum = (typeof SellerSettlementScalarFieldEnum)[keyof typeof SellerSettlementScalarFieldEnum]
+
+
+export const SellerChannelConnectionScalarFieldEnum = {
+  id: 'id',
+  shopId: 'shopId',
+  channelType: 'channelType',
+  status: 'status',
+  externalShopId: 'externalShopId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerChannelConnectionScalarFieldEnum = (typeof SellerChannelConnectionScalarFieldEnum)[keyof typeof SellerChannelConnectionScalarFieldEnum]
+
+
+export const SellerChannelProductMappingScalarFieldEnum = {
+  id: 'id',
+  connectionId: 'connectionId',
+  variantId: 'variantId',
+  externalProductId: 'externalProductId',
+  externalSku: 'externalSku',
+  isActive: 'isActive',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerChannelProductMappingScalarFieldEnum = (typeof SellerChannelProductMappingScalarFieldEnum)[keyof typeof SellerChannelProductMappingScalarFieldEnum]
+
+
+export const SellerChannelOrderMappingScalarFieldEnum = {
+  id: 'id',
+  connectionId: 'connectionId',
+  externalOrderId: 'externalOrderId',
+  orderId: 'orderId',
+  rawPayload: 'rawPayload',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerChannelOrderMappingScalarFieldEnum = (typeof SellerChannelOrderMappingScalarFieldEnum)[keyof typeof SellerChannelOrderMappingScalarFieldEnum]
+
+
+export const SellerChannelSyncRunScalarFieldEnum = {
+  id: 'id',
+  connectionId: 'connectionId',
+  direction: 'direction',
+  trigger: 'trigger',
+  status: 'status',
+  totalCount: 'totalCount',
+  createdCount: 'createdCount',
+  updatedCount: 'updatedCount',
+  failedCount: 'failedCount',
+  message: 'message',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerChannelSyncRunScalarFieldEnum = (typeof SellerChannelSyncRunScalarFieldEnum)[keyof typeof SellerChannelSyncRunScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -1,50 +1,43 @@
+import { randomUUID } from "node:crypto";
 import type { Prisma, PrismaClient } from "../../generated/prisma/client.js";
-import { SEED_IDS } from "../constants.js";
+import type { VariantSeedInput } from "../types.js";
 
-export async function seedCarts(prisma: PrismaClient): Promise<{
+export async function seedCarts(
+    prisma: PrismaClient,
+    input: {
+        customerIds: string[];
+        variants: VariantSeedInput[];
+    },
+): Promise<{
     carts: number;
     cartItems: number;
 }> {
-    const carts: Prisma.CartCreateManyInput[] = [
-        {
-            id: SEED_IDS.carts.customerA,
-            userId: SEED_IDS.users.customerA,
-        },
-        {
-            id: SEED_IDS.carts.customerB,
-            userId: SEED_IDS.users.customerB,
-        },
-        {
-            id: SEED_IDS.carts.customerC,
-            userId: SEED_IDS.users.customerC,
-        },
-    ];
+    const cartRecords = input.customerIds.map((customerId) => ({
+        id: randomUUID(),
+        userId: customerId,
+    }));
 
-    const cartItems: Prisma.CartItemCreateManyInput[] = [
-        {
-            cartId: SEED_IDS.carts.customerA,
-            variantId: SEED_IDS.variants.smartphoneA128,
-            quantity: 1,
-        },
-        {
-            cartId: SEED_IDS.carts.customerA,
-            variantId: SEED_IDS.variants.blenderABlack,
-            quantity: 2,
-        },
-        {
-            cartId: SEED_IDS.carts.customerB,
-            variantId: SEED_IDS.variants.laptopA16,
-            quantity: 1,
-        },
-        {
-            cartId: SEED_IDS.carts.customerC,
-            variantId: SEED_IDS.variants.speakerABlue,
-            quantity: 3,
-        },
-    ];
+    const carts: Prisma.CartCreateManyInput[] = cartRecords.map((record) => ({
+        id: record.id,
+        userId: record.userId,
+    }));
+
+    const cartItems: Prisma.CartItemCreateManyInput[] = cartRecords.flatMap((cart, cartIndex) => {
+        const start = cartIndex * 3;
+        const variantSlice = input.variants.slice(start, start + 3);
+
+        return variantSlice.map((variant, variantOffset) => ({
+            cartId: cart.id,
+            variantId: variant.id,
+            quantity: variantOffset + 1,
+        }));
+    });
 
     await prisma.cart.createMany({ data: carts });
-    await prisma.cartItem.createMany({ data: cartItems });
+
+    if (cartItems.length > 0) {
+        await prisma.cartItem.createMany({ data: cartItems });
+    }
 
     return {
         carts: carts.length,

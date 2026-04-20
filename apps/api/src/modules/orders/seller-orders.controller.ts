@@ -44,6 +44,11 @@ export class SellerOrdersController {
   @ApiQuery({ name: 'placedFrom', required: false, type: String })
   @ApiQuery({ name: 'placedTo', required: false, type: String })
   @ApiQuery({
+    name: 'channelType',
+    required: false,
+    enum: ['WEB', 'TIKTOK_MOCK', 'SHOPEE_MOCK'],
+  })
+  @ApiQuery({
     name: 'status',
     required: false,
     enum: [

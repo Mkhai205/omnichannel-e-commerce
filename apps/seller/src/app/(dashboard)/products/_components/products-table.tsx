@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ProductItem } from "@repo/shared-types";
+import type { ProductItem, SalesChannelType } from "@repo/shared-types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui";
 import Image from "next/image";
 
@@ -10,9 +10,33 @@ const PRODUCT_FALLBACK_IMAGE_SRC = "/products/image.webp";
 type ProductsTableProps = {
     products: ProductItem[];
     categoryMap: Record<string, string>;
+    activeChannelType: SalesChannelType;
+    syncedChannelsByProductId: Record<string, SalesChannelType[]>;
     isLoading: boolean;
     onRowClick: (productId: string) => void;
 };
+
+function toChannelTagLabel(channelType: SalesChannelType): string {
+    switch (channelType) {
+        case "TIKTOK_MOCK":
+            return "TikTok";
+        case "SHOPEE_MOCK":
+            return "Shopee";
+        default:
+            return "WEB";
+    }
+}
+
+function toChannelTagClassName(channelType: SalesChannelType): string {
+    switch (channelType) {
+        case "TIKTOK_MOCK":
+            return "bg-sky-100 text-sky-700 border-sky-200";
+        case "SHOPEE_MOCK":
+            return "bg-orange-100 text-orange-700 border-orange-200";
+        default:
+            return "bg-slate-100 text-slate-700 border-slate-200";
+    }
+}
 
 function toStatusLabel(status: ProductItem["status"]): string {
     switch (status) {
@@ -104,9 +128,14 @@ function summarizeOtherSpecs(product: ProductItem): string {
 export function ProductsTable({
     products,
     categoryMap,
+    activeChannelType,
+    syncedChannelsByProductId,
     isLoading,
     onRowClick,
 }: ProductsTableProps) {
+    const showSyncColumn = activeChannelType === "WEB";
+    const columnCount = showSyncColumn ? 7 : 6;
+
     return (
         <section className="overflow-hidden rounded-lg border border-slate-200 bg-white">
             <Table>
@@ -119,6 +148,11 @@ export function ProductsTable({
                         <TableHead className="text-center font-extrabold">Trạng thái</TableHead>
                         <TableHead className="text-center font-extrabold">Biến thể</TableHead>
                         <TableHead className="text-center font-extrabold">Thông số khác</TableHead>
+                        {showSyncColumn ? (
+                            <TableHead className="text-center font-extrabold">
+                                Đồng bộ kênh
+                            </TableHead>
+                        ) : null}
                         <TableHead className="text-center font-extrabold">Tổng tồn</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -126,7 +160,7 @@ export function ProductsTable({
                     {isLoading ? (
                         <TableRow>
                             <TableCell
-                                colSpan={6}
+                                colSpan={columnCount}
                                 className="py-10 text-center text-sm text-slate-500"
                             >
                                 Đang tải danh sách sản phẩm...
@@ -137,7 +171,7 @@ export function ProductsTable({
                     {!isLoading && products.length === 0 ? (
                         <TableRow>
                             <TableCell
-                                colSpan={6}
+                                colSpan={columnCount}
                                 className="py-10 text-center text-sm text-slate-500"
                             >
                                 Chưa có sản phẩm nào.
@@ -146,57 +180,83 @@ export function ProductsTable({
                     ) : null}
 
                     {!isLoading
-                        ? products.map((product) => (
-                              <TableRow
-                                  key={product.id}
-                                  className="cursor-pointer transition-colors hover:bg-slate-50"
-                                  role="button"
-                                  tabIndex={0}
-                                  onClick={() => onRowClick(product.id)}
-                                  onKeyDown={(event) => {
-                                      if (event.key === "Enter" || event.key === " ") {
-                                          event.preventDefault();
-                                          onRowClick(product.id);
-                                      }
-                                  }}
-                              >
-                                  <TableCell>
-                                      <div className="grid grid-cols-[56px_1fr] items-start gap-4">
-                                          <ProductThumbnail
-                                              src={toProductImageSrc(product)}
-                                              alt={product.name}
-                                          />
-                                          <div className="grid gap-1">
-                                              <p className="text-sm font-semibold text-slate-900">
-                                                  {product.name}
-                                              </p>
-                                              <p className="line-clamp-2 text-xs text-slate-500">
-                                                  {product.description || "Không có mô tả"}
-                                              </p>
+                        ? products.map((product) => {
+                              const syncedChannels = syncedChannelsByProductId[product.id] ?? [];
+
+                              return (
+                                  <TableRow
+                                      key={product.id}
+                                      className="cursor-pointer transition-colors hover:bg-slate-50"
+                                      role="button"
+                                      tabIndex={0}
+                                      onClick={() => onRowClick(product.id)}
+                                      onKeyDown={(event) => {
+                                          if (event.key === "Enter" || event.key === " ") {
+                                              event.preventDefault();
+                                              onRowClick(product.id);
+                                          }
+                                      }}
+                                  >
+                                      <TableCell>
+                                          <div className="grid grid-cols-[56px_1fr] items-start gap-4">
+                                              <ProductThumbnail
+                                                  src={toProductImageSrc(product)}
+                                                  alt={product.name}
+                                              />
+                                              <div className="grid gap-1">
+                                                  <p className="text-sm font-semibold text-slate-900">
+                                                      {product.name}
+                                                  </p>
+                                                  <p className="line-clamp-2 text-xs text-slate-500">
+                                                      {product.description || "Không có mô tả"}
+                                                  </p>
+                                              </div>
                                           </div>
-                                      </div>
-                                  </TableCell>
-                                  <TableCell className="text-sm text-center text-slate-700">
-                                      {categoryMap[product.categoryId] || "Không xác định"}
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                      <span
-                                          className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${toStatusClassName(product.status)}`}
-                                      >
-                                          {toStatusLabel(product.status)}
-                                      </span>
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                      {product.variants.length}
-                                  </TableCell>
-                                  <TableCell className="text-sm text-center text-slate-600">
-                                      {summarizeOtherSpecs(product)}
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                      {sumVariantStock(product)}
-                                  </TableCell>
-                              </TableRow>
-                          ))
+                                      </TableCell>
+                                      <TableCell className="text-sm text-center text-slate-700">
+                                          {categoryMap[product.categoryId] || "Không xác định"}
+                                      </TableCell>
+                                      <TableCell className="text-center">
+                                          <span
+                                              className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${toStatusClassName(product.status)}`}
+                                          >
+                                              {toStatusLabel(product.status)}
+                                          </span>
+                                      </TableCell>
+                                      <TableCell className="text-center">
+                                          {product.variants.length}
+                                      </TableCell>
+                                      <TableCell className="text-sm text-center text-slate-600">
+                                          {summarizeOtherSpecs(product)}
+                                      </TableCell>
+                                      {showSyncColumn ? (
+                                          <TableCell className="text-center">
+                                              {syncedChannels.length === 0 ? (
+                                                  <span className="inline-flex rounded-full border border-slate-200 bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">
+                                                      Chưa đồng bộ
+                                                  </span>
+                                              ) : (
+                                                  <div className="flex flex-wrap justify-center gap-1">
+                                                      {syncedChannels.map((channelType) => (
+                                                          <span
+                                                              key={`${product.id}-${channelType}`}
+                                                              className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${toChannelTagClassName(
+                                                                  channelType,
+                                                              )}`}
+                                                          >
+                                                              {toChannelTagLabel(channelType)}
+                                                          </span>
+                                                      ))}
+                                                  </div>
+                                              )}
+                                          </TableCell>
+                                      ) : null}
+                                      <TableCell className="text-center">
+                                          {sumVariantStock(product)}
+                                      </TableCell>
+                                  </TableRow>
+                              );
+                          })
                         : null}
                 </TableBody>
             </Table>

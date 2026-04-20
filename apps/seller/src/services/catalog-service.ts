@@ -49,6 +49,10 @@ function toSellerProductsQueryString(filters: SellerProductsFilterRequest): stri
         params.set("status", filters.status);
     }
 
+    if (filters.channelType) {
+        params.set("channelType", filters.channelType);
+    }
+
     return params.toString();
 }
 

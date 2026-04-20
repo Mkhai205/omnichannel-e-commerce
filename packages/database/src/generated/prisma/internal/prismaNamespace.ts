@@ -403,7 +403,11 @@ export const ModelName = {
   AdminWallet: 'AdminWallet',
   AdminWalletLedger: 'AdminWalletLedger',
   SellerWallet: 'SellerWallet',
-  SellerSettlement: 'SellerSettlement'
+  SellerSettlement: 'SellerSettlement',
+  SellerChannelConnection: 'SellerChannelConnection',
+  SellerChannelProductMapping: 'SellerChannelProductMapping',
+  SellerChannelOrderMapping: 'SellerChannelOrderMapping',
+  SellerChannelSyncRun: 'SellerChannelSyncRun'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "shop" | "category" | "product" | "productVariant" | "productReview" | "cart" | "cartItem" | "address" | "oauthAccount" | "refreshToken" | "order" | "orderItem" | "payment" | "paymentOrder" | "paymentWebhookLog" | "adminWallet" | "adminWalletLedger" | "sellerWallet" | "sellerSettlement"
+    modelProps: "user" | "shop" | "category" | "product" | "productVariant" | "productReview" | "cart" | "cartItem" | "address" | "oauthAccount" | "refreshToken" | "order" | "orderItem" | "payment" | "paymentOrder" | "paymentWebhookLog" | "adminWallet" | "adminWalletLedger" | "sellerWallet" | "sellerSettlement" | "sellerChannelConnection" | "sellerChannelProductMapping" | "sellerChannelOrderMapping" | "sellerChannelSyncRun"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1903,6 +1907,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SellerChannelConnection: {
+      payload: Prisma.$SellerChannelConnectionPayload<ExtArgs>
+      fields: Prisma.SellerChannelConnectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SellerChannelConnectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelConnectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SellerChannelConnectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelConnectionPayload>
+        }
+        findFirst: {
+          args: Prisma.SellerChannelConnectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelConnectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SellerChannelConnectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelConnectionPayload>
+        }
+        findMany: {
+          args: Prisma.SellerChannelConnectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelConnectionPayload>[]
+        }
+        create: {
+          args: Prisma.SellerChannelConnectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelConnectionPayload>
+        }
+        createMany: {
+          args: Prisma.SellerChannelConnectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SellerChannelConnectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelConnectionPayload>[]
+        }
+        delete: {
+          args: Prisma.SellerChannelConnectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelConnectionPayload>
+        }
+        update: {
+          args: Prisma.SellerChannelConnectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelConnectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.SellerChannelConnectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SellerChannelConnectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SellerChannelConnectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelConnectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.SellerChannelConnectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelConnectionPayload>
+        }
+        aggregate: {
+          args: Prisma.SellerChannelConnectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSellerChannelConnection>
+        }
+        groupBy: {
+          args: Prisma.SellerChannelConnectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerChannelConnectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SellerChannelConnectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerChannelConnectionCountAggregateOutputType> | number
+        }
+      }
+    }
+    SellerChannelProductMapping: {
+      payload: Prisma.$SellerChannelProductMappingPayload<ExtArgs>
+      fields: Prisma.SellerChannelProductMappingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SellerChannelProductMappingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelProductMappingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SellerChannelProductMappingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelProductMappingPayload>
+        }
+        findFirst: {
+          args: Prisma.SellerChannelProductMappingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelProductMappingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SellerChannelProductMappingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelProductMappingPayload>
+        }
+        findMany: {
+          args: Prisma.SellerChannelProductMappingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelProductMappingPayload>[]
+        }
+        create: {
+          args: Prisma.SellerChannelProductMappingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelProductMappingPayload>
+        }
+        createMany: {
+          args: Prisma.SellerChannelProductMappingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SellerChannelProductMappingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelProductMappingPayload>[]
+        }
+        delete: {
+          args: Prisma.SellerChannelProductMappingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelProductMappingPayload>
+        }
+        update: {
+          args: Prisma.SellerChannelProductMappingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelProductMappingPayload>
+        }
+        deleteMany: {
+          args: Prisma.SellerChannelProductMappingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SellerChannelProductMappingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SellerChannelProductMappingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelProductMappingPayload>[]
+        }
+        upsert: {
+          args: Prisma.SellerChannelProductMappingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelProductMappingPayload>
+        }
+        aggregate: {
+          args: Prisma.SellerChannelProductMappingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSellerChannelProductMapping>
+        }
+        groupBy: {
+          args: Prisma.SellerChannelProductMappingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerChannelProductMappingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SellerChannelProductMappingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerChannelProductMappingCountAggregateOutputType> | number
+        }
+      }
+    }
+    SellerChannelOrderMapping: {
+      payload: Prisma.$SellerChannelOrderMappingPayload<ExtArgs>
+      fields: Prisma.SellerChannelOrderMappingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SellerChannelOrderMappingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelOrderMappingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SellerChannelOrderMappingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelOrderMappingPayload>
+        }
+        findFirst: {
+          args: Prisma.SellerChannelOrderMappingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelOrderMappingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SellerChannelOrderMappingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelOrderMappingPayload>
+        }
+        findMany: {
+          args: Prisma.SellerChannelOrderMappingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelOrderMappingPayload>[]
+        }
+        create: {
+          args: Prisma.SellerChannelOrderMappingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelOrderMappingPayload>
+        }
+        createMany: {
+          args: Prisma.SellerChannelOrderMappingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SellerChannelOrderMappingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelOrderMappingPayload>[]
+        }
+        delete: {
+          args: Prisma.SellerChannelOrderMappingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelOrderMappingPayload>
+        }
+        update: {
+          args: Prisma.SellerChannelOrderMappingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelOrderMappingPayload>
+        }
+        deleteMany: {
+          args: Prisma.SellerChannelOrderMappingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SellerChannelOrderMappingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SellerChannelOrderMappingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelOrderMappingPayload>[]
+        }
+        upsert: {
+          args: Prisma.SellerChannelOrderMappingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelOrderMappingPayload>
+        }
+        aggregate: {
+          args: Prisma.SellerChannelOrderMappingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSellerChannelOrderMapping>
+        }
+        groupBy: {
+          args: Prisma.SellerChannelOrderMappingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerChannelOrderMappingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SellerChannelOrderMappingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerChannelOrderMappingCountAggregateOutputType> | number
+        }
+      }
+    }
+    SellerChannelSyncRun: {
+      payload: Prisma.$SellerChannelSyncRunPayload<ExtArgs>
+      fields: Prisma.SellerChannelSyncRunFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SellerChannelSyncRunFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelSyncRunPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SellerChannelSyncRunFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelSyncRunPayload>
+        }
+        findFirst: {
+          args: Prisma.SellerChannelSyncRunFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelSyncRunPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SellerChannelSyncRunFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelSyncRunPayload>
+        }
+        findMany: {
+          args: Prisma.SellerChannelSyncRunFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelSyncRunPayload>[]
+        }
+        create: {
+          args: Prisma.SellerChannelSyncRunCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelSyncRunPayload>
+        }
+        createMany: {
+          args: Prisma.SellerChannelSyncRunCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SellerChannelSyncRunCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelSyncRunPayload>[]
+        }
+        delete: {
+          args: Prisma.SellerChannelSyncRunDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelSyncRunPayload>
+        }
+        update: {
+          args: Prisma.SellerChannelSyncRunUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelSyncRunPayload>
+        }
+        deleteMany: {
+          args: Prisma.SellerChannelSyncRunDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SellerChannelSyncRunUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SellerChannelSyncRunUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelSyncRunPayload>[]
+        }
+        upsert: {
+          args: Prisma.SellerChannelSyncRunUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerChannelSyncRunPayload>
+        }
+        aggregate: {
+          args: Prisma.SellerChannelSyncRunAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSellerChannelSyncRun>
+        }
+        groupBy: {
+          args: Prisma.SellerChannelSyncRunGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerChannelSyncRunGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SellerChannelSyncRunCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerChannelSyncRunCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2115,6 +2415,8 @@ export const OrderScalarFieldEnum = {
   deliveredAt: 'deliveredAt',
   settlementStatus: 'settlementStatus',
   settledAt: 'settledAt',
+  sourceChannelType: 'sourceChannelType',
+  sourceChannelConnectionId: 'sourceChannelConnectionId',
   subtotal: 'subtotal',
   totalAmount: 'totalAmount',
   note: 'note',
@@ -2249,6 +2551,71 @@ export const SellerSettlementScalarFieldEnum = {
 } as const
 
 export type SellerSettlementScalarFieldEnum = (typeof SellerSettlementScalarFieldEnum)[keyof typeof SellerSettlementScalarFieldEnum]
+
+
+export const SellerChannelConnectionScalarFieldEnum = {
+  id: 'id',
+  shopId: 'shopId',
+  channelType: 'channelType',
+  status: 'status',
+  externalShopId: 'externalShopId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerChannelConnectionScalarFieldEnum = (typeof SellerChannelConnectionScalarFieldEnum)[keyof typeof SellerChannelConnectionScalarFieldEnum]
+
+
+export const SellerChannelProductMappingScalarFieldEnum = {
+  id: 'id',
+  connectionId: 'connectionId',
+  variantId: 'variantId',
+  externalProductId: 'externalProductId',
+  externalSku: 'externalSku',
+  isActive: 'isActive',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerChannelProductMappingScalarFieldEnum = (typeof SellerChannelProductMappingScalarFieldEnum)[keyof typeof SellerChannelProductMappingScalarFieldEnum]
+
+
+export const SellerChannelOrderMappingScalarFieldEnum = {
+  id: 'id',
+  connectionId: 'connectionId',
+  externalOrderId: 'externalOrderId',
+  orderId: 'orderId',
+  rawPayload: 'rawPayload',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerChannelOrderMappingScalarFieldEnum = (typeof SellerChannelOrderMappingScalarFieldEnum)[keyof typeof SellerChannelOrderMappingScalarFieldEnum]
+
+
+export const SellerChannelSyncRunScalarFieldEnum = {
+  id: 'id',
+  connectionId: 'connectionId',
+  direction: 'direction',
+  trigger: 'trigger',
+  status: 'status',
+  totalCount: 'totalCount',
+  createdCount: 'createdCount',
+  updatedCount: 'updatedCount',
+  failedCount: 'failedCount',
+  message: 'message',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerChannelSyncRunScalarFieldEnum = (typeof SellerChannelSyncRunScalarFieldEnum)[keyof typeof SellerChannelSyncRunScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2487,6 +2854,20 @@ export type ListEnumSettlementStatusFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'SalesChannelType'
+ */
+export type EnumSalesChannelTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SalesChannelType'>
+    
+
+
+/**
+ * Reference to a field of type 'SalesChannelType[]'
+ */
+export type ListEnumSalesChannelTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SalesChannelType[]'>
+    
+
+
+/**
  * Reference to a field of type 'PaymentProvider'
  */
 export type EnumPaymentProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentProvider'>
@@ -2539,6 +2920,62 @@ export type EnumSellerSettlementStatusFieldRefInput<$PrismaModel> = FieldRefInpu
  * Reference to a field of type 'SellerSettlementStatus[]'
  */
 export type ListEnumSellerSettlementStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SellerSettlementStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ChannelConnectionStatus'
+ */
+export type EnumChannelConnectionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChannelConnectionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ChannelConnectionStatus[]'
+ */
+export type ListEnumChannelConnectionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChannelConnectionStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ChannelSyncDirection'
+ */
+export type EnumChannelSyncDirectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChannelSyncDirection'>
+    
+
+
+/**
+ * Reference to a field of type 'ChannelSyncDirection[]'
+ */
+export type ListEnumChannelSyncDirectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChannelSyncDirection[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ChannelSyncTrigger'
+ */
+export type EnumChannelSyncTriggerFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChannelSyncTrigger'>
+    
+
+
+/**
+ * Reference to a field of type 'ChannelSyncTrigger[]'
+ */
+export type ListEnumChannelSyncTriggerFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChannelSyncTrigger[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ChannelSyncStatus'
+ */
+export type EnumChannelSyncStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChannelSyncStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ChannelSyncStatus[]'
+ */
+export type ListEnumChannelSyncStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChannelSyncStatus[]'>
     
 
 
@@ -2670,6 +3107,10 @@ export type GlobalOmitConfig = {
   adminWalletLedger?: Prisma.AdminWalletLedgerOmit
   sellerWallet?: Prisma.SellerWalletOmit
   sellerSettlement?: Prisma.SellerSettlementOmit
+  sellerChannelConnection?: Prisma.SellerChannelConnectionOmit
+  sellerChannelProductMapping?: Prisma.SellerChannelProductMappingOmit
+  sellerChannelOrderMapping?: Prisma.SellerChannelOrderMappingOmit
+  sellerChannelSyncRun?: Prisma.SellerChannelSyncRunOmit
 }
 
 /* Types for Logging */

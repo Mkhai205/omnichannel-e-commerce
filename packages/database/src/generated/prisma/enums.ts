@@ -112,3 +112,48 @@ export const SellerSettlementStatus = {
 } as const
 
 export type SellerSettlementStatus = (typeof SellerSettlementStatus)[keyof typeof SellerSettlementStatus]
+
+
+export const SalesChannelType = {
+  WEB: 'WEB',
+  TIKTOK_MOCK: 'TIKTOK_MOCK',
+  SHOPEE_MOCK: 'SHOPEE_MOCK'
+} as const
+
+export type SalesChannelType = (typeof SalesChannelType)[keyof typeof SalesChannelType]
+
+
+export const ChannelConnectionStatus = {
+  CONNECTED: 'CONNECTED',
+  DISCONNECTED: 'DISCONNECTED',
+  EXPIRED: 'EXPIRED',
+  ERROR: 'ERROR'
+} as const
+
+export type ChannelConnectionStatus = (typeof ChannelConnectionStatus)[keyof typeof ChannelConnectionStatus]
+
+
+export const ChannelSyncDirection = {
+  IMPORT_ORDERS: 'IMPORT_ORDERS',
+  EXPORT_PRODUCTS: 'EXPORT_PRODUCTS',
+  EXPORT_INVENTORY: 'EXPORT_INVENTORY'
+} as const
+
+export type ChannelSyncDirection = (typeof ChannelSyncDirection)[keyof typeof ChannelSyncDirection]
+
+
+export const ChannelSyncTrigger = {
+  MANUAL: 'MANUAL',
+  CRON: 'CRON'
+} as const
+
+export type ChannelSyncTrigger = (typeof ChannelSyncTrigger)[keyof typeof ChannelSyncTrigger]
+
+
+export const ChannelSyncStatus = {
+  SUCCESS: 'SUCCESS',
+  PARTIAL: 'PARTIAL',
+  FAILED: 'FAILED'
+} as const
+
+export type ChannelSyncStatus = (typeof ChannelSyncStatus)[keyof typeof ChannelSyncStatus]

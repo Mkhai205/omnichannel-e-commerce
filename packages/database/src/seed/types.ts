@@ -1,11 +1,5 @@
 import type { Prisma } from "../generated/prisma/client.js";
 
-export type SeedMode = "full" | "catalog";
-
-export type SeedProfile = "core" | "qa" | "catalog-load";
-
-export type SeedCleanupMode = "none" | "reset-all" | "reset-seed-only" | "prune-catalog-generated";
-
 export type SeedCategoryRecord = {
     key: string;
     id: string;
@@ -19,18 +13,42 @@ export type SeedCategoriesResult = {
     records: SeedCategoryRecord[];
 };
 
-export type CatalogSeedOptions = {
-    includeFixedProducts?: boolean;
-    categoryRecords?: SeedCategoryRecord[];
-    productsPerCategory?: number;
-    variantsMin?: number;
-    variantsMax?: number;
-    activeRatio?: number;
+export type SeedUserContext = {
+    count: number;
+    adminId: string;
+    sellerIds: string[];
+    customerIds: string[];
+};
+
+export type SeedShopContext = {
+    count: number;
+    records: Array<{
+        id: string;
+        userId: string;
+    }>;
+};
+
+export type SeedAddressContext = {
+    count: number;
+    records: Array<{
+        id: string;
+        userId: string;
+    }>;
+};
+
+export type SeedOrderRecord = {
+    id: string;
+    orderNumber: string;
+    shopId: string;
+    userId: string;
+    status: "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+    totalAmount: string;
 };
 
 export type SeedSummary = {
     users: number;
     shops: number;
+    channels: number;
     categories: number;
     products: number;
     productVariants: number;
@@ -52,6 +70,7 @@ export type SeedSummary = {
 export type VariantSeedInput = {
     id: string;
     productId: string;
+    shopId: string;
     sku: string;
     attributes: Prisma.InputJsonValue;
     price: string;

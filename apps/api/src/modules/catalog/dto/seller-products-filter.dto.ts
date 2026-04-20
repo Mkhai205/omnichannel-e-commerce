@@ -31,4 +31,9 @@ export class SellerProductsFilterDto implements SellerProductsFilterRequest {
   @IsOptional()
   @IsIn(['DRAFT', 'ACTIVE', 'HIDDEN'])
   status?: 'DRAFT' | 'ACTIVE' | 'HIDDEN';
+
+  @ApiPropertyOptional({ enum: ['WEB', 'TIKTOK_MOCK', 'SHOPEE_MOCK'] })
+  @IsOptional()
+  @IsIn(['WEB', 'TIKTOK_MOCK', 'SHOPEE_MOCK'])
+  channelType?: 'WEB' | 'TIKTOK_MOCK' | 'SHOPEE_MOCK';
 }

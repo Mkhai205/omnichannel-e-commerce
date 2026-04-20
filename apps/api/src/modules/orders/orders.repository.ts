@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@repo/database';
-import type { OrderStatus, SettlementStatus } from '@repo/shared-types';
+import type {
+  OrderStatus,
+  SalesChannelType,
+  SettlementStatus,
+} from '@repo/shared-types';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
 
 const CHECKOUT_CART_ITEM_SELECT = {
@@ -307,6 +311,7 @@ export class OrdersRepository {
     input: {
       page: number;
       limit: number;
+      channelType?: SalesChannelType;
       status?: OrderStatus;
       search?: string;
       placedFrom?: Date;
@@ -330,6 +335,7 @@ export class OrdersRepository {
   countSellerOrdersByUserId(
     sellerUserId: string,
     input: {
+      channelType?: SalesChannelType;
       status?: OrderStatus;
       search?: string;
       placedFrom?: Date;
@@ -559,6 +565,7 @@ export class OrdersRepository {
   private buildSellerOrdersWhere(
     sellerUserId: string,
     input: {
+      channelType?: SalesChannelType;
       status?: OrderStatus;
       search?: string;
       placedFrom?: Date;
@@ -569,6 +576,7 @@ export class OrdersRepository {
       shop: {
         userId: sellerUserId,
       },
+      ...(input.channelType ? { sourceChannelType: input.channelType } : {}),
       ...(input.status ? { status: input.status } : {}),
     };
 

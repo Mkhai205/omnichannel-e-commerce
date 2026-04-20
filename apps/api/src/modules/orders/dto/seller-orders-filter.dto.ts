@@ -12,6 +12,8 @@ const ORDER_STATUS_OPTIONS = [
   'CANCELLED',
 ] as const;
 
+const SALES_CHANNEL_OPTIONS = ['WEB', 'TIKTOK_MOCK', 'SHOPEE_MOCK'] as const;
+
 export class SellerOrdersFilterDto implements SellerOrdersFilterRequest {
   @ApiPropertyOptional({ default: 1, minimum: 1 })
   @IsOptional()
@@ -30,6 +32,11 @@ export class SellerOrdersFilterDto implements SellerOrdersFilterRequest {
   @IsOptional()
   @IsIn(ORDER_STATUS_OPTIONS)
   status?: (typeof ORDER_STATUS_OPTIONS)[number];
+
+  @ApiPropertyOptional({ enum: SALES_CHANNEL_OPTIONS })
+  @IsOptional()
+  @IsIn(SALES_CHANNEL_OPTIONS)
+  channelType?: (typeof SALES_CHANNEL_OPTIONS)[number];
 
   @ApiPropertyOptional({ example: 'ORD-2026' })
   @IsOptional()
