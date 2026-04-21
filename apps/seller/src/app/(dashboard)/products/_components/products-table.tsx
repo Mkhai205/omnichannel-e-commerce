@@ -91,6 +91,7 @@ function ProductThumbnail({ src, alt }: { src: string; alt: string }) {
             height={56}
             src={resolvedSrc}
             alt={alt}
+            unoptimized
             className="h-14 w-14 rounded-md border border-slate-200 object-cover"
             loading="lazy"
             onError={() => {

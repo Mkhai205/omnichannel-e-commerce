@@ -173,13 +173,59 @@ export class StorageService {
       return undefined;
     }
 
-    return Object.entries(metadata).reduce<ItemBucketMetadata>(
-      (acc, [key, value]) => {
-        acc[`x-amz-meta-${key}`] = value;
+    const builtMetadata = Object.entries(metadata).reduce<ItemBucketMetadata>(
+      (acc, [rawKey, value]) => {
+        const normalizedKey = rawKey.trim();
+
+        if (!normalizedKey) {
+          return acc;
+        }
+
+        const lowerKey = normalizedKey.toLowerCase();
+
+        // S3-compatible content headers must stay as top-level metadata keys.
+        if (lowerKey === 'content-type' || lowerKey === 'contenttype') {
+          acc['Content-Type'] = value;
+          return acc;
+        }
+
+        if (lowerKey === 'cache-control') {
+          acc['Cache-Control'] = value;
+          return acc;
+        }
+
+        if (lowerKey === 'content-disposition') {
+          acc['Content-Disposition'] = value;
+          return acc;
+        }
+
+        if (lowerKey === 'content-encoding') {
+          acc['Content-Encoding'] = value;
+          return acc;
+        }
+
+        if (lowerKey === 'content-language') {
+          acc['Content-Language'] = value;
+          return acc;
+        }
+
+        if (lowerKey === 'expires') {
+          acc.Expires = value;
+          return acc;
+        }
+
+        acc[
+          lowerKey.startsWith('x-amz-meta-')
+            ? normalizedKey
+            : `x-amz-meta-${normalizedKey}`
+        ] = value;
+
         return acc;
       },
       {},
     );
+
+    return Object.keys(builtMetadata).length > 0 ? builtMetadata : undefined;
   }
 
   private getDefaultPresignedUrlExpiresInSeconds(): number {
